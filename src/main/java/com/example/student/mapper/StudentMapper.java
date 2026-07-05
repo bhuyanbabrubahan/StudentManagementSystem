@@ -24,6 +24,7 @@ public class StudentMapper {
 	    student.setFees(dto.getFees());
 	    student.setStatus(dto.getStatus());
 	    student.setProfileImage(dto.getProfileImage());
+	    
 
 	    return student;
 	}
@@ -46,8 +47,14 @@ public class StudentMapper {
 	    dto.setStatus(student.getStatus());
 	    dto.setProfileImage(student.getProfileImage());
 
+	    if(student.getDepartment()!=null){
+	        dto.setDepartmentId(student.getDepartment().getId());
+	        dto.setDepartmentName(student.getDepartment().getDepartmentName());
+	    }
+	    
 	    dto.setCreatedAt(student.getCreatedAt());
 	    dto.setUpdatedAt(student.getUpdatedAt());
+	    
 
 	    return dto;
 	}
@@ -66,6 +73,7 @@ public class StudentMapper {
 		student.setFees(dto.getFees());
 		student.setStatus(dto.getStatus());
 		student.setProfileImage(dto.getProfileImage());
+		
 	}
 	
 }

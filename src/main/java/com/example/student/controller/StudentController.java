@@ -27,15 +27,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/students")
 public class StudentController {
 
-    private final GlobalExceptionHandler globalExceptionHandler;
-
     private final StudentService studentService;
 
     public StudentController(StudentService studentService, GlobalExceptionHandler globalExceptionHandler) {
 
         this.studentService = studentService;
-
-        this.globalExceptionHandler = globalExceptionHandler;
     }
 
     @PostMapping

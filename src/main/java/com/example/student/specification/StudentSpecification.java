@@ -8,7 +8,7 @@ import com.example.student.entity.Gender;
 import com.example.student.entity.Student;
 import com.example.student.entity.StudentStatus;
 
-public class StudentSpecification {
+public class StudentSpecification { 
 
 	public static Specification<Student> hasStatus(StudentStatus status) {
 
@@ -19,13 +19,13 @@ public class StudentSpecification {
 	
 	public static Specification<Student> hasGender(Gender gender){
 		
-		return (root, query, criticalBuilder) ->
-				criticalBuilder.equal(root.get("gender"), gender);
+		return (root, query, criteriaBuilder) ->
+			criteriaBuilder.equal(root.get("gender"), gender);
 	}
 	
 	public static Specification<Student> hasFeesGreaterThan(BigDecimal fees){
 		
-		return (root, query, criticalBuilder) ->
-				criticalBuilder.greaterThan(root.get("fees"), fees);
+		return (root, query, criteriaBuilder) ->
+			criteriaBuilder.greaterThan(root.get("fees"), fees);
 	}
 }

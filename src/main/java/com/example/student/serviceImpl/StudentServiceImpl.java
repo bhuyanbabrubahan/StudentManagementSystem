@@ -13,11 +13,13 @@ import com.example.student.dto.PageResponse;
 import com.example.student.dto.StudentRequestDto;
 import com.example.student.dto.StudentResponseDto;
 import com.example.student.dto.StudentSearchRequest;
+import com.example.student.entity.Department;
 import com.example.student.entity.Student;
 import com.example.student.entity.StudentStatus;
 import com.example.student.exception.DuplicateStudentException;
 import com.example.student.exception.ResourceNotFoundException;
 import com.example.student.mapper.StudentMapper;
+import com.example.student.repository.DepartmentRepository;
 import com.example.student.repository.StudentRepository;
 import com.example.student.service.StudentService;
 import com.example.student.specification.StudentSpecification;
@@ -28,11 +30,14 @@ public class StudentServiceImpl implements StudentService {
 	private final StudentRepository repository;
 
 	private final StudentMapper mapper;
+	
+	private final DepartmentRepository departmentRepository;
 
-	public StudentServiceImpl(StudentRepository repository, StudentMapper mapper) {
+	public StudentServiceImpl(StudentRepository repository, StudentMapper mapper, DepartmentRepository departmentRepository) {
 
 		this.repository = repository;
 		this.mapper = mapper;
+		this.departmentRepository =  departmentRepository;
 
 	}
 
@@ -43,11 +48,20 @@ public class StudentServiceImpl implements StudentService {
 		{
 			throw new DuplicateStudentException("Email already exists");
 		}
+		
+		Department department = departmentRepository
+		        .findById(requestDto.getDepartmentId())
+		        .orElseThrow(() ->
+		                new ResourceNotFoundException("Department not found"));
 
 		Student student = 
 				mapper.convertToEntity(requestDto); //Request DTO to make Entity
+		
+		student.setDepartment(department); //Only object reference is set, no DB operation
+		
 		Student savedStudent = 
 				repository.save(student); //We cant save repo we have to map first then save student entity
+		
 		StudentResponseDto responseDto = 
 				mapper.convertToResponseDto(savedStudent);
 		

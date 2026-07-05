@@ -27,7 +27,6 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class Student extends BaseEntity {
 
 	@Id
@@ -83,11 +82,10 @@ public class Student extends BaseEntity {
 	@Column(name = "status")
 	private StudentStatus status;
 
-	/*
-	 * @ManyToOne(fetch = FetchType.LAZY)
-	 * 
-	 * @JoinColumn(name = "department_id") private Department department;
-	 */
+	@ToString.Exclude
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "department_id", nullable = false)
+	private Department department;
 	
 	
 }

@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class) // Its for @valid exception
     public ResponseEntity<ApiResponse<Object>> handleValidationException(MethodArgumentNotValidException ex) {
 
         Map<String, String> errors = new LinkedHashMap<>();
@@ -64,6 +64,29 @@ public class GlobalExceptionHandler {
         return ResponseBuilder.error(
                 ex.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+    
+    @ExceptionHandler(DuplicateDepartmentException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDuplicateDepartmentException(DuplicateDepartmentException ex) {
+
+        return ResponseBuilder.error(
+                ex.getMessage(),
+                HttpStatus.CONFLICT);
+    }
+    
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiResponse<Object>> handleBusinessException(BusinessException ex) {
+
+        ApiResponse<Object> response = new ApiResponse<>();
+
+        response.setSuccess(false);
+        response.setMessage(ex.getMessage());
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        response.setData(null);
+        response.setTimestamp(LocalDateTime.now());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
 }

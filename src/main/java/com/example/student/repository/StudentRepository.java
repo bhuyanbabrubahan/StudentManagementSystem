@@ -17,4 +17,8 @@ public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpec
 	Optional<Student> findByIdAndStatus(Long id, StudentStatus status);
 	
 	Page<Student> findByStatus(StudentStatus status, Pageable pageable);
+	
+	
+	
+	long countByDepartmentIdAndStatus(Long departmentId, StudentStatus status);
 }
