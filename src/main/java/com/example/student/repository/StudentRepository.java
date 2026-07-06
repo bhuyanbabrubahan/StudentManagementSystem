@@ -19,6 +19,11 @@ public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpec
 	Page<Student> findByStatus(StudentStatus status, Pageable pageable);
 	
 	
-	
 	long countByDepartmentIdAndStatus(Long departmentId, StudentStatus status);
+	
+	boolean existsByDepartment_Id(Long departmentId);
+	
+	
+
+	long countByDepartment_Id(Long departmentId);
 }

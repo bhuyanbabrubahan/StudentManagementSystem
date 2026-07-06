@@ -15,9 +15,13 @@ import com.example.student.dto.CourseSearchRequest;
 import com.example.student.dto.PageResponse;
 import com.example.student.entity.Course;
 import com.example.student.entity.CourseStatus;
+import com.example.student.entity.Department;
+import com.example.student.entity.DepartmentStatus;
+import com.example.student.exception.BusinessException;
 import com.example.student.exception.ResourceNotFoundException;
 import com.example.student.mapper.CourseMapper;
 import com.example.student.repository.CourseRepository;
+import com.example.student.repository.DepartmentRepository;
 import com.example.student.service.CourseService;
 import com.example.student.specification.CourseSpecification;
 
@@ -26,20 +30,50 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository repository;
     private final CourseMapper mapper;
+    private final DepartmentRepository departmentRepository;
 
-    public CourseServiceImpl(CourseRepository repository, CourseMapper mapper) {
+    public CourseServiceImpl(
+            CourseRepository repository,
+            CourseMapper mapper,
+            DepartmentRepository departmentRepository) {
+
         this.repository = repository;
         this.mapper = mapper;
+        this.departmentRepository = departmentRepository;
     }
 
     // ---------------- CREATE ----------------
     @Override
     public CourseResponseDto createCourse(CourseRequestDto dto) {
 
+        // 1. Check duplicate course name
+        if (repository.existsByCourseName(dto.getCourseName())) {
+            throw new BusinessException("Course name already exists.");
+        }
+
+        // 2. Check duplicate course code
+        if (repository.existsByCourseCode(dto.getCourseCode())) {
+            throw new BusinessException("Course code already exists.");
+        }
+
+        // 3. Fetch ACTIVE department
+        Department department = departmentRepository
+                .findByIdAndStatus(dto.getDepartmentId(), DepartmentStatus.ACTIVE)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Department not found with id: "
+                                        + dto.getDepartmentId()));
+
+        // 4. Convert DTO → Entity
         Course course = mapper.toEntity(dto);
 
+        // 5. Set relationship
+        course.setDepartment(department);
+
+        // 6. Save entity
         Course saved = repository.save(course);
 
+        // 7. Return Response DTO
         return mapper.toDto(saved);
     }
 
@@ -58,14 +92,38 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseResponseDto updateCourse(Long id, CourseRequestDto dto) {
 
+        // 1. Fetch existing ACTIVE course
         Course course = repository.findByIdAndStatusNot(id, CourseStatus.DELETED)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Course not found with id: " + id));
 
+        // 2. Check duplicate course name (ignore current course)
+        if (repository.existsByCourseNameAndIdNot(dto.getCourseName(), id)) {
+            throw new BusinessException("Course name already exists.");
+        }
+
+        // 3. Check duplicate course code (ignore current course)
+        if (repository.existsByCourseCodeAndIdNot(dto.getCourseCode(), id)) {
+            throw new BusinessException("Course code already exists.");
+        }
+
+        // 4. Fetch ACTIVE department
+        Department department = departmentRepository
+                .findByIdAndStatus(dto.getDepartmentId(), DepartmentStatus.ACTIVE)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Department not found with id: " + dto.getDepartmentId()));
+
+        // 5. Update simple fields (Dirty Checking)
         mapper.updateEntity(course, dto);
 
+        // 6. Update relationship if department changed
+        course.setDepartment(department);
+
+        // 7. Save updated course
         Course updated = repository.save(course);
 
+        // 8. Return response DTO
         return mapper.toDto(updated);
     }
 

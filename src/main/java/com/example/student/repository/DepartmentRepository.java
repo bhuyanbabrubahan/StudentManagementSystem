@@ -10,16 +10,20 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.example.student.entity.Department;
 import com.example.student.entity.DepartmentStatus;
 
-public interface DepartmentRepository extends JpaRepository<Department, Long>, JpaSpecificationExecutor<Department>  {
+public interface DepartmentRepository extends JpaRepository<Department, Long>, JpaSpecificationExecutor<Department> {
 
 	boolean existsByDepartmentCode(String departmentCode);
-	
-	Optional<Department> findByIdAndStatus(
-	        Long id,
-	        DepartmentStatus status);
 
-	Page<Department> findByStatus(
-	        DepartmentStatus status,
-	        Pageable pageable);
+	Optional<Department> findByIdAndStatus(Long id, DepartmentStatus status);
+
+	Page<Department> findByStatus(DepartmentStatus status, Pageable pageable);
+
+	boolean existsByDepartmentName(String departmentName);
+
+	boolean existsByDepartmentNameAndIdNot(String departmentName, Long id);
+
+	boolean existsByDepartmentCodeAndIdNot(String departmentCode, Long id);
 	
+	boolean existsById(Long departmentId); 
+
 }

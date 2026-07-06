@@ -15,11 +15,11 @@ import com.example.student.dto.DepartmentSearchRequest;
 import com.example.student.dto.PageResponse;
 import com.example.student.entity.Department;
 import com.example.student.entity.DepartmentStatus;
-import com.example.student.entity.StudentStatus;
 import com.example.student.exception.BusinessException;
 import com.example.student.exception.DuplicateDepartmentException;
 import com.example.student.exception.ResourceNotFoundException;
 import com.example.student.mapper.DepartmentMapper;
+import com.example.student.repository.CourseRepository;
 import com.example.student.repository.DepartmentRepository;
 import com.example.student.repository.StudentRepository;
 import com.example.student.service.DepartmentService;
@@ -31,13 +31,16 @@ public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentRepository repository;
     private final DepartmentMapper mapper;
     private final StudentRepository studentRepository;
+    private final CourseRepository courseRepository;
 
     public DepartmentServiceImpl(DepartmentRepository repository,
                                  DepartmentMapper mapper,
-                                 StudentRepository studentRepository) {
+                                 StudentRepository studentRepository,
+                                 CourseRepository courseRepository) {
         this.repository = repository;
         this.mapper = mapper;
         this.studentRepository = studentRepository;
+        this.courseRepository = courseRepository;
     }
 
     @Override
@@ -110,49 +113,65 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 	
 	
-	@Override
-	public DepartmentResponseDto updateDepartment(Long id, DepartmentRequestDto dto) {
+    @Override
+    public DepartmentResponseDto updateDepartment(Long id, DepartmentRequestDto dto) {
 
-	    // 1. Fetch department from DB with ACTIVE status only
-	    Department department = repository.findByIdAndStatus(id, DepartmentStatus.ACTIVE)
-	            .orElseThrow(() ->
-	                    new ResourceNotFoundException("Department not found with id: " + id));
+        // 1. Fetch ACTIVE department from database
+        Department department = repository.findByIdAndStatus(id, DepartmentStatus.ACTIVE)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Department not found with id: " + id));
 
-	    // 2. Map incoming DTO fields into existing entity (NO new object creation)
-	    mapper.updateEntity(department, dto);
+        // 2. Check duplicate department name (ignore current record)
+        if (repository.existsByDepartmentNameAndIdNot(dto.getDepartmentName(), id)) {
+            throw new BusinessException("Department name already exists.");
+        }
 
-	    // 3. Save updated entity (ensures persistence + safe in all cases)
-	    Department updated = repository.save(department);
+        // 3. Check duplicate department code (ignore current record)
+        if (repository.existsByDepartmentCodeAndIdNot(dto.getDepartmentCode(), id)) {
+            throw new BusinessException("Department code already exists.");
+        }
 
-	    // 4. Convert entity → response DTO (never expose entity to API)
-	    return mapper.toDto(updated);
-	}
+        // 4. Copy DTO values into managed entity (Dirty Checking)
+        mapper.updateEntity(department, dto);
+
+        // 5. Save updated entity
+        Department updatedDepartment = repository.save(department);
+
+        // 6. Convert Entity -> Response DTO
+        return mapper.toDto(updatedDepartment);
+    }
 	
 	
-	@Override
-	public void deleteDepartment(Long id) {
+    @Override
+    public void deleteDepartment(Long id) {
 
-	    // 1. Fetch department (ACTIVE only)
-	    Department department = repository.findByIdAndStatus(id, DepartmentStatus.ACTIVE)
-	            .orElseThrow(() ->
-	                    new ResourceNotFoundException("Department not found with id: " + id));
+        // 1. Fetch ACTIVE department
+        Department department = repository.findByIdAndStatus(id, DepartmentStatus.ACTIVE)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Department not found with id: " + id));
 
-	    // 2. Check dependency (students exist or not)
-	    long studentCount = studentRepository.countByDepartmentIdAndStatus(
-	            id,
-	            StudentStatus.ACTIVE
-	    );
+        // 2. Count dependencies (Students)
+        long studentCount = studentRepository.countByDepartment_Id(id);
 
-	    if (studentCount > 0) {
-	        throw new BusinessException("Cannot delete department. Students are assigned to this department.");
-	    }
+        // 3. Count dependencies (Courses)
+        long courseCount = courseRepository.countByDepartment_Id(id);
 
-	    // 3. Soft delete (BEST PRACTICE)
-	    department.setStatus(DepartmentStatus.DELETED);
+        // 4. Business validation
+        if (studentCount > 0 || courseCount > 0) {
 
-	    // 4. Save updated entity
-	    repository.save(department);
-	}
+            throw new BusinessException(
+                    "Cannot delete Department. Students = "
+                            + studentCount +
+                            ", Courses = " + courseCount
+            );
+        }
+
+        // 5. Soft delete
+        department.setStatus(DepartmentStatus.DELETED);
+
+        repository.save(department);
+    }
 	
 	
 	@Override
