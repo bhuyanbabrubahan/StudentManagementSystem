@@ -87,16 +87,30 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public StudentResponseDto updateStudent(Long id, StudentRequestDto dto) {
-		Student student = repository.findByIdAndStatus(id, StudentStatus.ACTIVE)
-				.orElseThrow(() -> new ResourceNotFoundException("Not Updated, Student not found with id : " + id));
-		
-		mapper.updateEntity(student, dto);
-		
-		Student updateStudent = repository.save(student) ;
 
-		return mapper.convertToResponseDto(updateStudent);
+	    // 1. Fetch existing active student
+	    Student student = repository.findByIdAndStatus(id, StudentStatus.ACTIVE)
+	            .orElseThrow(() ->
+	                    new ResourceNotFoundException("Student not found with id : " + id));
+
+	    // 2. Validate department
+	    Department department = departmentRepository
+	            .findById(dto.getDepartmentId())
+	            .orElseThrow(() ->
+	                    new ResourceNotFoundException("Department not found"));
+
+	    // 3. Update student fields
+	    mapper.updateEntity(student, dto);
+
+	    // 4. Update relationship
+	    student.setDepartment(department);
+
+	    // 5. Save
+	    Student updatedStudent = repository.save(student);
+
+	    // 6. Return DTO
+	    return mapper.convertToResponseDto(updatedStudent);
 	}
-
 	
 	
 	
