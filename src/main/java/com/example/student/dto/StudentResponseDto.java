@@ -48,6 +48,18 @@ public class StudentResponseDto {
     private Long departmentId;
     
     private String departmentName;
+    
+    private String village;
+
+    private String tehsil;
+
+    private String district;
+
+    private String state;
+
+    private String country;
+
+    private String pincode;
 
     
     

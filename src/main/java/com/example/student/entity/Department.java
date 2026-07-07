@@ -60,7 +60,6 @@ public class Department extends BaseEntity{
     @OneToMany(
             mappedBy = "department",
             fetch = FetchType.LAZY)
-    
     private List<Student> students = new ArrayList<>();
     
     

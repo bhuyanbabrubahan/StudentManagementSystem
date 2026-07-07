@@ -67,4 +67,6 @@ public class StudentRequestDto {
 
     private Long departmentId;
     
+    private Long villageId;
+    
 }

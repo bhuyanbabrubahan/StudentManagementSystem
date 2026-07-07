@@ -55,6 +55,23 @@ public class StudentMapper {
 	    dto.setCreatedAt(student.getCreatedAt());
 	    dto.setUpdatedAt(student.getUpdatedAt());
 	    
+		/*
+		 * dto.setVillage(student.getVillage().getVillageName());
+		 * 
+		 * dto.setPincode(student.getVillage().getPincode());
+		 * 
+		 * dto.setTehsil( student.getVillage() .getTehsil() .getTehsilName());
+		 * 
+		 * dto.setDistrict( student.getVillage() .getTehsil() .getDistrict()
+		 * .getDistrictName());
+		 * 
+		 * dto.setState( student.getVillage() .getTehsil() .getDistrict() .getState()
+		 * .getStateName());
+		 * 
+		 * dto.setCountry( student.getVillage() .getTehsil() .getDistrict() .getState()
+		 * .getCountry() .getCountryName());
+		 */
+	    
 
 	    return dto;
 	}

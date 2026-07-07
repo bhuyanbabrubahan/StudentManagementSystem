@@ -4,6 +4,5 @@ public enum DepartmentStatus {
 
 	ACTIVE,
 	INACTIVE,
-	SUSPENDED,
 	DELETED
 }
