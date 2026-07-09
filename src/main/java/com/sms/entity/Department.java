@@ -63,6 +63,11 @@ public class Department extends BaseEntity{
     private List<Student> students = new ArrayList<>();
     
     
-    
+    @OneToMany(
+            mappedBy = "department",
+            fetch = FetchType.LAZY
+    )
+    @ToString.Exclude
+    private List<Faculty> faculties = new ArrayList<>();
     
 }

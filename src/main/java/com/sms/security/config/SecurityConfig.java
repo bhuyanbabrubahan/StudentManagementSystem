@@ -163,6 +163,31 @@ public class SecurityConfig {
 	                            "ADMIN",
 	                            "STUDENT"
 	                    )
+	                    
+	                    
+	                 // ==========================
+	                 // FACULTY
+	                 // ==========================
+
+
+	                 .requestMatchers(
+	                         HttpMethod.GET,
+	                         "/api/faculties",
+	                         "/api/faculties/**"
+	                 )
+	                 .hasAnyRole(
+	                         "ADMIN",
+	                         "FACULTY"
+	                 )
+
+
+	                 .requestMatchers(
+	                         "/api/faculties",
+	                         "/api/faculties/**"
+	                 )
+	                 .hasRole(
+	                         "ADMIN"
+	                 )
 
 
 	                    // ==========================

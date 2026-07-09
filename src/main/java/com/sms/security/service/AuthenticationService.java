@@ -27,6 +27,8 @@ import com.sms.security.entity.Role;
 import com.sms.security.entity.User;
 import com.sms.security.entity.UserStatus;
 import com.sms.security.repository.UserRepository;
+import com.sms.sequence.enums.ModuleType;
+import com.sms.sequence.service.CodeGeneratorService;
 
 @Service
 public class AuthenticationService {
@@ -40,6 +42,7 @@ public class AuthenticationService {
 	private final StudentMapper studentMapper;
 	private final AuthenticationManager authenticationManager;
 	private final JwtService jwtService;
+	private final CodeGeneratorService codeGeneratorService;
 
 	public AuthenticationService(
 
@@ -51,7 +54,8 @@ public class AuthenticationService {
 			PasswordEncoder passwordEncoder,
 			StudentMapper studentMapper,
 			AuthenticationManager authenticationManager,
-			JwtService jwtService
+			JwtService jwtService,
+			CodeGeneratorService codeGeneratorService
 
 	) {
 
@@ -64,6 +68,7 @@ public class AuthenticationService {
 		this.studentMapper = studentMapper;
 		this.authenticationManager = authenticationManager;
 		this.jwtService = jwtService;
+		this.codeGeneratorService = codeGeneratorService;
 
 	}
 
@@ -135,9 +140,14 @@ public class AuthenticationService {
 
 		student.setAddress(address);
 
-		student.setStatus(StudentStatus.ACTIVE);
+		student.setRollNumber(
+			    codeGeneratorService.generateCode(
+			        ModuleType.STUDENT,
+			        "STU"
+			    )
+			);
 
-		student.setRollNumber(generateRollNumber());
+			student.setStatus(StudentStatus.ACTIVE);
 
 		student = studentRepository.save(student);
 
@@ -192,7 +202,13 @@ public class AuthenticationService {
 	            );
 
 
+	    if(user.getStatus() != UserStatus.ACTIVE) {
 
+	        throw new ResourceNotFoundException(
+	                "User account is inactive"
+	        );
+
+	    }
 
 	    String token =
 
@@ -217,13 +233,5 @@ public class AuthenticationService {
 
 	}
 	
-
-	private String generateRollNumber() {
-
-		long count = studentRepository.count() + 1;
-
-		return String.format("STU2026%04d", count);
-
-	}
 
 }

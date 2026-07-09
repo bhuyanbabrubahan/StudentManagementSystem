@@ -14,14 +14,12 @@ public class StudentMapper {
 
 	    Student student = new Student();
 
-	    student.setRollNumber(dto.getRollNumber());
 	    student.setFirstName(dto.getFirstName());
 	    student.setLastName(dto.getLastName());
 	    student.setGender(dto.getGender());
 	    student.setDateOfBirth(dto.getDateOfBirth());
 	    student.setAdmissionDate(dto.getAdmissionDate());
 	    student.setFees(dto.getFees());
-	    student.setStatus(dto.getStatus());
 	    student.setProfileImage(dto.getProfileImage());
 	    
 
@@ -77,14 +75,12 @@ public class StudentMapper {
 	
 	
 	public void updateEntity(Student student, StudentRequestDto dto) {
-		student.setRollNumber(dto.getRollNumber());
 		student.setFirstName(dto.getFirstName());
 		student.setLastName(dto.getLastName());
 		student.setGender(dto.getGender());
 		student.setDateOfBirth(dto.getDateOfBirth());
 		student.setAdmissionDate(dto.getAdmissionDate());
 		student.setFees(dto.getFees());
-		student.setStatus(dto.getStatus());
 		student.setProfileImage(dto.getProfileImage());
 		
 	}

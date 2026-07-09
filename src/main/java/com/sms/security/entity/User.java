@@ -8,12 +8,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.sms.entity.BaseEntity;
+import com.sms.entity.Faculty;
 import com.sms.entity.Student;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -54,9 +56,18 @@ public class User extends BaseEntity implements UserDetails {
 	 *
 	 * Student table owns relationship because Student contains user_id foreign key.
 	 */
-	@OneToOne(mappedBy = "user")
+	@OneToOne(mappedBy = "user",
+			fetch = FetchType.LAZY)
 	@ToString.Exclude
 	private Student student;
+	
+	
+	@OneToOne(
+	        mappedBy = "user",
+	        fetch = FetchType.LAZY
+	)
+	@ToString.Exclude
+	private Faculty faculty;
 
 	/*
 	 * Spring Security authority mapping

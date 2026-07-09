@@ -2,12 +2,9 @@ package com.sms.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import com.sms.entity.Gender;
-import com.sms.entity.StudentStatus;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -23,9 +20,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudentRequestDto {
-
-	@NotBlank(message = "Roll Number is required")
-	private String rollNumber;
 
 	@NotBlank(message = "First Name is required")
 	@Size(min = 2, max = 50,
@@ -55,9 +49,6 @@ public class StudentRequestDto {
 	@NotNull(message = "Fees is required")
 	@Positive(message = "Fees must be greater than zero")
 	private BigDecimal fees;
-
-	@NotNull(message = "Status is required")
-	private StudentStatus status;
 
     private String profileImage;
 

@@ -3,6 +3,7 @@ package com.location.address.entity;
 import com.location.address.enums.AddressType;
 import com.location.village.entity.Village;
 import com.sms.entity.BaseEntity;
+import com.sms.entity.Faculty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -70,5 +72,13 @@ public class Address extends BaseEntity {
             nullable = false)
     @ToString.Exclude
     private Village village;
+    
+    
+    @OneToOne(
+            mappedBy = "address",
+            fetch = FetchType.LAZY
+    )
+    @ToString.Exclude
+    private Faculty faculty;
 
 }
