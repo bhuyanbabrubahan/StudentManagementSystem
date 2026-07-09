@@ -12,7 +12,6 @@ import com.sms.entity.StudentStatus;
 
 public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpecificationExecutor<Student>{
 
-	boolean existsByEmail(String email);
 	
 	Optional<Student> findByIdAndStatus(Long id, StudentStatus status);
 	

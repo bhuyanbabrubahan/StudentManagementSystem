@@ -1,0 +1,241 @@
+package com.sms.security.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.sms.security.filter.JwtAuthenticationFilter;
+import com.sms.security.service.CustomUserDetailsService;
+
+@Configuration
+public class SecurityConfig {
+
+	private final CustomUserDetailsService userDetailsService;
+	private final PasswordEncoder passwordEncoder;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+
+	public SecurityConfig(CustomUserDetailsService userDetailsService, PasswordEncoder passwordEncoder,
+			JwtAuthenticationFilter jwtAuthenticationFilter, JwtAuthenticationEntryPoint authenticationEntryPoint) {
+
+		this.userDetailsService = userDetailsService;
+		this.passwordEncoder = passwordEncoder;
+		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+		this.authenticationEntryPoint = authenticationEntryPoint;
+
+	}
+
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+
+	    return http
+
+	            // REST API में CSRF नहीं चाहिए
+	            .csrf(csrf -> csrf.disable())
+
+
+	            .authorizeHttpRequests(auth -> auth
+
+
+	                    // ==========================
+	                    // PUBLIC APIs
+	                    // ==========================
+
+	                    .requestMatchers(
+	                            "/api/auth/**"
+	                    )
+	                    .permitAll()
+
+
+
+	                    // ==========================
+	                    // DEPARTMENT
+	                    // ==========================
+
+
+	                    // GET Department
+	                    .requestMatchers(
+	                            HttpMethod.GET,
+	                            "/api/departments",
+	                            "/api/departments/**"
+	                    )
+	                    .hasAnyRole(
+	                            "ADMIN",
+	                            "STUDENT",
+	                            "FACULTY"
+	                    )
+
+
+	                    // CREATE UPDATE DELETE Department
+	                    .requestMatchers(
+	                            "/api/departments",
+	                            "/api/departments/**"
+	                    )
+	                    .hasRole("ADMIN")
+
+
+
+	                    // ==========================
+	                    // COURSE
+	                    // ==========================
+
+
+	                    .requestMatchers(
+	                            HttpMethod.GET,
+	                            "/api/courses",
+	                            "/api/courses/**"
+	                    )
+	                    .hasAnyRole(
+	                            "ADMIN",
+	                            "STUDENT",
+	                            "FACULTY"
+	                    )
+
+
+	                    .requestMatchers(
+	                            "/api/courses",
+	                            "/api/courses/**"
+	                    )
+	                    .hasRole("ADMIN")
+
+
+
+	                    // ==========================
+	                    // STUDENT
+	                    // ==========================
+
+
+	                    .requestMatchers(
+	                            "/api/students",
+	                            "/api/students/**"
+	                    )
+	                    .hasAnyRole(
+	                            "ADMIN",
+	                            "STUDENT",
+	                            "FACULTY"
+	                    )
+
+
+	                    // ==========================
+	                    // ADMISSION
+	                    // ==========================
+
+
+	                    .requestMatchers(
+	                            "/api/admissions",
+	                            "/api/admissions/**"
+	                    )
+	                    .hasAnyRole(
+	                            "ADMIN",
+	                            "STUDENT"
+	                    )
+
+
+
+	                    // ==========================
+	                    // LOCATION
+	                    // ==========================
+
+
+	                    .requestMatchers(
+	                            "/api/countries",
+	                            "/api/countries/**",
+	                            "/api/states",
+	                            "/api/states/**",
+	                            "/api/districts",
+	                            "/api/districts/**",
+	                            "/api/tehsils",
+	                            "/api/tehsils/**",
+	                            "/api/villages",
+	                            "/api/villages/**"
+	                    )
+	                    .hasAnyRole(
+	                            "ADMIN",
+	                            "STUDENT"
+	                    )
+
+
+	                    // ==========================
+	                    // ADMIN
+	                    // ==========================
+
+	                    .requestMatchers(
+	                            "/api/admin/create"
+	                    )
+	                    .hasRole("ADMIN")
+
+	                    // ==========================
+	                    // ANY OTHER API
+	                    // ==========================
+
+	                    .anyRequest()
+	                    .authenticated()
+
+	            )
+
+
+
+	            // JWT Stateless
+	            .sessionManagement(session ->
+
+	                    session.sessionCreationPolicy(
+	                            SessionCreationPolicy.STATELESS
+	                    )
+
+	            )
+
+	            .exceptionHandling(exception ->
+
+	            exception.authenticationEntryPoint(
+	                    authenticationEntryPoint
+	            )
+
+	            )
+
+
+	            .authenticationProvider(
+	                    authenticationProvider()
+	            )
+
+
+	            .addFilterBefore(
+	                    jwtAuthenticationFilter,
+	                    UsernamePasswordAuthenticationFilter.class
+	            )
+
+
+	            .build();
+
+	}
+
+	@Bean
+	public AuthenticationProvider authenticationProvider() {
+
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+
+		provider.setUserDetailsService(userDetailsService);
+
+		provider.setPasswordEncoder(passwordEncoder);
+
+		return provider;
+
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+
+		return configuration.getAuthenticationManager();
+
+	}
+
+}

@@ -96,6 +96,11 @@ public class LocationImportServiceImpl implements LocationImportService {
 	                "Processing Page : {} | Records : {}",
 	                page + 1,
 	                pageData.getNumberOfElements());
+	        
+	        log.info(
+	        	    "Processing Page : {} | Records : {}",
+	        	    page + 1,
+	        	    pageData.getNumberOfElements());
 
 	        result.setTotalRows(
 	                result.getTotalRows()

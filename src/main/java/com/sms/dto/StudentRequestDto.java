@@ -36,10 +36,6 @@ public class StudentRequestDto {
 	@Size(min = 2, max = 50)
 	private String lastName;
 
-	@NotBlank(message = "Email is required")
-	@Email(message = "Enter valid email")
-	private String email;
-
 	@NotBlank(message = "Phone Number is required")
 	@Pattern(
 	    regexp = "^[6-9]\\d{9}$",

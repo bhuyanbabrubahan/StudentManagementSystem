@@ -3,6 +3,9 @@ package com.sms.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.location.address.entity.Address;
+import com.sms.security.entity.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,11 +48,6 @@ public class Student extends BaseEntity {
 	        length = 50)
 	private String lastName;
 
-	@Column(
-	        nullable = false,
-	        unique = true,
-	        length = 100)
-	private String email;
 
 	@Column(
 	        name = "phone_number",
@@ -86,6 +85,18 @@ public class Student extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "department_id", nullable = false)
 	private Department department;
+	
+	
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="user_id", unique = true)
+	@ToString.Exclude
+	private User user;
+	
+	
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="address_id")
+	@ToString.Exclude
+	private Address address;
 	
 	
 }

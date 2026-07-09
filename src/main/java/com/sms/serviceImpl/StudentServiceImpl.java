@@ -16,7 +16,6 @@ import com.sms.dto.StudentSearchRequest;
 import com.sms.entity.Department;
 import com.sms.entity.Student;
 import com.sms.entity.StudentStatus;
-import com.sms.exception.DuplicateStudentException;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.mapper.StudentMapper;
 import com.sms.repository.DepartmentRepository;
@@ -43,11 +42,6 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public StudentResponseDto saveStudent(StudentRequestDto requestDto) {
-		
-		if(repository.existsByEmail(requestDto.getEmail()))
-		{
-			throw new DuplicateStudentException("Email already exists");
-		}
 		
 		Department department = departmentRepository
 		        .findById(requestDto.getDepartmentId())

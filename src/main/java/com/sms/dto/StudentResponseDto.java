@@ -25,8 +25,6 @@ public class StudentResponseDto {
 
     private String lastName;
 
-    private String email;
-
     private String phoneNumber;
 
     private Gender gender;

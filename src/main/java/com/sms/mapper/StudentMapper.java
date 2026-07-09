@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import com.sms.dto.StudentRequestDto;
 import com.sms.dto.StudentResponseDto;
 import com.sms.entity.Student;
+import com.sms.security.dto.RegisterRequestDto;
 
 @Component
 public class StudentMapper {
@@ -16,8 +17,6 @@ public class StudentMapper {
 	    student.setRollNumber(dto.getRollNumber());
 	    student.setFirstName(dto.getFirstName());
 	    student.setLastName(dto.getLastName());
-	    student.setEmail(dto.getEmail());
-	    student.setPhoneNumber(dto.getPhoneNumber());
 	    student.setGender(dto.getGender());
 	    student.setDateOfBirth(dto.getDateOfBirth());
 	    student.setAdmissionDate(dto.getAdmissionDate());
@@ -25,6 +24,24 @@ public class StudentMapper {
 	    student.setStatus(dto.getStatus());
 	    student.setProfileImage(dto.getProfileImage());
 	    
+
+	    return student;
+	}
+	
+	public Student convertToEntity(RegisterRequestDto dto) {
+
+	    Student student = new Student();
+
+	    student.setFirstName(dto.getFirstName());
+
+	    student.setLastName(dto.getLastName());
+
+	    student.setPhoneNumber(dto.getPhoneNumber());
+
+	    student.setGender(dto.getGender());
+
+	    student.setDateOfBirth(dto.getDateOfBirth());
+
 
 	    return student;
 	}
@@ -38,7 +55,6 @@ public class StudentMapper {
 	    dto.setRollNumber(student.getRollNumber());
 	    dto.setFirstName(student.getFirstName());
 	    dto.setLastName(student.getLastName());
-	    dto.setEmail(student.getEmail());
 	    dto.setPhoneNumber(student.getPhoneNumber());
 	    dto.setGender(student.getGender());
 	    dto.setDateOfBirth(student.getDateOfBirth());
@@ -55,24 +71,6 @@ public class StudentMapper {
 	    dto.setCreatedAt(student.getCreatedAt());
 	    dto.setUpdatedAt(student.getUpdatedAt());
 	    
-		/*
-		 * dto.setVillage(student.getVillage().getVillageName());
-		 * 
-		 * dto.setPincode(student.getVillage().getPincode());
-		 * 
-		 * dto.setTehsil( student.getVillage() .getTehsil() .getTehsilName());
-		 * 
-		 * dto.setDistrict( student.getVillage() .getTehsil() .getDistrict()
-		 * .getDistrictName());
-		 * 
-		 * dto.setState( student.getVillage() .getTehsil() .getDistrict() .getState()
-		 * .getStateName());
-		 * 
-		 * dto.setCountry( student.getVillage() .getTehsil() .getDistrict() .getState()
-		 * .getCountry() .getCountryName());
-		 */
-	    
-
 	    return dto;
 	}
 	
@@ -82,8 +80,6 @@ public class StudentMapper {
 		student.setRollNumber(dto.getRollNumber());
 		student.setFirstName(dto.getFirstName());
 		student.setLastName(dto.getLastName());
-		student.setEmail(dto.getEmail());
-		student.setPhoneNumber(dto.getPhoneNumber());
 		student.setGender(dto.getGender());
 		student.setDateOfBirth(dto.getDateOfBirth());
 		student.setAdmissionDate(dto.getAdmissionDate());
