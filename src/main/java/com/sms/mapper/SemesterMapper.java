@@ -1,87 +1,36 @@
 package com.sms.mapper;
 
 
-import org.springframework.stereotype.Component;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import com.sms.dto.SemesterRequestDto;
 import com.sms.dto.SemesterResponseDto;
 import com.sms.entity.Semester;
 
+@Mapper(componentModel = "spring")
+public interface SemesterMapper {
 
-@Component
-public class SemesterMapper {
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "course", ignore = true)
+    Semester toEntity(SemesterRequestDto dto);
 
+    @Mapping(source = "course.id", target = "courseId")
+    @Mapping(source = "course.courseName", target = "courseName")
+    SemesterResponseDto toDto(Semester semester);
 
-    // DTO -> Entity
-    public Semester toEntity(SemesterRequestDto dto) {
-
-        Semester semester = new Semester();
-
-        semester.setSemesterName(dto.getSemesterName());
-
-        semester.setSemesterNumber(dto.getSemesterNumber());
-
-        return semester;
-    }
-
-
-
-    // Entity -> Response DTO
-    public SemesterResponseDto toDto(Semester semester) {
-
-        SemesterResponseDto dto = new SemesterResponseDto();
-
-
-        dto.setId(semester.getId());
-
-        dto.setSemesterName(
-                semester.getSemesterName()
-        );
-
-
-        dto.setSemesterNumber(
-                semester.getSemesterNumber()
-        );
-
-
-        dto.setStatus(
-                semester.getStatus().name()
-        );
-
-
-        if(semester.getCourse()!=null){
-
-            dto.setCourseId(
-                    semester.getCourse().getId()
-            );
-
-
-            dto.setCourseName(
-                    semester.getCourse().getCourseName()
-            );
-        }
-
-
-        return dto;
-    }
-
-
-
-    // Update existing Entity
-    public void updateEntity(
-            Semester semester,
+    @BeanMapping(
+            nullValuePropertyMappingStrategy =
+                    NullValuePropertyMappingStrategy.IGNORE
+    )
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "course", ignore = true)
+    void updateEntity(
+            @MappingTarget Semester semester,
             SemesterRequestDto dto
-    ){
-
-        semester.setSemesterName(
-                dto.getSemesterName()
-        );
-
-
-        semester.setSemesterNumber(
-                dto.getSemesterNumber()
-        );
-
-    }
+    );
 
 }

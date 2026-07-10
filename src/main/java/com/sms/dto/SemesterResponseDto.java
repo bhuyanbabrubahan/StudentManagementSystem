@@ -1,30 +1,30 @@
 package com.sms.dto;
 
+import java.time.LocalDate;
 
 import lombok.Getter;
 import lombok.Setter;
-
 
 @Getter
 @Setter
 public class SemesterResponseDto {
 
+	private Long id;
 
-    private Long id;
+	private String semesterName;
 
+	private Integer semesterNumber;
 
-    private String semesterName;
+	private LocalDate semesterStartDate;
 
+	private LocalDate semesterEndDate;
 
-    private Integer semesterNumber;
+	private Integer totalWorkingDays;
 
+	private Long courseId;
 
-    private Long courseId;
+	private String courseName;
 
-
-    private String courseName;
-
-
-    private String status;
+	private String status;
 
 }
