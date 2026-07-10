@@ -375,6 +375,74 @@ public class SecurityConfig {
 	                   "ADMIN"
 	           )
 	                 
+	           
+	           
+	        // ==========================
+	        // EXAM
+	        // ==========================
+
+
+	        // GET
+	        .requestMatchers(
+	                HttpMethod.GET,
+	                "/api/exams",
+	                "/api/exams/**"
+	        )
+	        .hasAnyRole(
+	                "ADMIN",
+	                "FACULTY",
+	                "STUDENT"
+	        )
+
+
+
+	        // SEARCH
+
+	        .requestMatchers(
+	                HttpMethod.POST,
+	                "/api/exams/search"
+	        )
+	        .hasAnyRole(
+	                "ADMIN",
+	                "FACULTY"
+	        )
+
+
+
+	        // CREATE
+
+	        .requestMatchers(
+	                HttpMethod.POST,
+	                "/api/exams"
+	        )
+	        .hasAnyRole(
+	                "ADMIN",
+	                "FACULTY"
+	        )
+
+
+
+	        // UPDATE
+
+	        .requestMatchers(
+	                HttpMethod.PUT,
+	                "/api/exams/**"
+	        )
+	        .hasRole(
+	                "ADMIN"
+	        )
+
+
+
+	        // DELETE
+
+	        .requestMatchers(
+	                HttpMethod.DELETE,
+	                "/api/exams/**"
+	        )
+	        .hasRole(
+	                "ADMIN"
+	        )
 	                 
 
 	                    // ==========================
