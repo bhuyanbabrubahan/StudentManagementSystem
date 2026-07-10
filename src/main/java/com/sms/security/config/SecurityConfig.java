@@ -189,6 +189,127 @@ public class SecurityConfig {
 	                         "ADMIN"
 	                 )
 
+	                 
+	                 
+	              // SEARCH
+	                 .requestMatchers(
+	                         HttpMethod.POST,
+	                         "/api/semesters/search"
+	                 )
+	                 .hasAnyRole("ADMIN", "FACULTY")
+
+	                 // CREATE
+	                 .requestMatchers(
+	                         HttpMethod.POST,
+	                         "/api/semesters"
+	                 )
+	                 .hasRole("ADMIN")
+
+	                 // UPDATE
+	                 .requestMatchers(
+	                         HttpMethod.PUT,
+	                         "/api/semesters/**"
+	                 )
+	                 .hasRole("ADMIN")
+
+	                 // DELETE
+	                 .requestMatchers(
+	                         HttpMethod.DELETE,
+	                         "/api/semesters/**"
+	                 )
+	                 .hasRole("ADMIN")
+
+	                 // GET
+	                 .requestMatchers(
+	                         HttpMethod.GET,
+	                         "/api/semesters",
+	                         "/api/semesters/**"
+	                 )
+	                 .hasAnyRole("ADMIN", "FACULTY", "STUDENT")
+	                 
+	                 
+	                 
+	              // ==========================
+	              // FACULTY SUBJECT MAPPING
+	              // ==========================
+
+	              // GET
+	              .requestMatchers(
+	                      HttpMethod.GET,
+	                      "/api/faculty-subjects",
+	                      "/api/faculty-subjects/**"
+	              )
+	              .hasAnyRole(
+	                      "ADMIN",
+	                      "FACULTY"
+	              )
+
+	              // SEARCH
+	              .requestMatchers(
+	                      HttpMethod.POST,
+	                      "/api/faculty-subjects/search"
+	              )
+	              .hasAnyRole(
+	                      "ADMIN",
+	                      "FACULTY"
+	              )
+
+	              // CREATE
+	              .requestMatchers(
+	                      HttpMethod.POST,
+	                      "/api/faculty-subjects"
+	              )
+	              .hasRole("ADMIN")
+
+	              // UPDATE
+	              .requestMatchers(
+	                      HttpMethod.PUT,
+	                      "/api/faculty-subjects/**"
+	              )
+	              .hasRole("ADMIN")
+
+	              // DELETE
+	              .requestMatchers(
+	                      HttpMethod.DELETE,
+	                      "/api/faculty-subjects/**"
+	              )
+	              .hasRole("ADMIN")
+	                 
+	                 
+	              // ==========================
+	              // SUBJECT
+	              // ==========================
+
+
+	              // GET SUBJECT
+	              // ADMIN + FACULTY + STUDENT
+
+	              .requestMatchers(
+	                      HttpMethod.GET,
+	                      "/api/subjects",
+	                      "/api/subjects/**"
+	              )
+	              .hasAnyRole(
+	                      "ADMIN",
+	                      "FACULTY",
+	                      "STUDENT"
+	              )
+
+
+	              // CREATE UPDATE DELETE SEARCH
+	              // Only ADMIN
+
+	              .requestMatchers(
+	                      "/api/subjects",
+	                      "/api/subjects/**"
+	              )
+	              .hasRole(
+	                      "ADMIN"
+	              )
+	                 
+	                 
+	                 
+	                 
 
 	                    // ==========================
 	                    // ADMIN

@@ -6,7 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import com.sms.entity.Gender;
 import com.sms.entity.Student;
-import com.sms.entity.StudentStatus;
+import com.sms.enums.StudentStatus;
 
 public class StudentSpecification { 
 

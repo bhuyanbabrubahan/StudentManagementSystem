@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.sms.entity.Faculty;
-import com.sms.entity.FacultyStatus;
+import com.sms.enums.FacultyStatus;
 
 public interface FacultyRepository extends JpaRepository<Faculty, Long>, JpaSpecificationExecutor<Faculty> {
 

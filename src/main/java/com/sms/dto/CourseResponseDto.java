@@ -3,7 +3,7 @@ package com.sms.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.sms.entity.CourseStatus;
+import com.sms.enums.CourseStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

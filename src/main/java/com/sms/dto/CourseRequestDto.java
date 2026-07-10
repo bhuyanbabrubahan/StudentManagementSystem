@@ -2,7 +2,7 @@ package com.sms.dto;
 
 import java.math.BigDecimal;
 
-import com.sms.entity.CourseStatus;
+import com.sms.enums.CourseStatus;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;

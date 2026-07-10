@@ -18,7 +18,7 @@ import com.sms.dto.StudentResponseDto;
 import com.sms.dto.StudentSearchRequest;
 import com.sms.entity.Department;
 import com.sms.entity.Student;
-import com.sms.entity.StudentStatus;
+import com.sms.enums.StudentStatus;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.mapper.StudentMapper;
 import com.sms.repository.DepartmentRepository;

@@ -13,10 +13,9 @@ import com.sms.dto.FacultyResponseDto;
 import com.sms.dto.FacultySearchRequest;
 import com.sms.dto.PageResponse;
 import com.sms.entity.Department;
-import com.sms.entity.DepartmentStatus;
 import com.sms.entity.Faculty;
-import com.sms.entity.FacultyStatus;
-
+import com.sms.enums.DepartmentStatus;
+import com.sms.enums.FacultyStatus;
 import com.sms.exception.ResourceAlreadyExistsException;
 import com.sms.exception.ResourceNotFoundException;
 

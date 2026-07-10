@@ -2,8 +2,12 @@ package com.sms.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.location.address.entity.Address;
+import com.sms.enums.FacultyStatus;
 import com.sms.security.entity.User;
 
 import jakarta.persistence.*;
@@ -124,6 +128,15 @@ public class Faculty extends BaseEntity {
     )
     @ToString.Exclude
     private User user;
+    
+    
+    @JsonIgnore
+    @OneToMany(
+            mappedBy = "faculty",
+            fetch = FetchType.LAZY
+    )
+    private List<FacultySubjectMapping> subjectMappings =
+            new ArrayList<>();
 
 
 }

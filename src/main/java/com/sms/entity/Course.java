@@ -12,6 +12,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.sms.enums.CourseStatus;
+
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -57,5 +63,13 @@ public class Course extends BaseEntity{
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
+    
+    @ToString.Exclude
+    @OneToMany(
+            mappedBy = "course",
+            fetch = FetchType.LAZY
+    )
+    private List<Semester> semesters = new ArrayList<>();
+    
     
 }

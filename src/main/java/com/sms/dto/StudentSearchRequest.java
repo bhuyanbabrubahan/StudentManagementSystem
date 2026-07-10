@@ -3,7 +3,7 @@ package com.sms.dto;
 import java.math.BigDecimal;
 
 import com.sms.entity.Gender;
-import com.sms.entity.StudentStatus;
+import com.sms.enums.StudentStatus;
 
 import lombok.Getter;
 import lombok.Setter;

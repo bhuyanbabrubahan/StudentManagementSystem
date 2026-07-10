@@ -3,9 +3,9 @@ package com.sms.specification;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.sms.entity.Faculty;
-import com.sms.entity.FacultyStatus;
 import com.sms.entity.Designation;
 import com.sms.entity.Qualification;
+import com.sms.enums.FacultyStatus;
 
 public class FacultySpecification {
 	

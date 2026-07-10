@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.sms.entity.Gender;
-import com.sms.entity.StudentStatus;
+import com.sms.enums.StudentStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

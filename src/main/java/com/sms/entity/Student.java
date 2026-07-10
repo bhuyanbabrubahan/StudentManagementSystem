@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.location.address.entity.Address;
+import com.sms.enums.StudentStatus;
 import com.sms.security.entity.User;
 
 import jakarta.persistence.Column;

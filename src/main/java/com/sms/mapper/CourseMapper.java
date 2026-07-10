@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import com.sms.dto.CourseRequestDto;
 import com.sms.dto.CourseResponseDto;
 import com.sms.entity.Course;
-import com.sms.entity.CourseStatus;
 import com.sms.entity.Department;
+import com.sms.enums.CourseStatus;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.repository.DepartmentRepository;
 

@@ -5,9 +5,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.sms.entity.Designation;
-import com.sms.entity.FacultyStatus;
 import com.sms.entity.Gender;
 import com.sms.entity.Qualification;
+import com.sms.enums.FacultyStatus;
 
 import lombok.Getter;
 import lombok.Setter;

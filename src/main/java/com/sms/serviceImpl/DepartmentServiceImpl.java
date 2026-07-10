@@ -14,7 +14,7 @@ import com.sms.dto.DepartmentResponseDto;
 import com.sms.dto.DepartmentSearchRequest;
 import com.sms.dto.PageResponse;
 import com.sms.entity.Department;
-import com.sms.entity.DepartmentStatus;
+import com.sms.enums.DepartmentStatus;
 import com.sms.exception.BusinessException;
 import com.sms.exception.DuplicateDepartmentException;
 import com.sms.exception.ResourceNotFoundException;

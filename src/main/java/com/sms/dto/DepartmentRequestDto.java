@@ -1,6 +1,6 @@
 package com.sms.dto;
 
-import com.sms.entity.DepartmentStatus;
+import com.sms.enums.DepartmentStatus;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

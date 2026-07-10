@@ -3,7 +3,7 @@ package com.sms.specification;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.sms.entity.Department;
-import com.sms.entity.DepartmentStatus;
+import com.sms.enums.DepartmentStatus;
 
 
 

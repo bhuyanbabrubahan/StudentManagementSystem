@@ -2,7 +2,7 @@ package com.sms.dto;
 
 import java.time.LocalDateTime;
 
-import com.sms.entity.DepartmentStatus;
+import com.sms.enums.DepartmentStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

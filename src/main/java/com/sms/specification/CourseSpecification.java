@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.sms.entity.Course;
-import com.sms.entity.CourseStatus;
+import com.sms.enums.CourseStatus;
 
 public class CourseSpecification {
 
