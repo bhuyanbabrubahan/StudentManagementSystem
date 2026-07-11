@@ -17,7 +17,7 @@ import com.location.district.dto.DistrictRequestDto;
 import com.location.district.dto.DistrictResponseDto;
 import com.location.district.dto.DistrictSearchDto;
 import com.location.district.service.DistrictService;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.util.ResponseBuilder;
 
 import jakarta.validation.Valid;
@@ -31,7 +31,7 @@ public class DistrictController {
     private final DistrictService districtService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<DistrictResponseDto>> createDistrict(
+    public ResponseEntity<ApiResponseDto<DistrictResponseDto>> createDistrict(
             @Valid @RequestBody DistrictRequestDto dto) {
 
         DistrictResponseDto response = districtService.createDistrict(dto);
@@ -44,7 +44,7 @@ public class DistrictController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<DistrictResponseDto>> getDistrictById(
+    public ResponseEntity<ApiResponseDto<DistrictResponseDto>> getDistrictById(
             @PathVariable Long id) {
 
         DistrictResponseDto response = districtService.getDistrictById(id);
@@ -57,7 +57,7 @@ public class DistrictController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<DistrictResponseDto>>> getAllDistricts(
+    public ResponseEntity<ApiResponseDto<Page<DistrictResponseDto>>> getAllDistricts(
             Pageable pageable) {
 
         Page<DistrictResponseDto> response =
@@ -71,7 +71,7 @@ public class DistrictController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<Page<DistrictResponseDto>>> searchDistricts(
+    public ResponseEntity<ApiResponseDto<Page<DistrictResponseDto>>> searchDistricts(
             @RequestBody DistrictSearchDto dto,
             Pageable pageable) {
 
@@ -86,7 +86,7 @@ public class DistrictController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<DistrictResponseDto>> updateDistrict(
+    public ResponseEntity<ApiResponseDto<DistrictResponseDto>> updateDistrict(
             @PathVariable Long id,
             @Valid @RequestBody DistrictRequestDto dto) {
 
@@ -101,7 +101,7 @@ public class DistrictController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Object>> deleteDistrict(
+    public ResponseEntity<ApiResponseDto<Object>> deleteDistrict(
             @PathVariable Long id) {
 
         districtService.deleteDistrict(id);

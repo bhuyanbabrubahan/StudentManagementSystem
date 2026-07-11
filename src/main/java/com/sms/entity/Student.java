@@ -82,5 +82,12 @@ public class Student extends BaseEntity {
 	@JoinColumn(name = "address_id")
 	@ToString.Exclude
 	private Address address;
+	
+	public String getFullName() {
+	    String first = firstName != null ? firstName.trim() : "";
+	    String last = lastName != null ? lastName.trim() : "";
+
+	    return (first + " " + last).trim();
+	}
 
 }

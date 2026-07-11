@@ -9,7 +9,7 @@ import com.sms.dto.PageResponse;
 import com.sms.dto.SemesterRequestDto;
 import com.sms.dto.SemesterResponseDto;
 import com.sms.dto.SemesterSearchRequest;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.service.SemesterService;
 import com.sms.util.ResponseBuilder;
 
@@ -29,7 +29,7 @@ public class SemesterController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<SemesterResponseDto>> createSemester(
+    public ResponseEntity<ApiResponseDto<SemesterResponseDto>> createSemester(
             @Valid
             @RequestBody SemesterRequestDto dto
     ) {
@@ -49,7 +49,7 @@ public class SemesterController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','FACULTY','STUDENT')")
-    public ResponseEntity<ApiResponse<SemesterResponseDto>> getById(
+    public ResponseEntity<ApiResponseDto<SemesterResponseDto>> getById(
             @PathVariable Long id
     ) {
 
@@ -68,7 +68,7 @@ public class SemesterController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','FACULTY','STUDENT')")
-    public ResponseEntity<ApiResponse<PageResponse<SemesterResponseDto>>> getAll(
+    public ResponseEntity<ApiResponseDto<PageResponse<SemesterResponseDto>>> getAll(
 
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size,
@@ -97,7 +97,7 @@ public class SemesterController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<SemesterResponseDto>> update(
+    public ResponseEntity<ApiResponseDto<SemesterResponseDto>> update(
 
             @PathVariable Long id,
 
@@ -124,7 +124,7 @@ public class SemesterController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Void>> delete(
+    public ResponseEntity<ApiResponseDto<Void>> delete(
 
             @PathVariable Long id
 
@@ -144,7 +144,7 @@ public class SemesterController {
 
     @PostMapping("/search")
     @PreAuthorize("hasAnyRole('ADMIN','FACULTY')")
-    public ResponseEntity<ApiResponse<PageResponse<SemesterResponseDto>>> search(
+    public ResponseEntity<ApiResponseDto<PageResponse<SemesterResponseDto>>> search(
 
             @RequestBody SemesterSearchRequest request,
             @RequestParam(defaultValue = "0") int page,

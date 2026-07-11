@@ -10,7 +10,7 @@ import com.admission.dto.AdmissionResponseDto;
 import com.admission.dto.AdmissionSearchRequest;
 import com.admission.service.AdmissionService;
 import com.sms.dto.PageResponse;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.util.ResponseBuilder;
 
 import jakarta.validation.Valid;
@@ -29,7 +29,7 @@ public class AdmissionController {
 
     // ---------------- CREATE ADMISSION ----------------
     @PostMapping
-    public ResponseEntity<ApiResponse<AdmissionResponseDto>> createAdmission(
+    public ResponseEntity<ApiResponseDto<AdmissionResponseDto>> createAdmission(
             @Valid @RequestBody AdmissionRequestDto dto) {
 
 
@@ -48,7 +48,7 @@ public class AdmissionController {
 
     // ---------------- GET BY ID ----------------
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<AdmissionResponseDto>> getAdmissionById(
+    public ResponseEntity<ApiResponseDto<AdmissionResponseDto>> getAdmissionById(
             @PathVariable Long id) {
 
 
@@ -67,7 +67,7 @@ public class AdmissionController {
 
     // ---------------- UPDATE ADMISSION ----------------
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<AdmissionResponseDto>> updateAdmission(
+    public ResponseEntity<ApiResponseDto<AdmissionResponseDto>> updateAdmission(
             @PathVariable Long id,
             @Valid @RequestBody AdmissionRequestDto dto) {
 
@@ -90,7 +90,7 @@ public class AdmissionController {
 
     // ---------------- CANCEL ADMISSION ----------------
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteAdmission(
+    public ResponseEntity<ApiResponseDto<Void>> deleteAdmission(
             @PathVariable Long id) {
 
 
@@ -108,7 +108,7 @@ public class AdmissionController {
 
     // ---------------- GET ALL WITH PAGINATION ----------------
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<AdmissionResponseDto>>> getAllAdmissions(
+    public ResponseEntity<ApiResponseDto<PageResponse<AdmissionResponseDto>>> getAllAdmissions(
 
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -138,7 +138,7 @@ public class AdmissionController {
 
     // ---------------- SEARCH ADMISSION ----------------
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<PageResponse<AdmissionResponseDto>>> searchAdmissions(
+    public ResponseEntity<ApiResponseDto<PageResponse<AdmissionResponseDto>>> searchAdmissions(
 
             @Valid @RequestBody AdmissionSearchRequest request,
             @RequestParam(defaultValue = "0") int page,

@@ -10,7 +10,7 @@ import com.sms.dto.ExamRequestDto;
 import com.sms.dto.ExamResponseDto;
 import com.sms.dto.PageResponse;
 import com.sms.dto.ExamSearchRequest;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.service.ExamService;
 import com.sms.util.ResponseBuilder;
 
@@ -37,7 +37,7 @@ public class ExamController {
 
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ExamResponseDto>> createExam(
+    public ResponseEntity<ApiResponseDto<ExamResponseDto>> createExam(
             
             @Valid
             @RequestBody ExamRequestDto dto
@@ -66,7 +66,7 @@ public class ExamController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ExamResponseDto>> getById(
+    public ResponseEntity<ApiResponseDto<ExamResponseDto>> getById(
             @PathVariable Long id
     ){
 
@@ -88,7 +88,7 @@ public class ExamController {
 
 
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<ExamResponseDto>>> getAll(
+    public ResponseEntity<ApiResponseDto<PageResponse<ExamResponseDto>>> getAll(
 
             @RequestParam(defaultValue="0")
             int page,
@@ -131,7 +131,7 @@ public class ExamController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ExamResponseDto>> update(
+    public ResponseEntity<ApiResponseDto<ExamResponseDto>> update(
 
             @PathVariable Long id,
 
@@ -165,7 +165,7 @@ public class ExamController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(
+    public ResponseEntity<ApiResponseDto<Void>> delete(
 
             @PathVariable Long id
 
@@ -192,7 +192,7 @@ public class ExamController {
 
 
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<PageResponse<ExamResponseDto>>> search(
+    public ResponseEntity<ApiResponseDto<PageResponse<ExamResponseDto>>> search(
 
             @RequestBody ExamSearchRequest request,
 

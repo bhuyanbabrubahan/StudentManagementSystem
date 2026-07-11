@@ -6,18 +6,19 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.util.ResponseBuilder;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateStudentException.class)
-    public ResponseEntity<ApiResponse<Object>> handleDuplicateStudentException(DuplicateStudentException ex) {
+    public ResponseEntity<ApiResponseDto<Object>> handleDuplicateStudentException(DuplicateStudentException ex) {
 
         return ResponseBuilder.error(
                 ex.getMessage(),
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException ex) {
+    public ResponseEntity<ApiResponseDto<Object>> handleResourceNotFoundException(ResourceNotFoundException ex) {
 
         return ResponseBuilder.error(
                 ex.getMessage(),
@@ -33,7 +34,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class) // Its for @valid exception
-    public ResponseEntity<ApiResponse<Object>> handleValidationException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiResponseDto<Object>> handleValidationException(MethodArgumentNotValidException ex) {
 
         Map<String, String> errors = new LinkedHashMap<>();
 
@@ -43,7 +44,7 @@ public class GlobalExceptionHandler {
                   errors.putIfAbsent(error.getField(),
                              error.getDefaultMessage()));
 
-        ApiResponse<Object> response = new ApiResponse<>();
+        ApiResponseDto<Object> response = new ApiResponseDto<>();
 
         response.setSuccess(false);
         response.setMessage("Validation Failed");
@@ -59,7 +60,7 @@ public class GlobalExceptionHandler {
     
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Object>> handleException(Exception ex) {
+    public ResponseEntity<ApiResponseDto<Object>> handleException(Exception ex) {
 
         return ResponseBuilder.error(
                 ex.getMessage(),
@@ -68,7 +69,7 @@ public class GlobalExceptionHandler {
     
     
     @ExceptionHandler(DuplicateDepartmentException.class)
-    public ResponseEntity<ApiResponse<Object>> handleDuplicateDepartmentException(DuplicateDepartmentException ex) {
+    public ResponseEntity<ApiResponseDto<Object>> handleDuplicateDepartmentException(DuplicateDepartmentException ex) {
 
         return ResponseBuilder.error(
                 ex.getMessage(),
@@ -76,9 +77,9 @@ public class GlobalExceptionHandler {
     }
     
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ApiResponse<Object>> handleBusinessException(BusinessException ex) {
+    public ResponseEntity<ApiResponseDto<Object>> handleBusinessException(BusinessException ex) {
 
-        ApiResponse<Object> response = new ApiResponse<>();
+        ApiResponseDto<Object> response = new ApiResponseDto<>();
 
         response.setSuccess(false);
         response.setMessage(ex.getMessage());
@@ -87,6 +88,20 @@ public class GlobalExceptionHandler {
         response.setTimestamp(LocalDateTime.now());
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+    
+    
+    
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponseDto<Object>> handleJsonParseException(
+            HttpMessageNotReadableException ex
+    ) {
+
+        return ResponseBuilder.error(
+                "Invalid request format or unknown field provided.",
+                HttpStatus.BAD_REQUEST
+        );
+
     }
 
 }

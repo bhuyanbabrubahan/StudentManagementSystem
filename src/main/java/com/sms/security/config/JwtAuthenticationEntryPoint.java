@@ -20,7 +20,8 @@ public class JwtAuthenticationEntryPoint
 
 
 
-    private final ObjectMapper objectMapper;
+    @SuppressWarnings("unused")
+	private final ObjectMapper objectMapper;
 
 
 

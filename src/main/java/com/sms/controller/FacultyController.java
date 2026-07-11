@@ -9,7 +9,7 @@ import com.sms.dto.FacultyRequestDto;
 import com.sms.dto.FacultyResponseDto;
 import com.sms.dto.FacultySearchRequest;
 import com.sms.dto.PageResponse;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.service.FacultyService;
 import com.sms.util.ResponseBuilder;
 
@@ -39,7 +39,7 @@ public class FacultyController {
     // ===============================
 
     @PostMapping
-    public ResponseEntity<ApiResponse<FacultyResponseDto>> createFaculty(
+    public ResponseEntity<ApiResponseDto<FacultyResponseDto>> createFaculty(
             @Valid @RequestBody FacultyRequestDto dto
     ) {
 
@@ -66,7 +66,7 @@ public class FacultyController {
     // ===============================
 
     @GetMapping("/{id:\\d+}")
-    public ResponseEntity<ApiResponse<FacultyResponseDto>> getFacultyById(
+    public ResponseEntity<ApiResponseDto<FacultyResponseDto>> getFacultyById(
             @PathVariable Long id
     ) {
 
@@ -93,7 +93,7 @@ public class FacultyController {
     // ===============================
 
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<FacultyResponseDto>>> getAllFaculties(
+    public ResponseEntity<ApiResponseDto<PageResponse<FacultyResponseDto>>> getAllFaculties(
 
             @RequestParam(defaultValue = "0")
             int page,
@@ -143,7 +143,7 @@ public class FacultyController {
 
 
     @PutMapping("/{id:\\d+}")
-    public ResponseEntity<ApiResponse<FacultyResponseDto>> updateFaculty(
+    public ResponseEntity<ApiResponseDto<FacultyResponseDto>> updateFaculty(
 
             @PathVariable Long id,
 
@@ -185,7 +185,7 @@ public class FacultyController {
 
 
     @DeleteMapping("/{id:\\d+}")
-    public ResponseEntity<ApiResponse<Void>> deleteFaculty(
+    public ResponseEntity<ApiResponseDto<Void>> deleteFaculty(
 
             @PathVariable Long id
 
@@ -217,7 +217,7 @@ public class FacultyController {
 
 
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<PageResponse<FacultyResponseDto>>> searchFaculties(
+    public ResponseEntity<ApiResponseDto<PageResponse<FacultyResponseDto>>> searchFaculties(
 
 
             @RequestBody FacultySearchRequest request,

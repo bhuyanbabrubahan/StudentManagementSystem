@@ -106,20 +106,29 @@
 			<version>1.6.3</version>
 		</dependency>
 
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.6.0</version>
+		</dependency>
+		
+		
+
 	</dependencies>
 
 	<build>
 
     <plugins>
 
-        <!-- Spring Boot Plugin -->
+			<!-- Spring Boot Plugin -->
         <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
         </plugin>
 
 
-        <!-- Compiler Plugin for Lombok + MapStruct -->
+			<!-- Compiler Plugin for Lombok + MapStruct -->
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
@@ -131,14 +140,14 @@
 
                 <annotationProcessorPaths>
 
-                    <!-- Lombok -->
+						<!-- Lombok -->
                     <path>
                         <groupId>org.projectlombok</groupId>
                         <artifactId>lombok</artifactId>
                     </path>
 
 
-                    <!-- MapStruct Processor -->
+						<!-- MapStruct Processor -->
                     <path>
                         <groupId>org.mapstruct</groupId>
                         <artifactId>mapstruct-processor</artifactId>
@@ -146,7 +155,7 @@
                     </path>
 
 
-                    <!-- Lombok + MapStruct Binding -->
+						<!-- Lombok + MapStruct Binding -->
                     <path>
                         <groupId>org.projectlombok</groupId>
                         <artifactId>lombok-mapstruct-binding</artifactId>

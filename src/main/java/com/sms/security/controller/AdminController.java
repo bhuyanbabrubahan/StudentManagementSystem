@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import com.sms.security.dto.AdminCreateRequestDto;
 import com.sms.security.dto.AdminResponseDto;
 import com.sms.security.service.AdminService;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.util.ResponseBuilder;
 
 import jakarta.validation.Valid;
@@ -25,7 +25,7 @@ public class AdminController {
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<ApiResponse<AdminResponseDto>> createAdmin(
+	public ResponseEntity<ApiResponseDto<AdminResponseDto>> createAdmin(
 
 			@Valid @RequestBody AdminCreateRequestDto request
 

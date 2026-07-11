@@ -16,7 +16,7 @@ import com.sms.dto.DepartmentRequestDto;
 import com.sms.dto.DepartmentResponseDto;
 import com.sms.dto.DepartmentSearchRequest;
 import com.sms.dto.PageResponse;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.service.DepartmentService;
 import com.sms.util.ResponseBuilder;
 
@@ -34,7 +34,7 @@ public class DepartmentController {
 	
 	
 	@PostMapping
-	public ResponseEntity<ApiResponse<DepartmentResponseDto>> createDepartment(
+	public ResponseEntity<ApiResponseDto<DepartmentResponseDto>> createDepartment(
 	        @Valid @RequestBody DepartmentRequestDto dto) {
 
 	    DepartmentResponseDto response =
@@ -48,7 +48,7 @@ public class DepartmentController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<ApiResponse<DepartmentResponseDto>> getDepartmentById(
+	public ResponseEntity<ApiResponseDto<DepartmentResponseDto>> getDepartmentById(
 	        @PathVariable Long id) {
 
 	    DepartmentResponseDto response =
@@ -64,7 +64,7 @@ public class DepartmentController {
 	
 	
 	@GetMapping
-	public ResponseEntity<ApiResponse<PageResponse<DepartmentResponseDto>>> getAllDepartments(
+	public ResponseEntity<ApiResponseDto<PageResponse<DepartmentResponseDto>>> getAllDepartments(
 	        @RequestParam(defaultValue = "0") int page,
 	        @RequestParam(defaultValue = "10") int size,
 	        @RequestParam(defaultValue = "id") String sortBy,
@@ -83,7 +83,7 @@ public class DepartmentController {
 	
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<ApiResponse<DepartmentResponseDto>> updateDepartment(
+	public ResponseEntity<ApiResponseDto<DepartmentResponseDto>> updateDepartment(
 	        @PathVariable Long id,
 	        @Valid @RequestBody DepartmentRequestDto dto) {
 
@@ -99,7 +99,7 @@ public class DepartmentController {
 	
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ApiResponse<String>> deleteDepartment(@PathVariable Long id) {
+	public ResponseEntity<ApiResponseDto<String>> deleteDepartment(@PathVariable Long id) {
 
 	    departmentService.deleteDepartment(id);
 
@@ -112,7 +112,7 @@ public class DepartmentController {
 	
 	
 	@PostMapping("/search")
-	public ResponseEntity<ApiResponse<PageResponse<DepartmentResponseDto>>> searchDepartments(
+	public ResponseEntity<ApiResponseDto<PageResponse<DepartmentResponseDto>>> searchDepartments(
 			@RequestBody DepartmentSearchRequest request, 
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size, 

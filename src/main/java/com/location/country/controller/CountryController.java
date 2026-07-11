@@ -21,7 +21,7 @@ import com.location.country.dto.CountryRequestDto;
 import com.location.country.dto.CountryResponseDto;
 import com.location.country.dto.CountrySearchDto;
 import com.location.country.service.CountryService;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.util.ResponseBuilder;
 
 import jakarta.validation.Valid;
@@ -36,7 +36,7 @@ public class CountryController {
 
     // CREATE
     @PostMapping
-    public ResponseEntity<ApiResponse<CountryResponseDto>> createCountry(
+    public ResponseEntity<ApiResponseDto<CountryResponseDto>> createCountry(
             @Valid @RequestBody CountryRequestDto requestDto) {
 
         CountryResponseDto response = countryService.createCountry(requestDto);
@@ -49,7 +49,7 @@ public class CountryController {
 
     // GET BY ID
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CountryResponseDto>> getCountryById(
+    public ResponseEntity<ApiResponseDto<CountryResponseDto>> getCountryById(
             @PathVariable Long id) {
 
         CountryResponseDto response = countryService.getCountryById(id);
@@ -61,7 +61,7 @@ public class CountryController {
 
     // GET ALL WITH PAGINATION & SORTING
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<CountryResponseDto>>> getAllCountries(
+    public ResponseEntity<ApiResponseDto<Page<CountryResponseDto>>> getAllCountries(
 
             @RequestParam(defaultValue = "0") int page,
 
@@ -87,7 +87,7 @@ public class CountryController {
 
     // SEARCH
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<Page<CountryResponseDto>>> searchCountries(
+    public ResponseEntity<ApiResponseDto<Page<CountryResponseDto>>> searchCountries(
 
             @RequestBody CountrySearchDto searchDto,
 
@@ -115,7 +115,7 @@ public class CountryController {
 
     // UPDATE
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<CountryResponseDto>> updateCountry(
+    public ResponseEntity<ApiResponseDto<CountryResponseDto>> updateCountry(
             @PathVariable Long id,
             @Valid @RequestBody CountryRequestDto requestDto) {
 
@@ -130,7 +130,7 @@ public class CountryController {
 
     // SOFT DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteCountry(
+    public ResponseEntity<ApiResponseDto<Void>> deleteCountry(
             @PathVariable Long id) {
 
         countryService.deleteCountry(id);

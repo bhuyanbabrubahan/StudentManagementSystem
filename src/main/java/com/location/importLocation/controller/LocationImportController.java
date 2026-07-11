@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.location.importLocation.dto.ImportResultDto;
 import com.location.importLocation.service.LocationImportService;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.util.ResponseBuilder;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class LocationImportController {
     private final LocationImportService locationImportService;
 
     @PostMapping("/import")
-    public ResponseEntity<ApiResponse<ImportResultDto>> importLocation() {
+    public ResponseEntity<ApiResponseDto<ImportResultDto>> importLocation() {
 
         ImportResultDto response =
                 locationImportService.importLocationMaster();

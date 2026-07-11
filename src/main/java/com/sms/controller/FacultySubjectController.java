@@ -8,7 +8,7 @@ import com.sms.dto.FacultySubjectRequestDto;
 import com.sms.dto.FacultySubjectResponseDto;
 import com.sms.dto.FacultySubjectSearchRequest;
 import com.sms.dto.PageResponse;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.service.FacultySubjectService;
 import com.sms.util.ResponseBuilder;
 
@@ -26,7 +26,7 @@ public class FacultySubjectController {
     // ASSIGN SUBJECT
     // ==========================
     @PostMapping
-    public ResponseEntity<ApiResponse<FacultySubjectResponseDto>> assignSubject(
+    public ResponseEntity<ApiResponseDto<FacultySubjectResponseDto>> assignSubject(
             @Valid @RequestBody FacultySubjectRequestDto dto) {
 
         FacultySubjectResponseDto response =
@@ -43,7 +43,7 @@ public class FacultySubjectController {
     // GET BY ID
     // ==========================
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<FacultySubjectResponseDto>> getById(
+    public ResponseEntity<ApiResponseDto<FacultySubjectResponseDto>> getById(
             @PathVariable Long id) {
 
         FacultySubjectResponseDto response =
@@ -60,7 +60,7 @@ public class FacultySubjectController {
     // GET ALL
     // ==========================
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<FacultySubjectResponseDto>>> getAll(
+    public ResponseEntity<ApiResponseDto<PageResponse<FacultySubjectResponseDto>>> getAll(
 
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -78,7 +78,7 @@ public class FacultySubjectController {
     // UPDATE
     // ==========================
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<FacultySubjectResponseDto>> update(
+    public ResponseEntity<ApiResponseDto<FacultySubjectResponseDto>> update(
 
             @PathVariable Long id,
 
@@ -95,7 +95,7 @@ public class FacultySubjectController {
     // DELETE (SOFT DELETE)
     // ==========================
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(
+    public ResponseEntity<ApiResponseDto<Void>> delete(
             @PathVariable Long id) {
 
         service.delete(id);
@@ -111,7 +111,7 @@ public class FacultySubjectController {
     // SEARCH
     // ==========================
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<PageResponse<FacultySubjectResponseDto>>> search(
+    public ResponseEntity<ApiResponseDto<PageResponse<FacultySubjectResponseDto>>> search(
 
             @RequestBody FacultySubjectSearchRequest request,
 

@@ -16,8 +16,7 @@ import com.sms.dto.PageResponse;
 import com.sms.dto.StudentRequestDto;
 import com.sms.dto.StudentResponseDto;
 import com.sms.dto.StudentSearchRequest;
-import com.sms.exception.GlobalExceptionHandler;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.service.StudentService;
 import com.sms.util.ResponseBuilder;
 
@@ -35,7 +34,7 @@ public class StudentController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<StudentResponseDto>> saveStudent(@Valid @RequestBody StudentRequestDto requestDto){
+    public ResponseEntity<ApiResponseDto<StudentResponseDto>> saveStudent(@Valid @RequestBody StudentRequestDto requestDto){
 
         StudentResponseDto responseDto = studentService.saveStudent(requestDto);
 
@@ -47,7 +46,7 @@ public class StudentController {
     
     
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<StudentResponseDto>>getStudentById(@PathVariable Long id){
+    public ResponseEntity<ApiResponseDto<StudentResponseDto>>getStudentById(@PathVariable Long id){
 
         StudentResponseDto responseDto = studentService.getStudentById(id);
 
@@ -58,7 +57,7 @@ public class StudentController {
     
     
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<StudentResponseDto>> updateStudent(@PathVariable Long id,
+    public ResponseEntity<ApiResponseDto<StudentResponseDto>> updateStudent(@PathVariable Long id,
     		@Valid @RequestBody StudentRequestDto dto) {
     	
     	StudentResponseDto response = studentService.updateStudent(id, dto);
@@ -70,7 +69,7 @@ public class StudentController {
     
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteStudent(@PathVariable Long id){
+    public ResponseEntity<ApiResponseDto<Void>> deleteStudent(@PathVariable Long id){
     	
     	studentService.deleteStudent(id);
 		return ResponseBuilder.success(null, "Student Deleted successfully ", HttpStatus.OK);
@@ -80,7 +79,7 @@ public class StudentController {
     
     
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<StudentResponseDto>>> getAllStudents(
+    public ResponseEntity<ApiResponseDto<PageResponse<StudentResponseDto>>> getAllStudents(
             @RequestParam int page,
             @RequestParam int size,
             @RequestParam String sortBy,
@@ -99,7 +98,7 @@ public class StudentController {
    
     
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<PageResponse<StudentResponseDto>>> searchStudents(
+    public ResponseEntity<ApiResponseDto<PageResponse<StudentResponseDto>>> searchStudents(
     		@RequestBody StudentSearchRequest request, 
     		@RequestParam int page,
             @RequestParam int size,

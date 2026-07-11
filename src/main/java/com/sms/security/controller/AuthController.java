@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.security.dto.LoginRequestDto;
 import com.sms.security.dto.LoginResponseDto;
 import com.sms.security.dto.RegisterRequestDto;
@@ -34,7 +34,7 @@ public class AuthController {
 	// ============================
 
 	@PostMapping("/register")
-	public ResponseEntity<ApiResponse<RegisterResponseDto>> register(
+	public ResponseEntity<ApiResponseDto<RegisterResponseDto>> register(
 
 			@Valid @RequestBody RegisterRequestDto request
 
@@ -59,7 +59,7 @@ public class AuthController {
 	// ============================
 
 	@PostMapping("/login")
-	public ResponseEntity<ApiResponse<LoginResponseDto>> login(
+	public ResponseEntity<ApiResponseDto<LoginResponseDto>> login(
 
 			@Valid @RequestBody LoginRequestDto request
 

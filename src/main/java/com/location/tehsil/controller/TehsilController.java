@@ -12,7 +12,7 @@ import com.location.tehsil.dto.TehsilRequestDto;
 import com.location.tehsil.dto.TehsilResponseDto;
 import com.location.tehsil.dto.TehsilSearchDto;
 import com.location.tehsil.service.TehsilService;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.util.ResponseBuilder;
 
 import jakarta.validation.Valid;
@@ -27,7 +27,7 @@ public class TehsilController {
     private final TehsilService tehsilService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<TehsilResponseDto>> createTehsil(
+    public ResponseEntity<ApiResponseDto<TehsilResponseDto>> createTehsil(
             @Valid @RequestBody TehsilRequestDto dto) {
 
         TehsilResponseDto response =
@@ -40,7 +40,7 @@ public class TehsilController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<TehsilResponseDto>> getTehsilById(
+    public ResponseEntity<ApiResponseDto<TehsilResponseDto>> getTehsilById(
             @PathVariable Long id) {
 
         TehsilResponseDto response =
@@ -53,7 +53,7 @@ public class TehsilController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<TehsilResponseDto>>> getAllTehsils(
+    public ResponseEntity<ApiResponseDto<Page<TehsilResponseDto>>> getAllTehsils(
             Pageable pageable) {
 
         Page<TehsilResponseDto> response =
@@ -66,7 +66,7 @@ public class TehsilController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<Page<TehsilResponseDto>>> searchTehsils(
+    public ResponseEntity<ApiResponseDto<Page<TehsilResponseDto>>> searchTehsils(
             @RequestBody TehsilSearchDto dto,
             Pageable pageable) {
 
@@ -80,7 +80,7 @@ public class TehsilController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<TehsilResponseDto>> updateTehsil(
+    public ResponseEntity<ApiResponseDto<TehsilResponseDto>> updateTehsil(
             @PathVariable Long id,
             @Valid @RequestBody TehsilRequestDto dto) {
 
@@ -94,7 +94,7 @@ public class TehsilController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteTehsil(
+    public ResponseEntity<ApiResponseDto<Void>> deleteTehsil(
             @PathVariable Long id) {
 
         tehsilService.deleteTehsil(id);

@@ -23,7 +23,7 @@ import com.location.state.dto.StateRequestDto;
 import com.location.state.dto.StateResponseDto;
 import com.location.state.dto.StateSearchDto;
 import com.location.state.service.StateService;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.service.StudentService;
 import com.sms.util.ResponseBuilder;
 
@@ -38,7 +38,7 @@ public class StateController {
     private final StateService stateService;
     
     @PostMapping
-    public ResponseEntity<ApiResponse<StateResponseDto>> createState(
+    public ResponseEntity<ApiResponseDto<StateResponseDto>> createState(
             @Valid @RequestBody StateRequestDto dto) {
     	
     	StateResponseDto response = stateService.createState(dto);
@@ -47,7 +47,7 @@ public class StateController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<StateResponseDto>> getState(
+    public ResponseEntity<ApiResponseDto<StateResponseDto>> getState(
             @PathVariable Long id) {
 
     	StateResponseDto response = stateService.getStateById(id);
@@ -56,7 +56,7 @@ public class StateController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<StateResponseDto>>> getAllStates(
+    public ResponseEntity<ApiResponseDto<Page<StateResponseDto>>> getAllStates(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "stateName") String sortBy,
@@ -77,7 +77,7 @@ public class StateController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<Page<StateResponseDto>>> searchStates(
+    public ResponseEntity<ApiResponseDto<Page<StateResponseDto>>> searchStates(
             @RequestBody StateSearchDto dto,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -99,7 +99,7 @@ public class StateController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<StateResponseDto>> updateState(
+    public ResponseEntity<ApiResponseDto<StateResponseDto>> updateState(
             @PathVariable Long id,
             @Valid @RequestBody StateRequestDto dto) {
 
@@ -112,7 +112,7 @@ public class StateController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteState(
+    public ResponseEntity<ApiResponseDto<Void>> deleteState(
             @PathVariable Long id) {
 
         stateService.deleteState(id);

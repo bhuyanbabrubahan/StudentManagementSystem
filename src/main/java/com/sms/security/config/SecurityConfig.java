@@ -432,6 +432,47 @@ public class SecurityConfig {
 	                "ADMIN"
 	        )
 
+	        
+	        .requestMatchers(
+	                HttpMethod.POST,
+	                "/api/results"
+	        )
+	        .hasRole("ADMIN")
+
+
+	        .requestMatchers(
+	                HttpMethod.PUT,
+	                "/api/results/**"
+	        )
+	        .hasRole("ADMIN")
+
+
+	        .requestMatchers(
+	                HttpMethod.DELETE,
+	                "/api/results/**"
+	        )
+	        .hasRole("ADMIN")
+
+
+	        .requestMatchers(
+	                HttpMethod.GET,
+	                "/api/results/**"
+	        )
+	        .hasAnyRole(
+	                "ADMIN",
+	                "FACULTY",
+	                "STUDENT"
+	        )
+
+
+	        .requestMatchers(
+	                HttpMethod.POST,
+	                "/api/results/search"
+	        )
+	        .hasAnyRole(
+	                "ADMIN",
+	                "FACULTY"
+	        )
 
 
 	        // DELETE
@@ -457,6 +498,18 @@ public class SecurityConfig {
 	                    // ==========================
 	                    // ANY OTHER API
 	                    // ==========================
+	                    
+	                    
+	                 // ==========================
+	                 // SWAGGER OPEN API
+	                 // ==========================
+
+	                 .requestMatchers(
+	                         "/swagger-ui/**",
+	                         "/swagger-ui.html",
+	                         "/v3/api-docs/**"
+	                 )
+	                 .permitAll()
 
 	                    .anyRequest()
 	                    .authenticated()

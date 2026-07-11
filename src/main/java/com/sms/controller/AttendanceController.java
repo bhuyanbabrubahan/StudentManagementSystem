@@ -9,7 +9,7 @@ import com.sms.dto.AttendanceRequestDto;
 import com.sms.dto.AttendanceResponseDto;
 import com.sms.dto.AttendanceSearchRequest;
 import com.sms.dto.PageResponse;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.service.AttendanceService;
 import com.sms.util.ResponseBuilder;
 
@@ -32,7 +32,7 @@ public class AttendanceController {
     // ==========================
 
     @PostMapping
-    public ResponseEntity<ApiResponse<AttendanceResponseDto>> createAttendance(
+    public ResponseEntity<ApiResponseDto<AttendanceResponseDto>> createAttendance(
 
             @Valid
             @RequestBody AttendanceRequestDto dto
@@ -59,7 +59,7 @@ public class AttendanceController {
     // ==========================
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<AttendanceResponseDto>> getAttendanceById(
+    public ResponseEntity<ApiResponseDto<AttendanceResponseDto>> getAttendanceById(
 
             @PathVariable Long id
 
@@ -85,7 +85,7 @@ public class AttendanceController {
     // ==========================
 
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<AttendanceResponseDto>>> getAllAttendance(
+    public ResponseEntity<ApiResponseDto<PageResponse<AttendanceResponseDto>>> getAllAttendance(
 
             @RequestParam(defaultValue = "0")
             int page,
@@ -130,7 +130,7 @@ public class AttendanceController {
     // ==========================
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<AttendanceResponseDto>> updateAttendance(
+    public ResponseEntity<ApiResponseDto<AttendanceResponseDto>> updateAttendance(
 
             @PathVariable Long id,
 
@@ -164,7 +164,7 @@ public class AttendanceController {
     // ==========================
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteAttendance(
+    public ResponseEntity<ApiResponseDto<Void>> deleteAttendance(
 
             @PathVariable Long id
 
@@ -191,7 +191,7 @@ public class AttendanceController {
     // ==========================
 
 	@PostMapping("/search")
-	public ResponseEntity<ApiResponse<PageResponse<AttendanceResponseDto>>> searchAttendance(@Valid
+	public ResponseEntity<ApiResponseDto<PageResponse<AttendanceResponseDto>>> searchAttendance(@Valid
 
 	@RequestBody AttendanceSearchRequest request,
 

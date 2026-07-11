@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.sms.entity.Exam;
+import com.sms.entity.Student;
 import com.sms.enums.ExamStatus;
 import com.sms.enums.ExamType;
 
@@ -35,9 +36,11 @@ public interface ExamRepository extends JpaRepository<Exam, Long>, JpaSpecificat
 	Optional<Exam> findByIdAndStatusNot(Long id, ExamStatus status);
 
 	// ==========================
-	// Pagination
 	// ==========================
 
 	Page<Exam> findByStatusNot(ExamStatus status, Pageable pageable);
+
+	Optional<Student> findByIdAndStatus(Long examId, ExamStatus active);
+	
 
 }

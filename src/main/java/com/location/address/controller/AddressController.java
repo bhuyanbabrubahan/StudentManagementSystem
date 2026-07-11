@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.location.address.dto.AddressRequestDto;
 import com.location.address.dto.AddressResponseDto;
 import com.location.address.service.AddressService;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.util.ResponseBuilder;
 
 import jakarta.validation.Valid;
@@ -41,7 +41,7 @@ public class AddressController {
     // CREATE ADDRESS
 
     @PostMapping
-	public ResponseEntity<ApiResponse<AddressResponseDto>> createAddress(
+	public ResponseEntity<ApiResponseDto<AddressResponseDto>> createAddress(
 			@Valid @RequestBody AddressRequestDto request) {
 
         AddressResponseDto response =
@@ -64,7 +64,7 @@ public class AddressController {
     // GET ADDRESS BY ID
 
     @GetMapping("/{id}")
-	public ResponseEntity<ApiResponse<AddressResponseDto>> getAddressById
+	public ResponseEntity<ApiResponseDto<AddressResponseDto>> getAddressById
 	(@PathVariable Long id) {
 
 
@@ -88,7 +88,7 @@ public class AddressController {
     // GET ALL ADDRESS
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<AddressResponseDto>>> getAllAddresses()
+    public ResponseEntity<ApiResponseDto<List<AddressResponseDto>>> getAllAddresses()
     {
 
 
@@ -113,7 +113,7 @@ public class AddressController {
     // UPDATE ADDRESS
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<AddressResponseDto>> updateAddress(
+    public ResponseEntity<ApiResponseDto<AddressResponseDto>> updateAddress(
             @PathVariable Long id,
             @Valid @RequestBody AddressRequestDto request)
     {
@@ -144,7 +144,7 @@ public class AddressController {
     // DELETE ADDRESS
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteAddress(
+    public ResponseEntity<ApiResponseDto<Void>> deleteAddress(
             @PathVariable Long id)
     {
 

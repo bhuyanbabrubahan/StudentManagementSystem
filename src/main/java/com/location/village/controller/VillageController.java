@@ -19,7 +19,7 @@ import com.location.village.dto.VillageRequestDto;
 import com.location.village.dto.VillageResponseDto;
 import com.location.village.dto.VillageSearchDto;
 import com.location.village.service.VillageService;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.util.ResponseBuilder;
 
 import jakarta.validation.Valid;
@@ -33,7 +33,7 @@ public class VillageController {
     private final VillageService villageService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<VillageResponseDto>> createVillage(
+    public ResponseEntity<ApiResponseDto<VillageResponseDto>> createVillage(
             @Valid @RequestBody VillageRequestDto dto) {
 
         VillageResponseDto response =
@@ -46,7 +46,7 @@ public class VillageController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<VillageResponseDto>> getVillage(
+    public ResponseEntity<ApiResponseDto<VillageResponseDto>> getVillage(
             @PathVariable Long id) {
 
         VillageResponseDto response =
@@ -59,7 +59,7 @@ public class VillageController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<VillageResponseDto>>> getAllVillages(
+    public ResponseEntity<ApiResponseDto<Page<VillageResponseDto>>> getAllVillages(
             Pageable pageable) {
 
         Page<VillageResponseDto> response =
@@ -72,7 +72,7 @@ public class VillageController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<Page<VillageResponseDto>>> searchVillages(
+    public ResponseEntity<ApiResponseDto<Page<VillageResponseDto>>> searchVillages(
             @RequestBody VillageSearchDto dto,
             Pageable pageable) {
 
@@ -86,7 +86,7 @@ public class VillageController {
     }
 
     @GetMapping("/tehsil/{tehsilId}")
-    public ResponseEntity<ApiResponse<List<VillageResponseDto>>> getVillagesByTehsil(
+    public ResponseEntity<ApiResponseDto<List<VillageResponseDto>>> getVillagesByTehsil(
             @PathVariable Long tehsilId) {
 
         List<VillageResponseDto> response =
@@ -99,7 +99,7 @@ public class VillageController {
     }
 
     @GetMapping("/pincode/{pincode}")
-    public ResponseEntity<ApiResponse<List<VillageResponseDto>>> getVillagesByPincode(
+    public ResponseEntity<ApiResponseDto<List<VillageResponseDto>>> getVillagesByPincode(
             @PathVariable String pincode) {
 
         List<VillageResponseDto> response =
@@ -112,7 +112,7 @@ public class VillageController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<VillageResponseDto>> updateVillage(
+    public ResponseEntity<ApiResponseDto<VillageResponseDto>> updateVillage(
             @PathVariable Long id,
             @Valid @RequestBody VillageRequestDto dto) {
 
@@ -126,7 +126,7 @@ public class VillageController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteVillage(
+    public ResponseEntity<ApiResponseDto<Void>> deleteVillage(
             @PathVariable Long id) {
 
         villageService.deleteVillage(id);

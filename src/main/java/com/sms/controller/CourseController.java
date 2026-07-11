@@ -16,7 +16,7 @@ import com.sms.dto.CourseRequestDto;
 import com.sms.dto.CourseResponseDto;
 import com.sms.dto.CourseSearchRequest;
 import com.sms.dto.PageResponse;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.service.CourseService;
 import com.sms.util.ResponseBuilder;
 
@@ -33,7 +33,7 @@ public class CourseController {
     }
     
     @PostMapping
-    public ResponseEntity<ApiResponse<CourseResponseDto>> createCourse(
+    public ResponseEntity<ApiResponseDto<CourseResponseDto>> createCourse(
             @Valid @RequestBody CourseRequestDto dto) {
 
         CourseResponseDto response = courseService.createCourse(dto);
@@ -46,7 +46,7 @@ public class CourseController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CourseResponseDto>> getCourseById(
+    public ResponseEntity<ApiResponseDto<CourseResponseDto>> getCourseById(
             @PathVariable Long id) {
 
         CourseResponseDto response = courseService.getCourseById(id);
@@ -59,7 +59,7 @@ public class CourseController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<CourseResponseDto>> updateCourse(
+    public ResponseEntity<ApiResponseDto<CourseResponseDto>> updateCourse(
             @PathVariable Long id,
             @Valid @RequestBody CourseRequestDto dto) {
 
@@ -74,7 +74,7 @@ public class CourseController {
     
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteCourse(
+    public ResponseEntity<ApiResponseDto<Void>> deleteCourse(
             @PathVariable Long id) {
 
         courseService.deleteCourse(id);
@@ -88,7 +88,7 @@ public class CourseController {
     
     
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<CourseResponseDto>>> getAllCourses(
+    public ResponseEntity<ApiResponseDto<PageResponse<CourseResponseDto>>> getAllCourses(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -106,7 +106,7 @@ public class CourseController {
     
     
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<PageResponse<CourseResponseDto>>> searchCourses(
+    public ResponseEntity<ApiResponseDto<PageResponse<CourseResponseDto>>> searchCourses(
             @RequestBody CourseSearchRequest request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

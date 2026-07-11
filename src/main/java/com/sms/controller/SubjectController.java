@@ -8,7 +8,7 @@ import com.sms.dto.PageResponse;
 import com.sms.dto.SubjectRequestDto;
 import com.sms.dto.SubjectResponseDto;
 import com.sms.dto.SubjectSearchRequest;
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 import com.sms.service.SubjectService;
 import com.sms.util.ResponseBuilder;
 
@@ -27,7 +27,7 @@ public class SubjectController {
     // ==========================
 
     @PostMapping
-    public ResponseEntity<ApiResponse<SubjectResponseDto>> createSubject(
+    public ResponseEntity<ApiResponseDto<SubjectResponseDto>> createSubject(
             @Valid @RequestBody SubjectRequestDto dto) {
 
         SubjectResponseDto response =
@@ -45,7 +45,7 @@ public class SubjectController {
     // ==========================
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<SubjectResponseDto>> getSubjectById(
+    public ResponseEntity<ApiResponseDto<SubjectResponseDto>> getSubjectById(
             @PathVariable Long id) {
 
         SubjectResponseDto response =
@@ -63,7 +63,7 @@ public class SubjectController {
     // ==========================
 
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<SubjectResponseDto>>> getAllSubjects(
+    public ResponseEntity<ApiResponseDto<PageResponse<SubjectResponseDto>>> getAllSubjects(
             @RequestParam(defaultValue = "0") int page,
 
             @RequestParam(defaultValue = "10") int size,
@@ -93,7 +93,7 @@ public class SubjectController {
     // ==========================
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<SubjectResponseDto>> updateSubject(
+    public ResponseEntity<ApiResponseDto<SubjectResponseDto>> updateSubject(
 
             @PathVariable Long id,
 
@@ -118,7 +118,7 @@ public class SubjectController {
     // ==========================
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteSubject(
+    public ResponseEntity<ApiResponseDto<Void>> deleteSubject(
             @PathVariable Long id
     ) {
 
@@ -136,7 +136,7 @@ public class SubjectController {
     // ==========================
 
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<PageResponse<SubjectResponseDto>>> searchSubjects(
+    public ResponseEntity<ApiResponseDto<PageResponse<SubjectResponseDto>>> searchSubjects(
 
 			@RequestBody SubjectSearchRequest request,
 			@RequestParam(defaultValue = "0") int page,

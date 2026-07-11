@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.sms.payload.ApiResponse;
+import com.sms.payload.ApiResponseDto;
 
 public class ResponseBuilder {
 
@@ -13,12 +13,12 @@ public class ResponseBuilder {
 
     }
 
-    public static <T> ResponseEntity<ApiResponse<T>> success(
+    public static <T> ResponseEntity<ApiResponseDto<T>> success(
             T data,
             String message,
             HttpStatus status) {
 
-        ApiResponse<T> response = new ApiResponse<>();
+        ApiResponseDto<T> response = new ApiResponseDto<>();
 
         response.setSuccess(true);
         response.setMessage(message);
@@ -29,11 +29,11 @@ public class ResponseBuilder {
         return new ResponseEntity<>(response, status);
     }
 
-    public static <T> ResponseEntity<ApiResponse<T>> error(
+    public static <T> ResponseEntity<ApiResponseDto<T>> error(
             String message,
             HttpStatus status) {
 
-        ApiResponse<T> response = new ApiResponse<>();
+        ApiResponseDto<T> response = new ApiResponseDto<>();
 
         response.setSuccess(false);
         response.setMessage(message);
