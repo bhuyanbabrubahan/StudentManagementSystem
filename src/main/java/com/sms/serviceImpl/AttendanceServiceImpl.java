@@ -19,9 +19,7 @@ import com.sms.entity.Attendance;
 import com.sms.entity.FacultySubjectMapping;
 import com.sms.entity.Semester;
 import com.sms.entity.Student;
-import com.sms.enums.AttendanceRecordStatus;
-import com.sms.enums.FacultySubjectStatus;
-import com.sms.enums.StudentStatus;
+import com.sms.enums.RecordStatus;
 import com.sms.exception.BusinessException;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.mapper.AttendanceMapper;
@@ -61,7 +59,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                         dto.getStudentId(),
                         dto.getFacultySubjectMappingId(),
                         dto.getAttendanceDate(),
-                        AttendanceRecordStatus.DELETED
+                        RecordStatus.DELETED
                 );
 
 
@@ -78,7 +76,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 studentRepository
                 .findByIdAndStatusNot(
                         dto.getStudentId(),
-                        StudentStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -95,7 +93,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 facultySubjectRepository
                 .findByIdAndStatusNot(
                         dto.getFacultySubjectMappingId(),
-                        FacultySubjectStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -127,7 +125,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         // 7. Default Record Status
         attendance.setStatus(
-                AttendanceRecordStatus.ACTIVE
+                RecordStatus.ACTIVE
         );
 
 
@@ -155,7 +153,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 repository
                 .findByIdAndStatusNot(
                         id,
-                        AttendanceRecordStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -209,7 +207,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         Page<Attendance> result =
                 repository.findByStatusNot(
-                        AttendanceRecordStatus.DELETED,
+                		RecordStatus.DELETED,
                         pageable
                 );
 
@@ -275,7 +273,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 repository
                 .findByIdAndStatusNot(
                         id,
-                        AttendanceRecordStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -294,7 +292,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                         dto.getStudentId(),
                         dto.getFacultySubjectMappingId(),
                         dto.getAttendanceDate(),
-                        AttendanceRecordStatus.DELETED,
+                        RecordStatus.DELETED,
                         id
                 );
 
@@ -312,7 +310,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 studentRepository
                 .findByIdAndStatusNot(
                         dto.getStudentId(),
-                        StudentStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -329,7 +327,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 facultySubjectRepository
                 .findByIdAndStatusNot(
                         dto.getFacultySubjectMappingId(),
-                        FacultySubjectStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -377,7 +375,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 repository
                 .findByIdAndStatusNot(
                         id,
-                        AttendanceRecordStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -390,7 +388,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         // 2. Soft Delete
         attendance.setStatus(
-                AttendanceRecordStatus.DELETED
+        		RecordStatus.DELETED
         );
 
         // 3. Save
@@ -423,7 +421,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
             spec =
             spec.and(
-            AttendanceSpecification.hasStatus(
+            AttendanceSpecification.hasRecordStatus(
                     request.getStatus()
             ));
 
@@ -432,8 +430,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
             spec =
             spec.and(
-            AttendanceSpecification.statusNot(
-                    AttendanceRecordStatus.DELETED
+            AttendanceSpecification.recordStatusNot(
+            		RecordStatus.DELETED
             ));
 
         }
@@ -505,12 +503,12 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         // Present/Absent
 
-        if(request.getAttendanceStatus()!=null){
+        if(request.getStatus()!=null){
 
             spec =
             spec.and(
-            AttendanceSpecification.hasAttendanceStatus(
-                    request.getAttendanceStatus()
+            AttendanceSpecification.hasStatus(
+                    request.getStatus()
             ));
 
         }

@@ -3,14 +3,14 @@ package com.sms.specification;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.sms.entity.Department;
-import com.sms.enums.DepartmentStatus;
+import com.sms.enums.RecordStatus;
 
 
 
 public class DepartmentSpecification {
 
     // 1. Status filter
-    public static Specification<Department> hasStatus(DepartmentStatus status) {
+    public static Specification<Department> hasStatus(RecordStatus status) {
         return (root, query, cb) ->
                 cb.equal(root.get("status"), status);
     }
@@ -26,8 +26,13 @@ public class DepartmentSpecification {
 
     // 3. Department Code (exact match usually)
     public static Specification<Department> hasDepartmentCode(String departmentCode) {
+
         return (root, query, cb) ->
-                cb.equal(root.get("departmentCode"), departmentCode);
+
+                cb.like(
+                        cb.lower(root.get("departmentCode")),
+                        "%" + departmentCode.trim().toLowerCase() + "%"
+                );
     }
 
     // 4. Description (LIKE search instead of exact match)

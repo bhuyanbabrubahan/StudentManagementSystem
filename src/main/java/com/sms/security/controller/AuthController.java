@@ -71,7 +71,7 @@ public class AuthController {
 
 		return ResponseBuilder.success(
 				response,
-				"Student Login Successful",
+				"Login Successful",
 				HttpStatus.OK
 
 		);

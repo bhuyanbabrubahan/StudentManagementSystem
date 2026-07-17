@@ -2,27 +2,66 @@ package com.sms.dto;
 
 import java.time.LocalDate;
 
+import com.sms.enums.RecordStatus;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Schema(
+    name = "FacultySubjectResponseDto",
+    description = "Response DTO containing faculty-subject assignment details."
+)
 public class FacultySubjectResponseDto {
 
-	private Long id;
+    @Schema(
+        description = "Unique Faculty Subject Mapping ID",
+        example = "1"
+    )
+    private Long id;
 
-	private Long facultyId;
+    @Schema(
+        description = "Faculty ID",
+        example = "10"
+    )
+    private Long facultyId;
 
-	private String facultyName;
+    @Schema(
+        description = "Faculty full name",
+        example = "Rahul Sharma"
+    )
+    private String facultyName;
 
-	private Long subjectId;
+    @Schema(
+        description = "Subject ID",
+        example = "5"
+    )
+    private Long subjectId;
 
-	private String subjectName;
+    @Schema(
+        description = "Subject name",
+        example = "Data Structures"
+    )
+    private String subjectName;
 
-	private LocalDate assignedDate;
+    @Schema(
+        description = "Date on which the subject was assigned to the faculty",
+        example = "2026-07-15"
+    )
+    private LocalDate assignedDate;
 
-	private String academicYear;
+    @Schema(
+        description = "Academic year of the faculty-subject assignment",
+        example = "2026-2027"
+    )
+    private String academicYear;
 
-	private String status;
+    @Schema(
+        description = "Current record status",
+        example = "ACTIVE"
+    )
+    private RecordStatus status;
 
 }

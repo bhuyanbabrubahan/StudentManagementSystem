@@ -16,8 +16,7 @@ import com.sms.dto.SubjectResponseDto;
 import com.sms.dto.SubjectSearchRequest;
 import com.sms.entity.Semester;
 import com.sms.entity.Subject;
-import com.sms.enums.SemesterStatus;
-import com.sms.enums.SubjectStatus;
+import com.sms.enums.RecordStatus;
 import com.sms.exception.BusinessException;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.mapper.SubjectMapper;
@@ -61,7 +60,7 @@ public class SubjectServiceImpl implements SubjectService {
         Semester semester = semesterRepository
                 .findByIdAndStatusNot(
                         dto.getSemesterId(),
-                        SemesterStatus.DELETED)
+                        RecordStatus.DELETED)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Semester not found with id : "
@@ -71,7 +70,7 @@ public class SubjectServiceImpl implements SubjectService {
 
         subject.setSubjectCode(generateSubjectCode());
         subject.setSemester(semester);
-        subject.setStatus(SubjectStatus.ACTIVE);
+        subject.setStatus(RecordStatus.ACTIVE);
 
         Subject saved = repository.save(subject);
 
@@ -86,7 +85,7 @@ public class SubjectServiceImpl implements SubjectService {
     public SubjectResponseDto getSubjectById(Long id) {
 
         Subject subject = repository
-                .findByIdAndStatusNot(id, SubjectStatus.DELETED)
+                .findByIdAndStatusNot(id, RecordStatus.DELETED)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Subject not found with id : " + id));
@@ -104,7 +103,7 @@ public class SubjectServiceImpl implements SubjectService {
             SubjectRequestDto dto) {
 
         Subject subject = repository
-                .findByIdAndStatusNot(id, SubjectStatus.DELETED)
+                .findByIdAndStatusNot(id, RecordStatus.DELETED)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Subject not found with id : " + id));
@@ -121,7 +120,7 @@ public class SubjectServiceImpl implements SubjectService {
         Semester semester = semesterRepository
                 .findByIdAndStatusNot(
                         dto.getSemesterId(),
-                        SemesterStatus.DELETED)
+                        RecordStatus.DELETED)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Semester not found with id : "
@@ -144,12 +143,12 @@ public class SubjectServiceImpl implements SubjectService {
     public void deleteSubject(Long id) {
 
         Subject subject = repository
-                .findByIdAndStatusNot(id, SubjectStatus.DELETED)
+                .findByIdAndStatusNot(id, RecordStatus.DELETED)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Subject not found with id : " + id));
 
-        subject.setStatus(SubjectStatus.DELETED);
+        subject.setStatus(RecordStatus.DELETED);
 
         repository.save(subject);
     }
@@ -174,7 +173,7 @@ public class SubjectServiceImpl implements SubjectService {
 
         Page<Subject> subjectPage =
                 repository.findByStatusNot(
-                        SubjectStatus.DELETED,
+                		RecordStatus.DELETED,
                         pageable);
 
         List<SubjectResponseDto> content =
@@ -217,7 +216,7 @@ public class SubjectServiceImpl implements SubjectService {
         } else {
             spec = spec.and(
                     SubjectSpecification.hasStatus(
-                            SubjectStatus.ACTIVE));
+                    		RecordStatus.ACTIVE));
         }
 
         if (request.getSubjectName() != null

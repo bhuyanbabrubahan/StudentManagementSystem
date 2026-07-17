@@ -29,7 +29,7 @@ public class FacultySubjectMapper {
 
 		dto.setAcademicYear(entity.getAcademicYear());
 
-		dto.setStatus(entity.getStatus().name());
+		dto.setStatus(entity.getStatus());
 
 		return dto;
 	}

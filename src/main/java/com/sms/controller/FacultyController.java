@@ -3,7 +3,15 @@ package com.sms.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.sms.dto.FacultyRequestDto;
 import com.sms.dto.FacultyResponseDto;
@@ -13,9 +21,17 @@ import com.sms.payload.ApiResponseDto;
 import com.sms.service.FacultyService;
 import com.sms.util.ResponseBuilder;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-
+@Tag(
+	    name = "Faculty Management",
+	    description = "APIs for managing faculty members including create, update, retrieve, delete and search operations."
+	)
 @RestController
 @RequestMapping("/api/faculties")
 public class FacultyController {
@@ -37,7 +53,16 @@ public class FacultyController {
     // ===============================
     // CREATE FACULTY
     // ===============================
-
+    @Operation(
+    	    summary = "Create Faculty",
+    	    description = "Creates a new faculty member along with user account and address details."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "201", description = "Faculty created successfully"),
+    	    @ApiResponse(responseCode = "400", description = "Invalid request data"),
+    	    @ApiResponse(responseCode = "404", description = "Department or Address reference not found"),
+    	    @ApiResponse(responseCode = "409", description = "Email, Phone Number or Employee Code already exists")
+    	})
     @PostMapping
     public ResponseEntity<ApiResponseDto<FacultyResponseDto>> createFaculty(
             @Valid @RequestBody FacultyRequestDto dto
@@ -65,10 +90,24 @@ public class FacultyController {
     // Only Numeric ID Allowed
     // ===============================
 
-    @GetMapping("/{id:\\d+}")
-    public ResponseEntity<ApiResponseDto<FacultyResponseDto>> getFacultyById(
-            @PathVariable Long id
-    ) {
+    @Operation(
+    	    summary = "Get Faculty By ID",
+    	    description = "Fetches a faculty record using its unique ID."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Faculty fetched successfully"),
+    	    @ApiResponse(responseCode = "404", description = "Faculty not found")
+    	})
+    	@GetMapping("/{id:\\d+}")
+    	public ResponseEntity<ApiResponseDto<FacultyResponseDto>> getFacultyById(
+
+    	        @Parameter(
+    	                description = "Unique Faculty ID",
+    	                example = "1",
+    	                required = true
+    	        )
+    	        @PathVariable Long id
+    	) {
 
 
         FacultyResponseDto response =
@@ -92,25 +131,33 @@ public class FacultyController {
     // Pagination + Sorting
     // ===============================
 
-    @GetMapping
-    public ResponseEntity<ApiResponseDto<PageResponse<FacultyResponseDto>>> getAllFaculties(
+    @Operation(
+    	    summary = "Get All Faculties",
+    	    description = "Returns all faculty records with pagination and sorting."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Faculty list fetched successfully")
+    	})
+    	@GetMapping
+    	public ResponseEntity<ApiResponseDto<PageResponse<FacultyResponseDto>>> getAllFaculties(
 
-            @RequestParam(defaultValue = "0")
-            int page,
+    	        @Parameter(description = "Page Number", example = "0")
+    	        @RequestParam(defaultValue = "0")
+    	        int page,
 
+    	        @Parameter(description = "Page Size", example = "10")
+    	        @RequestParam(defaultValue = "10")
+    	        int size,
 
-            @RequestParam(defaultValue = "10")
-            int size,
+    	        @Parameter(description = "Sort Field", example = "id")
+    	        @RequestParam(defaultValue = "id")
+    	        String sortBy,
 
+    	        @Parameter(description = "Sort Direction", example = "asc")
+    	        @RequestParam(defaultValue = "asc")
+    	        String direction
 
-            @RequestParam(defaultValue = "id")
-            String sortBy,
-
-
-            @RequestParam(defaultValue = "asc")
-            String direction
-
-    ) {
+    	) {
 
 
         PageResponse<FacultyResponseDto> response =
@@ -142,16 +189,30 @@ public class FacultyController {
     // ===============================
 
 
-    @PutMapping("/{id:\\d+}")
-    public ResponseEntity<ApiResponseDto<FacultyResponseDto>> updateFaculty(
+    @Operation(
+    	    summary = "Update Faculty",
+    	    description = "Updates an existing faculty record using the faculty ID."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Faculty updated successfully"),
+    	    @ApiResponse(responseCode = "400", description = "Invalid request"),
+    	    @ApiResponse(responseCode = "404", description = "Faculty not found"),
+    	    @ApiResponse(responseCode = "409", description = "Duplicate email or phone number")
+    	})
+    	@PutMapping("/{id:\\d+}")
+    	public ResponseEntity<ApiResponseDto<FacultyResponseDto>> updateFaculty(
 
-            @PathVariable Long id,
+    	        @Parameter(
+    	                description = "Faculty ID",
+    	                example = "1",
+    	                required = true
+    	        )
+    	        @PathVariable Long id,
 
+    	        @Valid
+    	        @RequestBody FacultyRequestDto dto
 
-            @Valid
-            @RequestBody FacultyRequestDto dto
-
-    ) {
+    	) {
 
 
 
@@ -184,12 +245,25 @@ public class FacultyController {
     // ===============================
 
 
-    @DeleteMapping("/{id:\\d+}")
-    public ResponseEntity<ApiResponseDto<Void>> deleteFaculty(
+    @Operation(
+    	    summary = "Delete Faculty",
+    	    description = "Soft deletes a faculty record."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Faculty deleted successfully"),
+    	    @ApiResponse(responseCode = "404", description = "Faculty not found")
+    	})
+    	@DeleteMapping("/{id:\\d+}")
+    	public ResponseEntity<ApiResponseDto<Void>> deleteFaculty(
 
-            @PathVariable Long id
+    	        @Parameter(
+    	                description = "Faculty ID",
+    	                example = "1",
+    	                required = true
+    	        )
+    	        @PathVariable Long id
 
-    ) {
+    	) {
 
 
         facultyService.deleteFaculty(id);
@@ -216,29 +290,49 @@ public class FacultyController {
     // ===============================
 
 
-    @PostMapping("/search")
-    public ResponseEntity<ApiResponseDto<PageResponse<FacultyResponseDto>>> searchFaculties(
+    @Operation(
+    	    summary = "Search Faculties",
+    	    description = """
+    	            Performs dynamic faculty search using optional filters.
+    	            
+    	            Supports:
+    	            - Faculty ID
+    	            - Employee Code
+    	            - First Name
+    	            - Last Name
+    	            - Department
+    	            - Designation
+    	            - Qualification
+    	            - Record Status
+    	            
+    	            Also supports Pagination and Sorting.
+    	            """
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Faculty search completed successfully")
+    	})
+    	@PostMapping("/search")
+    	public ResponseEntity<ApiResponseDto<PageResponse<FacultyResponseDto>>> searchFaculties(
 
+    	        @RequestBody FacultySearchRequest request,
 
-            @RequestBody FacultySearchRequest request,
+    	        @Parameter(description = "Page Number", example = "0")
+    	        @RequestParam(defaultValue = "0")
+    	        int page,
 
+    	        @Parameter(description = "Page Size", example = "10")
+    	        @RequestParam(defaultValue = "10")
+    	        int size,
 
-            @RequestParam(defaultValue = "0")
-            int page,
+    	        @Parameter(description = "Sort Field", example = "id")
+    	        @RequestParam(defaultValue = "id")
+    	        String sortBy,
 
+    	        @Parameter(description = "Sort Direction", example = "asc")
+    	        @RequestParam(defaultValue = "asc")
+    	        String direction
 
-            @RequestParam(defaultValue = "10")
-            int size,
-
-
-            @RequestParam(defaultValue = "id")
-            String sortBy,
-
-
-            @RequestParam(defaultValue = "asc")
-            String direction
-
-    ) {
+    	) {
 
 
 

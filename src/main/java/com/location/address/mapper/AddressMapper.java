@@ -19,8 +19,6 @@ public class AddressMapper {
 
 		address.setLandmark(dto.getLandmark());
 
-		address.setPostalCode(dto.getPostalCode());
-
 		address.setAddressType(dto.getAddressType());
 
 		return address;
@@ -35,34 +33,32 @@ public class AddressMapper {
 
 		address.setLandmark(dto.getLandmark());
 
-		address.setPostalCode(dto.getPostalCode());
-
 		address.setAddressType(dto.getAddressType());
 
 	}
 
 	public AddressResponseDto convertToResponseDto(Address address) {
 
-		AddressResponseDto response = new AddressResponseDto();
+	    AddressResponseDto response = new AddressResponseDto();
 
-		response.setId(address.getId());
+	    response.setId(address.getId());
+	    response.setHouseNumber(address.getHouseNumber());
+	    response.setStreet(address.getStreet());
+	    response.setLandmark(address.getLandmark());
+	    response.setAddressType(address.getAddressType());
 
-		response.setHouseNumber(address.getHouseNumber());
+	    if (address.getVillage() != null) {
 
-		response.setStreet(address.getStreet());
+	        response.setVillageId(
+	                address.getVillage().getId()
+	        );
 
-		response.setLandmark(address.getLandmark());
+	        response.setVillageName(
+	                address.getVillage().getVillageName()
+	        );
+	    }
 
-		response.setPostalCode(address.getPostalCode());
-
-		response.setAddressType(address.getAddressType());
-
-		response.setVillageId(address.getVillage().getId());
-
-		response.setVillageName(address.getVillage().getVillageName());
-
-		return response;
-
+	    return response;
 	}
 
 }

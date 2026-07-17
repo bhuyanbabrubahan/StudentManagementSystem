@@ -8,15 +8,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.sms.entity.Course;
-import com.sms.enums.CourseStatus;
+import com.sms.enums.RecordStatus;
 
 public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecificationExecutor<Course>{
 
 	// Fetch single ACTIVE course
-	Optional<Course> findByIdAndStatusNot(Long id, CourseStatus status);
+	Optional<Course> findByIdAndStatusNot(Long id, RecordStatus status);
 
 	// Get all ACTIVE courses with pagination
-	Page<Course> findByStatusNot(CourseStatus status, Pageable pageable);
+	Page<Course> findByStatusNot(RecordStatus status, Pageable pageable);
 
 	// Used while deleting Department
 	boolean existsByDepartment_Id(Long departmentId);
@@ -34,5 +34,5 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
 
 	long countByDepartment_Id(Long departmentId);
 	
-	Optional<Course> findByIdAndStatus(Long id, CourseStatus status);
+	Optional<Course> findByIdAndStatus(Long id, RecordStatus status);
 }

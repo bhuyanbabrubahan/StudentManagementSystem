@@ -2,7 +2,6 @@ package com.sms.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 import com.sms.dto.ResultRequestDto;
 import com.sms.dto.ResultResponseDto;

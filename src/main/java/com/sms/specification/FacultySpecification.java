@@ -2,10 +2,10 @@ package com.sms.specification;
 
 import org.springframework.data.jpa.domain.Specification;
 
-import com.sms.entity.Faculty;
 import com.sms.entity.Designation;
+import com.sms.entity.Faculty;
 import com.sms.entity.Qualification;
-import com.sms.enums.FacultyStatus;
+import com.sms.enums.RecordStatus;
 
 public class FacultySpecification {
 	
@@ -24,7 +24,7 @@ public class FacultySpecification {
 	// Status Filter
 	// ============================
 
-	public static Specification<Faculty> hasStatus(FacultyStatus status) {
+	public static Specification<Faculty> hasStatus(RecordStatus status) {
 
 		return (root, query, cb) ->
 

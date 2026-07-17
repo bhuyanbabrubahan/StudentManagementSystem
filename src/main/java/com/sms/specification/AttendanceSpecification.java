@@ -5,8 +5,7 @@ import java.time.LocalDate;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.sms.entity.Attendance;
-import com.sms.enums.AttendanceRecordStatus;
-import com.sms.enums.AttendanceStatus;
+import com.sms.enums.RecordStatus;
 
 
 public class AttendanceSpecification {
@@ -32,7 +31,7 @@ public class AttendanceSpecification {
 
 
     // ==========================
-    // Faculty Subject Filter
+    // Faculty Subject Mapping
     // ==========================
 
     public static Specification<Attendance> hasFacultySubject(
@@ -48,7 +47,12 @@ public class AttendanceSpecification {
 
     }
 
-    
+
+
+    // ==========================
+    // Faculty Filter
+    // ==========================
+
     public static Specification<Attendance> hasFaculty(
             Long facultyId
     ){
@@ -63,8 +67,14 @@ public class AttendanceSpecification {
                 facultyId
             );
     }
-    
-    
+
+
+
+
+    // ==========================
+    // Subject Filter
+    // ==========================
+
     public static Specification<Attendance> hasSubject(
             Long subjectId
     ){
@@ -79,6 +89,8 @@ public class AttendanceSpecification {
                 subjectId
             );
     }
+
+
 
 
     // ==========================
@@ -100,22 +112,24 @@ public class AttendanceSpecification {
 
 
 
+
     // ==========================
     // Attendance Status
     // ==========================
 
-    public static Specification<Attendance> hasAttendanceStatus(
-            AttendanceStatus status) {
+    public static Specification<Attendance> hasStatus(
+    		RecordStatus status) {
 
 
         return (root, query, cb) ->
 
                 cb.equal(
-                        root.get("attendanceStatus"),
+                        root.get("status"),
                         status
                 );
 
     }
+
 
 
 
@@ -123,18 +137,19 @@ public class AttendanceSpecification {
     // Record Status
     // ==========================
 
-    public static Specification<Attendance> hasStatus(
-            AttendanceRecordStatus status) {
+    public static Specification<Attendance> hasRecordStatus(
+            RecordStatus recordStatus) {
 
 
         return (root, query, cb) ->
 
                 cb.equal(
-                        root.get("status"),
-                        status
+                        root.get("recordStatus"),
+                        recordStatus
                 );
 
     }
+
 
 
 
@@ -142,15 +157,15 @@ public class AttendanceSpecification {
     // Exclude Deleted
     // ==========================
 
-    public static Specification<Attendance> statusNot(
-            AttendanceRecordStatus status) {
+    public static Specification<Attendance> recordStatusNot(
+            RecordStatus recordStatus) {
 
 
         return (root, query, cb) ->
 
                 cb.notEqual(
-                        root.get("status"),
-                        status
+                        root.get("recordStatus"),
+                        recordStatus
                 );
 
     }

@@ -14,23 +14,69 @@ import com.sms.entity.Semester;
 @Mapper(componentModel = "spring")
 public interface SemesterMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "course", ignore = true)
-    Semester toEntity(SemesterRequestDto dto);
+    // ==================================================
+    // DTO -> ENTITY
+    // ==================================================
 
-    @Mapping(source = "course.id", target = "courseId")
-    @Mapping(source = "course.courseName", target = "courseName")
-    SemesterResponseDto toDto(Semester semester);
+    @Mapping(target = "id", ignore = true)
+
+    @Mapping(target = "course", ignore = true)
+
+    @Mapping(target = "status", ignore = true)
+
+    Semester toEntity(
+            SemesterRequestDto dto
+    );
+
+
+
+    // ==================================================
+    // ENTITY -> DTO
+    // ==================================================
+
+    @Mapping(
+            source = "course.id",
+            target = "courseId"
+    )
+
+    @Mapping(
+            source = "course.courseCode",
+            target = "courseCode"
+    )
+
+    @Mapping(
+            source = "course.courseName",
+            target = "courseName"
+    )
+
+    SemesterResponseDto toDto(
+            Semester semester
+    );
+
+
+
+    // ==================================================
+    // UPDATE
+    // ==================================================
 
     @BeanMapping(
             nullValuePropertyMappingStrategy =
                     NullValuePropertyMappingStrategy.IGNORE
     )
+
     @Mapping(target = "id", ignore = true)
+
     @Mapping(target = "course", ignore = true)
+
+    @Mapping(target = "status", ignore = true)
+
     void updateEntity(
-            @MappingTarget Semester semester,
+
+            @MappingTarget
+            Semester semester,
+
             SemesterRequestDto dto
+
     );
 
 }

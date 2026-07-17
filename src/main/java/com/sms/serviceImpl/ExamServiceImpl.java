@@ -18,9 +18,7 @@ import com.sms.dto.PageResponse;
 import com.sms.entity.Exam;
 import com.sms.entity.Semester;
 import com.sms.entity.Subject;
-import com.sms.enums.ExamStatus;
-import com.sms.enums.SemesterStatus;
-import com.sms.enums.SubjectStatus;
+import com.sms.enums.RecordStatus;
 import com.sms.exception.BusinessException;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.mapper.ExamMapper;
@@ -61,7 +59,7 @@ public class ExamServiceImpl implements ExamService {
                         dto.getSubjectId(),
                         dto.getExamDate(),
                         dto.getExamType(),
-                        ExamStatus.DELETED
+                        RecordStatus.DELETED
                 );
 
 
@@ -81,7 +79,7 @@ public class ExamServiceImpl implements ExamService {
              subjectRepository
              .findByIdAndStatusNot(
                      dto.getSubjectId(),
-                     SubjectStatus.DELETED
+                     RecordStatus.DELETED
              )
              .orElseThrow(() ->
                      new ResourceNotFoundException(
@@ -99,7 +97,7 @@ public class ExamServiceImpl implements ExamService {
 	             semesterRepository
 	             .findByIdAndStatusNot(
 	                     dto.getSemesterId(),
-	                     SemesterStatus.DELETED
+	                     RecordStatus.DELETED
 	             )
 	             .orElseThrow(() ->
 	                     new ResourceNotFoundException(
@@ -138,7 +136,7 @@ public class ExamServiceImpl implements ExamService {
 
 
         exam.setStatus(
-                ExamStatus.ACTIVE
+        		RecordStatus.ACTIVE
         );
 
 
@@ -166,7 +164,7 @@ public class ExamServiceImpl implements ExamService {
                 repository
                 .findByIdAndStatusNot(
                         id,
-                        ExamStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -234,7 +232,7 @@ public class ExamServiceImpl implements ExamService {
 
         Page<Exam> result =
                 repository.findByStatusNot(
-                        ExamStatus.DELETED,
+                		RecordStatus.DELETED,
                         pageable
                 );
 
@@ -304,7 +302,7 @@ public class ExamServiceImpl implements ExamService {
                 repository
                 .findByIdAndStatusNot(
                         id,
-                        ExamStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -327,7 +325,7 @@ public class ExamServiceImpl implements ExamService {
                         dto.getSubjectId(),
                         dto.getExamDate(),
                         dto.getExamType(),
-                        ExamStatus.DELETED,
+                        RecordStatus.DELETED,
                         id
                 );
 
@@ -348,7 +346,7 @@ public class ExamServiceImpl implements ExamService {
 	             semesterRepository
 	             .findByIdAndStatusNot(
 	                     dto.getSemesterId(),
-	                     SemesterStatus.DELETED
+	                     RecordStatus.DELETED
 	             )
 	             .orElseThrow(() ->
 	
@@ -380,7 +378,7 @@ public class ExamServiceImpl implements ExamService {
                 subjectRepository
                 .findByIdAndStatusNot(
                         dto.getSubjectId(),
-                        SubjectStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -436,7 +434,7 @@ public class ExamServiceImpl implements ExamService {
                 repository
                 .findByIdAndStatusNot(
                         id,
-                        ExamStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -454,7 +452,7 @@ public class ExamServiceImpl implements ExamService {
 
 
         exam.setStatus(
-                ExamStatus.DELETED
+        		RecordStatus.DELETED
         );
 
 
@@ -511,7 +509,7 @@ public class ExamServiceImpl implements ExamService {
             spec =
             spec.and(
                     ExamSpecification.statusNot(
-                            ExamStatus.DELETED
+                    		RecordStatus.DELETED
                     )
             );
 

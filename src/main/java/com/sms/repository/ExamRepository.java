@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.sms.entity.Exam;
 import com.sms.entity.Student;
-import com.sms.enums.ExamStatus;
 import com.sms.enums.ExamType;
+import com.sms.enums.RecordStatus;
 
 public interface ExamRepository extends JpaRepository<Exam, Long>, JpaSpecificationExecutor<Exam> {
 
@@ -20,27 +20,27 @@ public interface ExamRepository extends JpaRepository<Exam, Long>, JpaSpecificat
 	// ==========================
 
 	boolean existsBySubjectIdAndExamDateAndExamTypeAndStatusNot(Long subjectId, LocalDate examDate, ExamType examType,
-			ExamStatus status);
+			RecordStatus status);
 
 	// ==========================
 	// Duplicate Check UPDATE
 	// ==========================
 
 	boolean existsBySubjectIdAndExamDateAndExamTypeAndStatusNotAndIdNot(Long subjectId, LocalDate examDate,
-			ExamType examType, ExamStatus status, Long id);
+			ExamType examType, RecordStatus status, Long id);
 
 	// ==========================
 	// Find Active Exam
 	// ==========================
 
-	Optional<Exam> findByIdAndStatusNot(Long id, ExamStatus status);
+	Optional<Exam> findByIdAndStatusNot(Long id, RecordStatus status);
 
 	// ==========================
 	// ==========================
 
-	Page<Exam> findByStatusNot(ExamStatus status, Pageable pageable);
+	Page<Exam> findByStatusNot(RecordStatus status, Pageable pageable);
 
-	Optional<Student> findByIdAndStatus(Long examId, ExamStatus active);
+	Optional<Student> findByIdAndStatus(Long examId, RecordStatus active);
 	
 
 }

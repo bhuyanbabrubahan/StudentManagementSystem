@@ -3,8 +3,8 @@ package com.sms.entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import com.sms.enums.ExamStatus;
 import com.sms.enums.ExamType;
+import com.sms.enums.RecordStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -81,7 +81,7 @@ public class Exam extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ExamStatus status;
+    private RecordStatus status;
 
     // ==========================
     // Relationships

@@ -3,7 +3,7 @@ package com.sms.specification;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.sms.entity.FacultySubjectMapping;
-import com.sms.enums.FacultySubjectStatus;
+import com.sms.enums.RecordStatus;
 
 public class FacultySubjectSpecification {
 
@@ -11,7 +11,7 @@ public class FacultySubjectSpecification {
     // STATUS
     // ==========================
     public static Specification<FacultySubjectMapping> hasStatus(
-            FacultySubjectStatus status) {
+    		RecordStatus status) {
 
         return (root, query, cb) ->
                 cb.equal(root.get("status"), status);
@@ -57,7 +57,7 @@ public class FacultySubjectSpecification {
     }
     
     public static Specification<FacultySubjectMapping> statusNot(
-    		FacultySubjectStatus status){
+    		RecordStatus status){
 
     return (root,query,cb)->
 

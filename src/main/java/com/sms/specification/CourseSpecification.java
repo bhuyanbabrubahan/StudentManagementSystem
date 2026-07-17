@@ -5,52 +5,100 @@ import java.math.BigDecimal;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.sms.entity.Course;
-import com.sms.enums.CourseStatus;
+import com.sms.enums.RecordStatus;
 
 public class CourseSpecification {
 
-    // 1. STATUS (default ACTIVE handled in service layer)
-    public static Specification<Course> hasStatus(CourseStatus status) {
+    // ==========================================
+    // Status
+    // ==========================================
+
+    public static Specification<Course> hasStatus(RecordStatus status) {
         return (root, query, cb) ->
                 cb.equal(root.get("status"), status);
     }
 
-    // 2. COURSE NAME (LIKE search)
+    // ==========================================
+    // Course Name
+    // ==========================================
+
     public static Specification<Course> hasCourseName(String courseName) {
         return (root, query, cb) ->
                 cb.like(
                         cb.lower(root.get("courseName")),
-                        "%" + courseName.toLowerCase() + "%"
+                        "%" + courseName.trim().toLowerCase() + "%"
                 );
     }
 
-    // 3. COURSE CODE (exact match)
+    // ==========================================
+    // Course Code
+    // ==========================================
+
     public static Specification<Course> hasCourseCode(String courseCode) {
         return (root, query, cb) ->
-                cb.equal(root.get("courseCode"), courseCode);
+                cb.like(
+                        cb.lower(root.get("courseCode")),
+                        "%" + courseCode.trim().toLowerCase() + "%"
+                );
     }
 
-    // 4. DEPARTMENT FILTER (JOIN handled by Hibernate)
+    // ==========================================
+    // Department
+    // ==========================================
+
     public static Specification<Course> hasDepartment(Long departmentId) {
         return (root, query, cb) ->
-                cb.equal(root.get("department").get("id"), departmentId);
+                cb.equal(
+                        root.get("department").get("id"),
+                        departmentId
+                );
     }
 
-    // 5. MIN FEES
+    // ==========================================
+    // Minimum Fees
+    // ==========================================
+
     public static Specification<Course> hasFeesGreaterThan(BigDecimal minFees) {
         return (root, query, cb) ->
-                cb.greaterThanOrEqualTo(root.get("fees"), minFees);
+                cb.greaterThanOrEqualTo(
+                        root.get("fees"),
+                        minFees
+                );
     }
 
-    // 6. MAX FEES
+    // ==========================================
+    // Maximum Fees
+    // ==========================================
+
     public static Specification<Course> hasFeesLessThan(BigDecimal maxFees) {
         return (root, query, cb) ->
-                cb.lessThanOrEqualTo(root.get("fees"), maxFees);
+                cb.lessThanOrEqualTo(
+                        root.get("fees"),
+                        maxFees
+                );
     }
 
-    // 7. OPTIONAL: ACTIVE ONLY helper (optional reuse)
-    public static Specification<Course> isActive() {
+    // ==========================================
+    // Minimum Duration
+    // ==========================================
+
+    public static Specification<Course> hasMinDuration(Integer minDuration) {
         return (root, query, cb) ->
-                cb.equal(root.get("status"), CourseStatus.ACTIVE);
+                cb.greaterThanOrEqualTo(
+                        root.get("durationInMonths"),
+                        minDuration
+                );
+    }
+
+    // ==========================================
+    // Maximum Duration
+    // ==========================================
+
+    public static Specification<Course> hasMaxDuration(Integer maxDuration) {
+        return (root, query, cb) ->
+                cb.lessThanOrEqualTo(
+                        root.get("durationInMonths"),
+                        maxDuration
+                );
     }
 }

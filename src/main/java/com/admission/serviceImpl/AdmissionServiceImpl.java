@@ -1,5 +1,6 @@
 package com.admission.serviceImpl;
 
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -24,196 +25,153 @@ import com.sms.dto.PageResponse;
 import com.sms.entity.Course;
 import com.sms.entity.Department;
 import com.sms.entity.Student;
-import com.sms.enums.CourseStatus;
-import com.sms.enums.DepartmentStatus;
-import com.sms.enums.StudentStatus;
+import com.sms.enums.RecordStatus;
 import com.sms.exception.BusinessException;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.repository.CourseRepository;
 import com.sms.repository.DepartmentRepository;
 import com.sms.repository.StudentRepository;
+import com.sms.sequence.enums.ModuleType;
+import com.sms.sequence.service.CodeGeneratorService;
+
+import lombok.RequiredArgsConstructor;
+
+
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class AdmissionServiceImpl implements AdmissionService {
 
 
     private final AdmissionRepository admissionRepository;
-
     private final StudentRepository studentRepository;
-
     private final DepartmentRepository departmentRepository;
-
     private final CourseRepository courseRepository;
-
     private final AdmissionMapper admissionMapper;
+    private final CodeGeneratorService codeGeneratorService;
 
 
-    public AdmissionServiceImpl(
-            AdmissionRepository admissionRepository,
-            StudentRepository studentRepository,
-            DepartmentRepository departmentRepository,
-            CourseRepository courseRepository,
-            AdmissionMapper admissionMapper) {
 
+    // =====================================================
+    // CREATE ADMISSION
+    // =====================================================
 
-        this.admissionRepository = admissionRepository;
-        this.studentRepository = studentRepository;
-        this.departmentRepository = departmentRepository;
-        this.courseRepository = courseRepository;
-        this.admissionMapper = admissionMapper;
-    }
 
     @Override
     public AdmissionResponseDto createAdmission(
             AdmissionRequestDto dto) {
 
-        //Student exist hona chahiye aur deleted student ko admission nahi milega.
-        Student student = studentRepository
-                .findByIdAndStatusNot(
-                        dto.getStudentId(),
-                        StudentStatus.DELETED
-                )
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                        		"Student not found with id: "
-                        				+ dto.getStudentId()));
 
-        //Ek student ke paas ek hi ACTIVE admission hona chahiye.
-        boolean exists =
-                admissionRepository
-                .existsByStudent_IdAndStatus(
-                        dto.getStudentId(),
-                        AdmissionStatus.ACTIVE
-                );
+    	Student student =
+    			getActiveStudent(
+    			        dto.getStudentId()
+    			);
 
-        if (exists) {
-            throw new BusinessException(
-                    "Student already has active admission");
-        }
 
-        //Admission create karte waqt selected Department exist hona chahiye aur ACTIVE hona chahiye.
-        Department department =
-                departmentRepository
-                .findByIdAndStatus(
-                        dto.getDepartmentId(),
-                        DepartmentStatus.ACTIVE
-                )
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                        		"Department not found with id: "
-                        				+ dto.getDepartmentId()));
 
-        //Course exist hona chahiye aur ACTIVE hona chahiye.
-        Course course =
-                courseRepository
-                .findByIdAndStatus(
-                        dto.getCourseId(),
-                        CourseStatus.ACTIVE
-                )
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                        		"Course not found with id: "
-                        				+ dto.getCourseId()));
-
-        //Selected Course selected Department ka hi hona chahiye.
-        if (!course.getDepartment()
-                .getId()
-                .equals(department.getId())) {
-
-            throw new BusinessException(
-                    "Course does not belong to department");
-        }
-        
-        //Request DTO ko Admission entity me convert karna.
-        Admission admission = admissionMapper.toEntity(dto);
-
-        //Validated Student ko Admission ke saath set karna.
-        admission.setStudent(student);
-
-        //Validated Department ko Admission ke saath set karna.
-        admission.setDepartment(department);
-
-        //Validated Course ko Admission ke saath set karna.
-        admission.setCourse(course);
-
-      //System automatically unique admission number generate karega.
-        admission.setAdmissionNumber(
-                generateAdmissionNumber()
+        validateDuplicateAdmission(
+                dto.getStudentId()
         );
 
-        //Naya admission create hote hi uska status ACTIVE set hoga.
+
+
+        Department department =
+        		getActiveDepartment(
+        		        dto.getDepartmentId()
+        		);
+
+
+
+        Course course =
+        		getActiveCourse(
+        		        dto.getCourseId()
+        		);
+
+
+
+        validateCourseDepartment(
+                course,
+                department
+        );
+
+
+        Admission admission =
+                admissionMapper.toEntity(dto);
+
+
+        admission.setStudent(student);
+
+        admission.setDepartment(department);
+
+        admission.setCourse(course);
+
+        admission.setAdmissionNumber(
+                codeGeneratorService
+                .generateCode(
+                        ModuleType.ADMISSION,
+                        "ADM"
+                )
+        );
+
+
         admission.setStatus(
                 AdmissionStatus.ACTIVE
         );
 
-        //Agar admission date request me nahi di gayi ho,
-        //to current date automatically set karna.
-        if (admission.getAdmissionDate() == null) {
+
+        if(admission.getAdmissionDate()==null){
 
             admission.setAdmissionDate(
-                    java.time.LocalDate.now()
+                    LocalDate.now()
             );
         }
 
-        //Admission ko database me save karna.
-        Admission saved =
+
+        Admission savedAdmission =
                 admissionRepository.save(admission);
 
-        //Saved Admission ko Response DTO me convert karke return karna.
-        return admissionMapper.toDto(saved);
 
-    }	
+        return admissionMapper.toDto(savedAdmission);
+
+    }
     
-  //Admin manually admission number nahi dalega.
-  //System automatically unique admission number generate karega.
-  private String generateAdmissionNumber() {
-
-      //Current year lena.
-      String year = String.valueOf(
-              java.time.Year.now().getValue()
-      );
-
-      //UUID se unique 6-character code generate karna.
-      String uniqueId = java.util.UUID
-              .randomUUID()
-              .toString()
-              .substring(0, 6)
-              .toUpperCase();
-
-      //Format: ADM + Current Year + Unique Code
-      //Example: ADM2026A1B2C3
-      return "ADM"
-              + year
-              + uniqueId;
-  }
-  
-  	//---------------- GET BY ID ----------------
-	@Override
-	public AdmissionResponseDto getAdmissionById(Long id) {
-
-		// Admission find karna.
-		// Cancelled admission ko normal fetch me allow nahi karenge.
-		Admission admission = 
-				admissionRepository
-				.findByIdAndStatusNot(
-						id, 
-						AdmissionStatus.CANCELLED
-				)
-				.orElseThrow(() -> 
-					new ResourceNotFoundException(
-							"Admission not found with id: " 
-					+ id
-				));
-
-		// Entity ko Response DTO me convert karke return karna.
-		return admissionMapper.toDto(admission);
-
-	}
+    
+	 // =====================================================
+	 // GET ADMISSION BY ID
+	 // =====================================================
 	
 	
-	// ---------------- GET ALL WITH PAGINATION ----------------
+	 @Override
+	 @Transactional(readOnly = true)
+	 public AdmissionResponseDto getAdmissionById(Long id) {
+	
+	
+	     Admission admission =
+	             admissionRepository
+	             .findByIdAndStatusNot(
+	                     id,
+	                     AdmissionStatus.CANCELLED
+	             )
+	             .orElseThrow(() ->
+	                     new ResourceNotFoundException(
+	                     "Admission not found with id : "
+	                     + id
+	             ));
+	
+	
+	     return admissionMapper.toDto(admission);
+	
+	 }
+	 
+	 
+	// =====================================================
+	// GET ALL ADMISSIONS WITH PAGINATION
+	// =====================================================
+
+
 	@Override
+	@Transactional(readOnly = true)
 	public PageResponse<AdmissionResponseDto> getAllAdmissions(
 	        int page,
 	        int size,
@@ -221,197 +179,126 @@ public class AdmissionServiceImpl implements AdmissionService {
 	        String direction) {
 
 
-	    //Sort create karna
-	    Sort sort = direction.equalsIgnoreCase("asc")
-	            ? Sort.by(sortBy).ascending()
-	            : Sort.by(sortBy).descending();
 
-
-
-		// Pagination object banana
-		Pageable pageable = PageRequest.of(page, size, sort);
-
-
-		// Cancelled admission exclude karna
-		Page<Admission> admissionPage = admissionRepository.findByStatusNot(AdmissionStatus.CANCELLED, pageable);
-
-
-	    //Entity List ko DTO List me convert karna
-		List<AdmissionResponseDto> content = 
-				admissionPage.getContent().stream().map(admissionMapper::toDto).toList();
-
-	    //Response object banana
-		PageResponse<AdmissionResponseDto> response = new PageResponse<>();
-
-
-		response.setContent(content);
-		response.setPageNumber(admissionPage.getNumber());
-		response.setPageSize(admissionPage.getSize());
-		response.setTotalElements(admissionPage.getTotalElements());
-		response.setTotalPages(admissionPage.getTotalPages());
-		response.setLast(admissionPage.isLast());
-
-	    return response;
-	}
-
-	
-	
-	
-	@Override
-	public PageResponse<AdmissionResponseDto> searchAdmissions(
-	        AdmissionSearchRequest request,
-	        int page,
-	        int size,
-	        String sortBy,
-	        String direction) {
-
-
-	    Specification<Admission> spec =
-	            Specification.where(null);
-
-
-
-	    // Default ACTIVE filter
-	    if(request.getStatus()!=null){
-
-	        spec = spec.and(
-	            AdmissionSpecification
-	            .hasStatus(request.getStatus())
-	        );
-
-	    }else{
-
-	        spec = spec.and(
-	            AdmissionSpecification
-	            .hasStatus(
-	            AdmissionStatus.ACTIVE)
-	        );
-	    }
-
-
-
-	    if(request.getAdmissionNumber()!=null
-	       && !request.getAdmissionNumber().isBlank()){
-
-	        spec = spec.and(
-	        AdmissionSpecification
-	        .hasAdmissionNumber(
-	        request.getAdmissionNumber()));
-
-	    }
-
-
-
-	    if(request.getStudentName()!=null
-	       && !request.getStudentName().isBlank()){
-
-	        spec = spec.and(
-	        AdmissionSpecification
-	        .hasStudentName(
-	        request.getStudentName()));
-
-	    }
-
-
-
-	    if(request.getAcademicYear()!=null){
-
-	        spec = spec.and(
-	        AdmissionSpecification
-	        .hasAcademicYear(
-	        request.getAcademicYear()));
-
-	    }
-
-
-
-	    if(request.getSemester()!=null){
-
-	        spec = spec.and(
-	        AdmissionSpecification
-	        .hasSemester(
-	        request.getSemester()));
-
-	    }
-
-
-
-	    if(request.getDepartmentId()!=null){
-
-	        spec = spec.and(
-	        AdmissionSpecification
-	        .hasDepartment(
-	        request.getDepartmentId()));
-
-	    }
-
-
-
-	    if(request.getCourseId()!=null){
-
-	        spec = spec.and(
-	        AdmissionSpecification
-	        .hasCourse(
-	        request.getCourseId()));
-
-	    }
-
+	    /*
+	     * Step 1:
+	     *
+	     * Create validated sort object.
+	     *
+	     * Invalid sort field ya direction
+	     * createSort() handle karega.
+	     */
 
 
 	    Sort sort =
-	        direction.equalsIgnoreCase("asc")
-	        ?
-	        Sort.by(sortBy).ascending()
-	        :
-	        Sort.by(sortBy).descending();
+	            createSort(
+	                    sortBy,
+	                    direction
+	            );
 
+
+
+
+
+	    /*
+	     * Step 2:
+	     *
+	     * Pagination object create karna.
+	     */
 
 
 	    Pageable pageable =
-	        PageRequest.of(
-	        page,
-	        size,
-	        sort);
+	            PageRequest.of(
+	                    page,
+	                    size,
+	                    sort
+	            );
 
+
+
+
+
+
+
+	    /*
+	     * Step 3:
+	     *
+	     * Cancelled admission exclude karna.
+	     *
+	     * Cancelled admissions user ko show nahi karenge.
+	     */
 
 
 	    Page<Admission> admissionPage =
 	            admissionRepository
-	            .findAll(spec,pageable);
+	            .findByStatusNot(
+	                    AdmissionStatus.CANCELLED,
+	                    pageable
+	            );
 
+
+
+
+
+
+
+	    /*
+	     * Step 4:
+	     *
+	     * Entity -> Response DTO conversion
+	     */
 
 
 	    List<AdmissionResponseDto> content =
-	            admissionPage.getContent()
+	            admissionPage
+	            .getContent()
 	            .stream()
 	            .map(admissionMapper::toDto)
 	            .toList();
 
 
 
-	    PageResponse<AdmissionResponseDto> response =
-	            new PageResponse<>();
+
+	    /*
+	     * Step 5:
+	     *
+	     * Common pagination response create karna.
+	     *
+	     * createPageResponse()
+	     * reusable helper method hai.
+	     */
 
 
-	    response.setContent(content);
-	    response.setPageNumber(admissionPage.getNumber());
-	    response.setPageSize(admissionPage.getSize());
-	    response.setTotalElements(admissionPage.getTotalElements());
-	    response.setTotalPages(admissionPage.getTotalPages());
-	    response.setLast(admissionPage.isLast());
+	    return createPageResponse(
+	            admissionPage,
+	            content
+	    );
 
-
-	    return response;
 	}
+	
+	
+	
+	
+	// =====================================================
+	// UPDATE ADMISSION
+	// =====================================================
 
-	// ---------------- UPDATE ----------------
+
 	@Override
 	public AdmissionResponseDto updateAdmission(
 	        Long id,
 	        AdmissionRequestDto dto) {
 
 
-	    // Existing admission fetch karna - Admission exist hona chahiye aur CANCELLED admission update nahi hoga.
+
+	    /*
+	     * Step 1:
+	     * Existing admission fetch karna.
+	     *
+	     * Cancelled admission update allowed nahi.
+	     */
+
+
 	    Admission admission =
 	            admissionRepository
 	            .findByIdAndStatusNot(
@@ -420,144 +307,170 @@ public class AdmissionServiceImpl implements AdmissionService {
 	            )
 	            .orElseThrow(() ->
 	                    new ResourceNotFoundException(
-	                    "Admission not found with id: "
+	                    "Admission not found with id : "
 	                    + id
 	            ));
 
 
-	    // Student validate karna - Selected Student exist hona chahiye aur DELETED student assign nahi hoga.
+
+	    /*
+	     * Step 2:
+	     * Student validation
+	     *
+	     * Deleted student assign nahi ho sakta.
+	     */
+
+
 	    Student student =
-	            studentRepository
-	            .findByIdAndStatusNot(
-	                    dto.getStudentId(),
-	                    StudentStatus.DELETED
-	            )
-	            .orElseThrow(() ->
-	                    new ResourceNotFoundException(
-	                    "Student not found with id: "
-	                    + dto.getStudentId()
-	            ));
-
-
-	    // Check duplicate ACTIVE admission - Agar student change kiya gaya hai 
-	    //to uske paas pehle se ACTIVE admission nahi hona chahiye.
-	    boolean exists =
-	            admissionRepository
-	            .existsByStudent_IdAndStatus(
-	                    dto.getStudentId(),
-	                    AdmissionStatus.ACTIVE
+	            getActiveStudent(
+	                    dto.getStudentId()
 	            );
 
 
-		if (exists && !admission.getStudent().getId().equals(dto.getStudentId())) {
+	    /*
+	     * Step 3:
+	     * Duplicate admission validation
+	     *
+	     * Same admission ko ignore karega.
+	     *
+	     * Example:
+	     *
+	     * Admission ID 1
+	     * Student ID 100
+	     *
+	     * Update same student -> allowed
+	     *
+	     * Other student already active -> rejected
+	     */
 
-			throw new BusinessException
-				("Student already has active admission");
-		}
+
+	    validateDuplicateAdmissionForUpdate(
+	            id,
+	            dto.getStudentId()
+	    );
 
 
-	    // Department validate - Selected Department exist hona chahiye aur ACTIVE hona chahiye.
+
+	     // Step 4: Department validation
+
+
 	    Department department =
-	            departmentRepository
-	            .findByIdAndStatus(
-	                    dto.getDepartmentId(),
-	                    DepartmentStatus.ACTIVE
-	            )
-	            .orElseThrow(() ->
-	                    new ResourceNotFoundException(
-	                    "Department not found with id: "
-	                    + dto.getDepartmentId()
-	            ));
+	            getActiveDepartment(
+	                    dto.getDepartmentId()
+	            );
 
 
+	     // Step 5: Course validation
 
-	    // Course validate - Selected Course exist hona chahiye aur ACTIVE hona chahiye.
 	    Course course =
-	            courseRepository
-	            .findByIdAndStatus(
-	                    dto.getCourseId(),
-	                    CourseStatus.ACTIVE
-	            )
-	            .orElseThrow(() ->
-	                    new ResourceNotFoundException(
-	                    "Course not found with id: "
-	                    + dto.getCourseId()
-	            ));
+	            getActiveCourse(
+	                    dto.getCourseId()
+	            );
+
+
+	     // Step 6: Course belongs to Department check
+
+	    validateCourseDepartment(
+	            course,
+	            department
+	    );
 
 
 
-	    // Course belongs to Department check - Selected Course selected Department ka hi hona chahiye.
-		if (!course.getDepartment().getId().equals(department.getId())) {
+	    /*
+	     * Step 7: Existing admission date preserve karna.
+	     * Agar request me date nahi aayi
+	     * to purani date maintain hogi.
+	     */
 
-	        throw new BusinessException(
-	        		"Course does not belong to department");
+
+	    LocalDate oldAdmissionDate =
+	            admission.getAdmissionDate();
+
+
+	     // Step 8: DTO updated values copy
+
+	    admissionMapper.updateEntity(
+	            admission,
+	            dto
+	    );
+
+
+	    if(dto.getAdmissionDate()==null){
+
+
+	        admission.setAdmissionDate(
+	                oldAdmissionDate
+	        );
+
 	    }
 
 
-		LocalDate oldDate = admission.getAdmissionDate();
-		// Request DTO ki updated values entity me copy karna.
-		admissionMapper.updateEntity(admission, dto);
-		
-		if(dto.getAdmissionDate() == null){
-		    admission.setAdmissionDate(oldDate);
-		}
-		
+	     // Step 9: Update relationships
 
-		//Validated Student ko Admission ke saath set karna.
 	    admission.setStudent(student);
 
-	    //Validated Department ko Admission ke saath set karna.
 	    admission.setDepartment(department);
 
-	    //Validated Course ko Admission ke saath set karna.
 	    admission.setCourse(course);
 
-	    //Updated Admission ko database me save karna.
+	    // Step 10: Save updated admission
+
 	    Admission updated =
 	            admissionRepository.save(admission);
 
-	    //Updated Admission ko Response DTO me convert karke return karna.
+
+	      //Step 11: Entity -> Response DTO
+
 	    return admissionMapper.toDto(updated);
 
 	}
+	
+	
+	
+	// =====================================================
+	// DELETE / CANCEL ADMISSION
+	// =====================================================
 
-	// ---------------- DELETE / CANCEL ADMISSION ----------------
+
 	@Override
 	public void deleteAdmission(Long id) {
 
-		//Admission exist hona chahiye.
+
 	    Admission admission =
 	            admissionRepository
 	            .findById(id)
 	            .orElseThrow(() ->
 	                    new ResourceNotFoundException(
-	                    "Admission not found with id: "
+	                    "Admission not found with id : "
 	                    + id
 	            ));
 
-	    //Already cancelled admission dobara cancel nahi hoga.
+
 	    if(admission.getStatus()
 	            == AdmissionStatus.CANCELLED){
+
 
 	        throw new BusinessException(
 	                "Admission already cancelled"
 	        );
+
 	    }
 
-	    //Completed admission cancel nahi ho sakta.
+
 	    if(admission.getStatus()
 	            == AdmissionStatus.COMPLETED){
+
 
 	        throw new BusinessException(
 	                "Completed admission cannot be cancelled"
 	        );
+
 	    }
 
-	    //Active admission ko CANCELLED status me convert karna.
 	    admission.setStatus(
 	            AdmissionStatus.CANCELLED
 	    );
-
 
 	    admissionRepository.save(admission);
 
@@ -565,4 +478,583 @@ public class AdmissionServiceImpl implements AdmissionService {
 	
 	
 	
+	
+	// =====================================================
+	// SEARCH ADMISSIONS WITH SPECIFICATION
+	// =====================================================
+
+
+	@Override
+	@Transactional(readOnly = true)
+	public PageResponse<AdmissionResponseDto> searchAdmissions(
+	        AdmissionSearchRequest request,
+	        int page,
+	        int size,
+	        String sortBy,
+	        String direction) {
+
+
+
+	    /*
+	     * Step 1:
+	     *
+	     * Empty Specification create karna.
+	     *
+	     * Baad me conditions dynamically add hongi.
+	     */
+
+
+	    Specification<Admission> specification =
+	            Specification.where(null);
+
+
+
+
+
+
+
+	    /*
+	     * Step 2:
+	     *
+	     * Status filter
+	     *
+	     * Agar user status bhejta hai
+	     * to wahi use hoga.
+	     *
+	     * Nahi bhejta hai to default ACTIVE.
+	     */
+
+
+	    if(request.getStatus() != null){
+
+
+	        specification =
+	                specification.and(
+	                AdmissionSpecification
+	                .hasStatus(
+	                        request.getStatus()
+	                ));
+
+	    }
+	    else{
+
+
+	        specification =
+	                specification.and(
+	                AdmissionSpecification
+	                .hasStatus(
+	                        AdmissionStatus.ACTIVE
+	                ));
+
+	    }
+
+
+
+
+
+
+
+
+	    /*
+	     * Step 3:
+	     *
+	     * Admission Number Search
+	     */
+
+
+	    if(request.getAdmissionNumber() != null
+	            &&
+	       !request.getAdmissionNumber().isBlank()){
+
+
+	        specification =
+	                specification.and(
+	                AdmissionSpecification
+	                .hasAdmissionNumber(
+	                        request.getAdmissionNumber()
+	                ));
+
+	    }
+
+
+
+
+
+
+
+
+	    /*
+	     * Step 4:
+	     *
+	     * Student Id Filter
+	     */
+
+
+	    if(request.getStudentId() != null){
+
+
+	        specification =
+	                specification.and(
+	                AdmissionSpecification
+	                .hasStudentId(
+	                        request.getStudentId()
+	                ));
+
+	    }
+
+
+
+
+
+
+
+
+	    /*
+	     * Step 5:
+	     *
+	     * Student Name Search
+	     */
+
+
+	    if(request.getStudentName() != null
+	            &&
+	       !request.getStudentName().isBlank()){
+
+
+	        specification =
+	                specification.and(
+	                AdmissionSpecification
+	                .hasStudentName(
+	                        request.getStudentName()
+	                ));
+
+	    }
+
+
+
+
+
+
+
+
+	    /*
+	     * Step 6:
+	     *
+	     * Department Filter
+	     */
+
+
+	    if(request.getDepartmentId() != null){
+
+
+	        specification =
+	                specification.and(
+	                AdmissionSpecification
+	                .hasDepartmentId(
+	                        request.getDepartmentId()
+	                ));
+
+	    }
+
+
+
+
+
+
+
+
+	    /*
+	     * Step 7:
+	     *
+	     * Course Filter
+	     */
+
+
+	    if(request.getCourseId() != null){
+
+
+	        specification =
+	                specification.and(
+	                AdmissionSpecification
+	                .hasCourseId(
+	                        request.getCourseId()
+	                ));
+
+	    }
+
+
+
+
+
+
+
+
+	    /*
+	     * Step 8:
+	     *
+	     * Academic Year Filter
+	     */
+
+
+	    if(request.getAcademicYear() != null){
+
+
+	        specification =
+	                specification.and(
+	                AdmissionSpecification
+	                .hasAcademicYear(
+	                        request.getAcademicYear()
+	                ));
+
+	    }
+
+
+
+
+
+
+
+
+	    /*
+	     * Step 9:
+	     *
+	     * Semester Filter
+	     */
+
+
+	    if(request.getSemester() != null){
+
+
+	        specification =
+	                specification.and(
+	                AdmissionSpecification
+	                .hasSemester(
+	                        request.getSemester()
+	                ));
+
+	    }
+
+
+
+
+
+
+
+
+	    /*
+	     * Step 10:
+	     *
+	     * Sorting + Pagination
+	     */
+
+
+	    Sort sort =
+	            createSort(
+	                    sortBy,
+	                    direction
+	            );
+
+
+
+
+	    Pageable pageable =
+	            PageRequest.of(
+	                    page,
+	                    size,
+	                    sort
+	            );
+
+
+
+
+
+
+
+
+	    /*
+	     * Step 11:
+	     *
+	     * Execute Specification query
+	     */
+
+
+	    Page<Admission> admissionPage =
+	            admissionRepository
+	            .findAll(
+	                    specification,
+	                    pageable
+	            );
+
+
+
+
+
+
+
+
+	    /*
+	     * Step 12:
+	     *
+	     * Entity -> DTO conversion
+	     */
+
+
+	    List<AdmissionResponseDto> content =
+	            admissionPage
+	            .getContent()
+	            .stream()
+	            .map(admissionMapper::toDto)
+	            .toList();
+
+
+
+
+
+
+
+
+	    /*
+	     * Step 13:
+	     *
+	     * Pagination Response
+	     */
+
+
+	    return createPageResponse(
+	            admissionPage,
+	            content
+	    );
+
+	}
+	
+	
+	
+	
+	// =====================================================
+	// SORT VALIDATION
+	// =====================================================
+
+	private Sort createSort(
+	        String sortBy,
+	        String direction) {
+
+
+	    /*
+	     * Allowed sorting fields
+	     */
+	    List<String> allowedFields =
+	            List.of(
+	                    "id",
+	                    "admissionNumber",
+	                    "admissionDate",
+	                    "academicYear"
+	            );
+
+
+	    /*
+	     * Default sort field
+	     */
+	    if(sortBy == null ||
+	       !allowedFields.contains(sortBy)) {
+
+	        sortBy = "id";
+	    }
+
+
+
+	    /*
+	     * Default direction DESC
+	     */
+	    if(direction == null ||
+	       !direction.equalsIgnoreCase("asc")) {
+
+
+	        return Sort.by(sortBy)
+	                .descending();
+	    }
+
+
+
+	    return Sort.by(sortBy)
+	            .ascending();
+
+	}
+	
+	
+	
+	// =====================================================
+	// HELPER METHODS
+	// =====================================================
+
+
+	private Student getActiveStudent(Long studentId) {
+
+
+	    return studentRepository
+	            .findByIdAndStatusNot(
+	                    studentId,
+	                    RecordStatus.DELETED
+	            )
+	            .orElseThrow(() ->
+	                    new ResourceNotFoundException(
+	                    "Student not found with id : "
+	                    + studentId
+	            ));
+
+	}
+
+
+
+
+
+	private Department getActiveDepartment(Long departmentId) {
+
+
+	    return departmentRepository
+	            .findByIdAndStatus(
+	                    departmentId,
+	                    RecordStatus.ACTIVE
+	            )
+	            .orElseThrow(() ->
+	                    new ResourceNotFoundException(
+	                    "Department not found with id : "
+	                    + departmentId
+	            ));
+
+	}
+
+
+
+
+
+	private Course getActiveCourse(Long courseId) {
+
+
+	    return courseRepository
+	            .findByIdAndStatus(
+	                    courseId,
+	                    RecordStatus.ACTIVE
+	            )
+	            .orElseThrow(() ->
+	                    new ResourceNotFoundException(
+	                    "Course not found with id : "
+	                    + courseId
+	            ));
+
+	}
+
+
+
+
+
+	private void validateCourseDepartment(
+	        Course course,
+	        Department department) {
+
+
+	    if(!course.getDepartment()
+	            .getId()
+	            .equals(
+	            department.getId())) {
+
+
+	        throw new BusinessException(
+	                "Course does not belong to department"
+	        );
+
+	    }
+
+	}
+
+
+
+
+
+	private void validateDuplicateAdmission(
+	        Long studentId) {
+
+
+	    boolean exists =
+	            admissionRepository
+	            .existsByStudent_IdAndStatus(
+	                    studentId,
+	                    AdmissionStatus.ACTIVE
+	            );
+
+
+	    if(exists) {
+
+
+	        throw new BusinessException(
+	                "Student already has active admission"
+	        );
+
+	    }
+
+	}
+	
+	
+	
+	private void validateDuplicateAdmissionForUpdate(
+	        Long admissionId,
+	        Long studentId
+	){
+	    
+
+	    boolean exists =
+	            admissionRepository
+	            .existsByStudent_IdAndStatus(
+	                    studentId,
+	                    AdmissionStatus.ACTIVE
+	            );
+
+
+	    if(exists){
+
+
+	        Admission existing =
+	                admissionRepository
+	                .findById(admissionId)
+	                .orElseThrow();
+
+
+	        if(!existing.getStudent()
+	                .getId()
+	                .equals(studentId)){
+
+
+	            throw new BusinessException(
+	            "Student already has active admission");
+
+	        }
+	    }
+
+	}
+	
+	
+	// =====================================================
+	// PAGE RESPONSE HELPER
+	// =====================================================
+
+	private <E, D> PageResponse<D> createPageResponse(Page<E> page, List<D> content) {
+
+		PageResponse<D> response = new PageResponse<>();
+
+		response.setContent(content);
+
+		response.setPageNumber(page.getNumber());
+
+		response.setPageSize(page.getSize());
+
+		response.setTotalElements(page.getTotalElements());
+
+		response.setTotalPages(page.getTotalPages());
+
+		response.setLast(page.isLast());
+
+		return response;
+
+	}
+
+
 }

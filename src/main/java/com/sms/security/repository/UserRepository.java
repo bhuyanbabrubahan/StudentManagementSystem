@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.sms.security.entity.Role;
 import com.sms.security.entity.User;
+import com.sms.security.entity.UserStatus;
 
 
 @Repository
@@ -20,6 +21,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
 
 	boolean existsByRole(Role admin);
+	
+	Optional<User> findByEmailAndStatus(
+	        String email,
+	        UserStatus status
+	);
     
 
 }

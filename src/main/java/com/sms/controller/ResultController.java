@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Tag(
         name = "Result Management",
-        description = "APIs for managing student examination results"
+        description = "APIs for managing student examination results including create, retrieve, update, delete and dynamic search operations."
 )
 public class ResultController {
 
@@ -46,239 +46,397 @@ public class ResultController {
 
 
 
-    // ==========================
-    // Create Result
-    // ==========================
-
-    @Operation(
-            summary = "Create Result",
-            description = 
-            "Creates a student result after validating student, exam and marks"
-    )
-    @ApiResponses({
-
-    	@ApiResponse(
-                responseCode = "200",
-                description = "Result created successfully"
-        ),
-
-        @ApiResponse(
-                responseCode = "400",
-                description = "Business validation failed"
-        ),
-
-        @ApiResponse(
-                responseCode = "404",
-                description = "Student or Exam not found"
-        )
-    })
-    @PostMapping
-    public ResponseEntity<?> createResult(
-            @RequestBody ResultRequestDto request
-    ){
-
-        ResultResponseDto response =
-                resultService.createResult(request);
-
-        return ResponseBuilder.success(
-                response,
-                "Result created successfully",
-                HttpStatus.CREATED
-        );
-
-    }
-
-
-
-    // ==========================
-    // Update Result
-    // ==========================
-
-    @Operation(
-            summary = "Update Result",
-            description = "Updates existing student result"
-    )
-    @ApiResponses({
-
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Result updated successfully"
-            ),
-
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid result data"
-            )
-
-    })
-    
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<ResultResponseDto>> updateResult(
-            @PathVariable Long id,
-            @Valid @RequestBody ResultRequestDto request
-    ){
-
-        ResultResponseDto response =
-                resultService.updateResult(id, request);
-
-        return ResponseBuilder.success(
-                response,
-                "Result updated successfully",
-                HttpStatus.OK
-        );
-
-    }
+	 // ==========================
+	 // CREATE RESULT
+	 // ==========================
+	
+	 @Operation(
+	         summary = "Create Result",
+	         description = """
+	                 Creates a new student examination result.
+	
+	                 Business Validations:
+	                 - Student must exist and be ACTIVE
+	                 - Exam must exist and be ACTIVE
+	                 - Student must belong to the exam semester
+	                 - Obtained marks cannot exceed maximum marks
+	                 - Duplicate result is not allowed
+	                 - Percentage, Grade and Result Status are calculated automatically
+	                 """
+	 )
+	 @ApiResponses({
+	         @ApiResponse(
+	                 responseCode = "201",
+	                 description = "Result created successfully"
+	         ),
+	         @ApiResponse(
+	                 responseCode = "400",
+	                 description = "Business validation failed"
+	         ),
+	         @ApiResponse(
+	                 responseCode = "404",
+	                 description = "Student or Exam not found"
+	         ),
+	         @ApiResponse(
+	                 responseCode = "409",
+	                 description = "Duplicate result already exists"
+	         )
+	 })
+	 @PostMapping
+	 public ResponseEntity<ApiResponseDto<ResultResponseDto>> createResult(
+	
+	         @io.swagger.v3.oas.annotations.parameters.RequestBody(
+	                 description = "Student examination result information",
+	                 required = true
+	         )
+	         @Valid
+	         @RequestBody ResultRequestDto request
+	
+	 ) {
+	
+	     ResultResponseDto response =
+	             resultService.createResult(request);
+	
+	     return ResponseBuilder.success(
+	             response,
+	             "Result created successfully",
+	             HttpStatus.CREATED
+	     );
+	
+	 }
 
 
 
+	// ==========================
+	// UPDATE RESULT
+	// ==========================
 
+	@Operation(
+	        summary = "Update Result",
+	        description = """
+	                Updates an existing student examination result.
 
-    // ==========================
-    // Get By Id
-    // ==========================
-    @Operation(
-            summary = "Get Result By Id",
-            description = "Fetch active result details using result id"
-    )
-    @ApiResponses({
+	                Business Validations:
+	                - Result must exist
+	                - Student must exist and be ACTIVE
+	                - Exam must exist and be ACTIVE
+	                - Student must belong to the exam semester
+	                - Obtained marks cannot exceed maximum marks
+	                - Percentage, Grade and Result Status are recalculated automatically
+	                """
+	)
+	@ApiResponses({
+	        @ApiResponse(
+	                responseCode = "200",
+	                description = "Result updated successfully"
+	        ),
+	        @ApiResponse(
+	                responseCode = "400",
+	                description = "Invalid request data or business validation failed"
+	        ),
+	        @ApiResponse(
+	                responseCode = "404",
+	                description = "Result, Student or Exam not found"
+	        ),
+	        @ApiResponse(
+	                responseCode = "409",
+	                description = "Duplicate result already exists"
+	        )
+	})
+	@PutMapping("/{id:\\d+}")
+	public ResponseEntity<ApiResponseDto<ResultResponseDto>> updateResult(
 
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Result found"
-            ),
+	        @Parameter(
+	                description = "Unique Result ID",
+	                example = "1",
+	                required = true
+	        )
+	        @PathVariable Long id,
 
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Result not found"
-            )
+	        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+	                description = "Updated student examination result information",
+	                required = true
+	        )
+	        @Valid
+	        @RequestBody ResultRequestDto request
 
-    })
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<ResultResponseDto>> getById(
-    		@PathVariable
-    		@Parameter(
-    		        description = "Result ID",
-    		        example = "1"
-    		)
-    		Long id
-    ){
+	) {
 
-        ResultResponseDto response =
-                resultService.getResultById(id);
+	    ResultResponseDto response =
+	            resultService.updateResult(id, request);
 
-        return ResponseBuilder.success(
-                response,
-                "Result fetched successfully",
-                HttpStatus.OK
-        );
+	    return ResponseBuilder.success(
+	            response,
+	            "Result updated successfully",
+	            HttpStatus.OK
+	    );
 
-    }
-
-
-
-
-
-    // ==========================
-    // Pagination
-    // ==========================
-    @Operation(
-            summary = "Get All Results",
-            description =
-            "Fetch paginated and sorted results"
-    )
-    @GetMapping
-    public ResponseEntity<ApiResponseDto<PageResponse<ResultResponseDto>>> getAll(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction
-    ){
-
-        PageResponse<ResultResponseDto> response =
-                resultService.getAllResults(
-                        page,
-                        size,
-                        sortBy,
-                        direction
-                );
-
-        return ResponseBuilder.success(
-                response,
-                "Results fetched successfully",
-                HttpStatus.OK
-        );
-
-    }
+	}
 
 
 
 
 
-    // ==========================
-    // Dynamic Search
-    // ==========================
-    @Operation(
-            summary = "Search Results",
-            description =
-            "Dynamic search using student, exam, grade, status and marks"
-    )
-    @PostMapping("/search")
-    public ResponseEntity<ApiResponseDto<PageResponse<ResultResponseDto>>> search(
-            @Valid @RequestBody ResultSearchRequest request,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction
-    ){
+	// ==========================
+	// GET RESULT BY ID
+	// ==========================
 
-        PageResponse<ResultResponseDto> response =
-                resultService.searchResults(
-                        request,
-                        page,
-                        size,
-                        sortBy,
-                        direction
-                );
+	@Operation(
+	        summary = "Get Result By ID",
+	        description = "Retrieves an active student examination result using the unique Result ID."
+	)
+	@ApiResponses({
+	        @ApiResponse(
+	                responseCode = "200",
+	                description = "Result fetched successfully"
+	        ),
+	        @ApiResponse(
+	                responseCode = "404",
+	                description = "Result not found"
+	        )
+	})
+	@GetMapping("/{id:\\d+}")
+	public ResponseEntity<ApiResponseDto<ResultResponseDto>> getById(
 
-        return ResponseBuilder.success(
-                response,
-                "Results searched successfully",
-                HttpStatus.OK
-        );
+	        @Parameter(
+	                description = "Unique Result ID",
+	                example = "1",
+	                required = true
+	        )
+	        @PathVariable Long id
 
-    }
+	) {
+
+	    ResultResponseDto response =
+	            resultService.getResultById(id);
+
+	    return ResponseBuilder.success(
+	            response,
+	            "Result fetched successfully",
+	            HttpStatus.OK
+	    );
+
+	}
 
 
 
 
 
-    // ==========================
-    // Soft Delete
-    // ==========================
-    @Operation(
-            summary = "Delete Result",
-            description = 
-            "Soft deletes result by changing record status"
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Result deleted successfully"
-    )
-    
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponseDto<Void>> delete(
-            @PathVariable Long id
-    ){
+	// ==========================
+	// GET ALL RESULTS
+	// ==========================
 
-        resultService.deleteResult(id);
+	@Operation(
+	        summary = "Get All Results",
+	        description = """
+	                Retrieves all student examination results.
 
-        return ResponseBuilder.success(
-                null,
-                "Result deleted successfully",
-                HttpStatus.OK
-        );
+	                Features:
+	                - Pagination
+	                - Sorting
+	                - Default ACTIVE records only
+	                """
+	)
+	@ApiResponses({
+	        @ApiResponse(
+	                responseCode = "200",
+	                description = "Results fetched successfully"
+	        )
+	})
+	@GetMapping
+	public ResponseEntity<ApiResponseDto<PageResponse<ResultResponseDto>>> getAll(
 
-    }
+	        @Parameter(
+	                description = "Page number",
+	                example = "0"
+	        )
+	        @RequestParam(defaultValue = "0")
+	        int page,
+
+	        @Parameter(
+	                description = "Number of records per page",
+	                example = "10"
+	        )
+	        @RequestParam(defaultValue = "10")
+	        int size,
+
+	        @Parameter(
+	                description = "Field used for sorting",
+	                example = "id"
+	        )
+	        @RequestParam(defaultValue = "id")
+	        String sortBy,
+
+	        @Parameter(
+	                description = "Sorting direction",
+	                example = "asc"
+	        )
+	        @RequestParam(defaultValue = "asc")
+	        String direction
+
+	) {
+
+	    PageResponse<ResultResponseDto> response =
+	            resultService.getAllResults(
+	                    page,
+	                    size,
+	                    sortBy,
+	                    direction
+	            );
+
+	    return ResponseBuilder.success(
+	            response,
+	            "Results fetched successfully",
+	            HttpStatus.OK
+	    );
+
+	}
+
+
+
+
+
+	// ==========================
+	// SEARCH RESULTS
+	// ==========================
+
+	@Operation(
+	        summary = "Search Results",
+	        description = """
+	                Performs dynamic student result search.
+
+	                Supported Filters:
+	                - Student ID
+	                - Roll Number
+	                - Student Name
+	                - Semester
+	                - Subject
+	                - Exam
+	                - Result Status
+	                - Grade
+	                - Percentage Range
+	                - Obtained Marks Range
+	                - Record Status
+
+	                Features:
+	                - Dynamic Specification
+	                - Pagination
+	                - Sorting
+	                - Case-insensitive search where applicable
+	                """
+	)
+	@ApiResponses({
+	        @ApiResponse(
+	                responseCode = "200",
+	                description = "Results searched successfully"
+	        )
+	})
+	@PostMapping("/search")
+	public ResponseEntity<ApiResponseDto<PageResponse<ResultResponseDto>>> search(
+
+	        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+	                description = "Student result search criteria",
+	                required = true
+	        )
+	        @Valid
+	        @RequestBody ResultSearchRequest request,
+
+	        @Parameter(
+	                description = "Page number",
+	                example = "0"
+	        )
+	        @RequestParam(defaultValue = "0")
+	        int page,
+
+	        @Parameter(
+	                description = "Number of records per page",
+	                example = "10"
+	        )
+	        @RequestParam(defaultValue = "10")
+	        int size,
+
+	        @Parameter(
+	                description = "Field used for sorting",
+	                example = "id"
+	        )
+	        @RequestParam(defaultValue = "id")
+	        String sortBy,
+
+	        @Parameter(
+	                description = "Sorting direction",
+	                example = "asc"
+	        )
+	        @RequestParam(defaultValue = "asc")
+	        String direction
+
+	) {
+
+	    PageResponse<ResultResponseDto> response =
+	            resultService.searchResults(
+	                    request,
+	                    page,
+	                    size,
+	                    sortBy,
+	                    direction
+	            );
+
+	    return ResponseBuilder.success(
+	            response,
+	            "Results searched successfully",
+	            HttpStatus.OK
+	    );
+
+	}
+
+
+
+
+
+	// ==========================
+	// DELETE RESULT
+	// ==========================
+
+	@Operation(
+	        summary = "Delete Result",
+	        description = """
+	                Soft deletes a student examination result.
+
+	                Business Validations:
+	                - Result must exist
+	                - Result must not already be deleted
+	                """
+	)
+	@ApiResponses({
+	        @ApiResponse(
+	                responseCode = "200",
+	                description = "Result deleted successfully"
+	        ),
+	        @ApiResponse(
+	                responseCode = "404",
+	                description = "Result not found"
+	        )
+	})
+	@DeleteMapping("/{id:\\d+}")
+	public ResponseEntity<ApiResponseDto<Void>> delete(
+
+	        @Parameter(
+	                description = "Unique Result ID",
+	                example = "1",
+	                required = true
+	        )
+	        @PathVariable Long id
+
+	) {
+
+	    resultService.deleteResult(id);
+
+	    return ResponseBuilder.success(
+	            null,
+	            "Result deleted successfully",
+	            HttpStatus.OK
+	    );
+
+	}
 
 
 }

@@ -29,7 +29,6 @@ public class AddressResponseDto {
     private String landmark;
 
 
-    private String postalCode;
 
 
     private AddressType addressType;

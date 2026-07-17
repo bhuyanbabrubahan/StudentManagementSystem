@@ -2,7 +2,7 @@ package com.sms.entity;
 
 import java.time.LocalDate;
 
-import com.sms.enums.FacultySubjectStatus;
+import com.sms.enums.RecordStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,40 +27,46 @@ import lombok.ToString;
 @NoArgsConstructor
 public class FacultySubjectMapping extends BaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
 
-	// ==========================
-	// FACULTY RELATIONSHIP
-	// ==========================
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@ToString.Exclude
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "faculty_id", nullable = false)
-	private Faculty faculty;
 
-	// ==========================
-	// SUBJECT RELATIONSHIP
-	// ==========================
 
-	@ToString.Exclude
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "subject_id", nullable = false)
-	private Subject subject;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name="faculty_id",
+        nullable=false
+    )
+    @ToString.Exclude
+    private Faculty faculty;
 
-	// ==========================
-	// BUSINESS DATA
-	// ==========================
 
-	@Column(nullable = false)
-	private LocalDate assignedDate;
 
-	@Column(nullable = false, length = 20)
-	private String academicYear;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name="subject_id",
+        nullable=false
+    )
+    @ToString.Exclude
+    private Subject subject;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private FacultySubjectStatus status;
+
+
+
+    @Column(nullable=false)
+    private LocalDate assignedDate;
+
+
+
+    @Column(nullable=false,length=20)
+    private String academicYear;
+
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable=false)
+    private RecordStatus status;
 
 }

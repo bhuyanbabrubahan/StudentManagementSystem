@@ -3,7 +3,7 @@ package com.sms.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sms.enums.DepartmentStatus;
+import com.sms.enums.RecordStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,7 +53,7 @@ public class Department extends BaseEntity{
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DepartmentStatus status;
+    private RecordStatus status;
     
     
 

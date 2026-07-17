@@ -3,7 +3,7 @@ package com.sms.entity;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.sms.enums.SemesterStatus;
+import com.sms.enums.RecordStatus;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -75,14 +75,13 @@ public class Semester extends BaseEntity {
     private LocalDate semesterEndDate;
 
     @Column(
-            name = "total_working_days",
-            nullable = false
+            name = "total_working_days"
     )
     private Integer totalWorkingDays;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SemesterStatus status;
+    private RecordStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(

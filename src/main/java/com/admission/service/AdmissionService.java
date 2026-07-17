@@ -7,11 +7,11 @@ import com.sms.dto.PageResponse;
 
 public interface AdmissionService {
 
-	AdmissionResponseDto createAdmission(AdmissionRequestDto dto);
+	AdmissionResponseDto createAdmission(AdmissionRequestDto request);
 
 	AdmissionResponseDto getAdmissionById(Long id);
 
-	AdmissionResponseDto updateAdmission(Long id, AdmissionRequestDto dto);
+	AdmissionResponseDto updateAdmission(Long id, AdmissionRequestDto request);
 
 	void deleteAdmission(Long id);
 

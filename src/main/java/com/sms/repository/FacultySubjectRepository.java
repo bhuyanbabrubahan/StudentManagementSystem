@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.sms.entity.FacultySubjectMapping;
-import com.sms.enums.FacultySubjectStatus;
+import com.sms.enums.RecordStatus;
 
 public interface FacultySubjectRepository
 		extends JpaRepository<FacultySubjectMapping, Long>, JpaSpecificationExecutor<FacultySubjectMapping> {
@@ -17,24 +17,24 @@ public interface FacultySubjectRepository
 	        Long facultyId,
 	        Long subjectId,
 	        String academicYear,
-	        FacultySubjectStatus status
+	        RecordStatus status
 	);
 
 	boolean existsByFacultyIdAndSubjectIdAndAcademicYearAndStatusNotAndIdNot(
 	        Long facultyId,
 	        Long subjectId,
 	        String academicYear,
-	        FacultySubjectStatus status,
+	        RecordStatus status,
 	        Long id
 	);
 
 	Optional<FacultySubjectMapping> findByIdAndStatusNot(
 	        Long id,
-	        FacultySubjectStatus status
+	        RecordStatus status
 	);
 
 	Page<FacultySubjectMapping> findByStatusNot(
-	        FacultySubjectStatus status,
+			RecordStatus status,
 	        Pageable pageable
 	);
 

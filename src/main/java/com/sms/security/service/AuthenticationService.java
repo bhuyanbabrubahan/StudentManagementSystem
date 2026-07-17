@@ -12,8 +12,7 @@ import com.location.village.entity.Village;
 import com.location.village.repository.VillageRepository;
 import com.sms.entity.Department;
 import com.sms.entity.Student;
-import com.sms.enums.DepartmentStatus;
-import com.sms.enums.StudentStatus;
+import com.sms.enums.RecordStatus;
 import com.sms.exception.ResourceAlreadyExistsException;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.mapper.StudentMapper;
@@ -87,7 +86,7 @@ public class AuthenticationService {
 
 		Department department =
 
-				departmentRepository.findByIdAndStatus(request.getDepartmentId(), DepartmentStatus.ACTIVE)
+				departmentRepository.findByIdAndStatus(request.getDepartmentId(), RecordStatus.ACTIVE)
 						.orElseThrow(() -> new ResourceNotFoundException("Department not found or inactive"));
 
 		// 3. Create User
@@ -120,8 +119,6 @@ public class AuthenticationService {
 
 		address.setLandmark(request.getAddress().getLandmark());
 
-		address.setPostalCode(request.getAddress().getPostalCode());
-
 		address.setAddressType(request.getAddress().getAddressType());
 
 		address.setVillage(village);
@@ -147,7 +144,7 @@ public class AuthenticationService {
 			    )
 			);
 
-			student.setStatus(StudentStatus.ACTIVE);
+			student.setStatus(RecordStatus.ACTIVE);
 
 		student = studentRepository.save(student);
 

@@ -3,8 +3,9 @@ package com.sms.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.sms.enums.CourseStatus;
+import com.sms.enums.RecordStatus;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,26 +17,40 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CourseResponseDto {
 
+	@Schema(description = "Course Id", example = "1")
     private Long id;
 
+	@Schema(description = "Course Code", example = "CSE101")
     private String courseCode;
 
+    @Schema(description = "Course Name", example = "Java Full Stack")
     private String courseName;
 
+    @Schema(description = "Duration In Months", example = "48")
     private Integer durationInMonths;
 
+    @Schema(description = "Fees", example = "50000.00")
     private BigDecimal fees;
 
+    @Schema(description = "Description", example = "Bachelor of Technology in Electronics Engineering")
     private String description;
 
-    private CourseStatus status;
+    @Schema(description = "Status", example = "ACTIVE")
+    private RecordStatus status;
 
     // 🔥 relationship output (important for frontend)
+    @Schema(description = "Department Id", example = "1")
     private Long departmentId;
 
+    @Schema(description = "Department Name", example = "Computer Science")
     private String departmentName;
 
+    @Schema(description = "Course creation timestamp", example = "2026-07-12T11:33:17.735736")
     private LocalDateTime createdAt;
 
+    @Schema(description = "Course last updated timestamp", example = "2026-07-12T11:42:20.458126")
     private LocalDateTime updatedAt;
+    
+    
+    
 }

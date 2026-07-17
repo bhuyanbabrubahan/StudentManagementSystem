@@ -40,9 +40,9 @@ public interface AttendanceMapper {
 
 
     @Mapping(
-        target = "status",
-        ignore = true
-    )
+    		 target = "status",
+    		 ignore = true
+    		)
 
     Attendance toEntity(
             AttendanceRequestDto dto
@@ -128,8 +128,8 @@ public interface AttendanceMapper {
 
 
     @Mapping(
-        target="status",
-        ignore=true
+    		 target="status",
+    		 ignore=true
     )
 
 

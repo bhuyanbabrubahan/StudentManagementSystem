@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sms.enums.SubjectStatus;
+import com.sms.enums.RecordStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -58,7 +58,7 @@ public class Subject extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SubjectStatus status;
+    private RecordStatus status;
 
     // Many Subjects -> One Semester
     @ToString.Exclude

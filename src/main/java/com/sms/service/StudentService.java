@@ -7,24 +7,60 @@ import com.sms.dto.StudentSearchRequest;
 
 public interface StudentService {
 
-	StudentResponseDto saveStudent(StudentRequestDto requestDto);
+    // ==========================================================
+    // CREATE
+    // ==========================================================
 
-	StudentResponseDto getStudentById(Long id);
+    StudentResponseDto saveStudent(
+            StudentRequestDto requestDto
+    );
 
-	StudentResponseDto updateStudent(Long id, StudentRequestDto dto);
+    // ==========================================================
+    // GET BY ID
+    // ==========================================================
 
-	void deleteStudent(Long id);
-	
-	
-	PageResponse<StudentResponseDto> getAllStudents(int page, int size, String sortBy, String direction);
-	
-	
-	PageResponse<StudentResponseDto> searchStudents(
-	        StudentSearchRequest request,
-	        int page,
-	        int size,
-	        String sortBy,
-	        String direction
-	);
-	
+    StudentResponseDto getStudentById(
+            Long id
+    );
+
+    // ==========================================================
+    // UPDATE
+    // ==========================================================
+
+    StudentResponseDto updateStudent(
+            Long id,
+            StudentRequestDto requestDto
+    );
+
+    // ==========================================================
+    // DELETE (Soft Delete)
+    // ==========================================================
+
+    void deleteStudent(
+            Long id
+    );
+
+    // ==========================================================
+    // GET ALL
+    // ==========================================================
+
+    PageResponse<StudentResponseDto> getAllStudents(
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    );
+
+    // ==========================================================
+    // SEARCH
+    // ==========================================================
+
+    PageResponse<StudentResponseDto> searchStudents(
+            StudentSearchRequest request,
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    );
+
 }

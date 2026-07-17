@@ -4,17 +4,37 @@ import java.util.List;
 
 import com.location.address.dto.AddressRequestDto;
 import com.location.address.dto.AddressResponseDto;
+import com.location.address.entity.Address;
 
 public interface AddressService {
 
-	AddressResponseDto createAddress(AddressRequestDto request);
+    // ==========================================================
+    // REST APIs
+    // ==========================================================
 
-	AddressResponseDto getAddressById(Long id);
+    AddressResponseDto createAddress(AddressRequestDto request);
 
-	List<AddressResponseDto> getAllAddresses();
+    AddressResponseDto getAddressById(Long id);
 
-	AddressResponseDto updateAddress(Long id, AddressRequestDto request);
+    List<AddressResponseDto> getAllAddresses();
 
-	void deleteAddress(Long id);
+    AddressResponseDto updateAddress(
+            Long id,
+            AddressRequestDto request
+    );
+
+    void deleteAddress(Long id);
+
+    // ==========================================================
+    // INTERNAL REUSABLE METHODS
+    // Used by Student, Faculty, Employee etc.
+    // ==========================================================
+
+    Address saveAddress(AddressRequestDto dto);
+
+    Address updateAddress(
+            Address address,
+            AddressRequestDto dto
+    );
 
 }

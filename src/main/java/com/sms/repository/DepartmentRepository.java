@@ -8,15 +8,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.sms.entity.Department;
-import com.sms.enums.DepartmentStatus;
+import com.sms.enums.RecordStatus;
 
 public interface DepartmentRepository extends JpaRepository<Department, Long>, JpaSpecificationExecutor<Department> {
 
 	boolean existsByDepartmentCode(String departmentCode);
 
-	Optional<Department> findByIdAndStatus(Long id, DepartmentStatus status);
+	Optional<Department> findByIdAndStatus(Long id, RecordStatus status);
 
-	Page<Department> findByStatus(DepartmentStatus status, Pageable pageable);
+	Page<Department> findByStatus(RecordStatus status, Pageable pageable);
 
 	boolean existsByDepartmentName(String departmentName);
 

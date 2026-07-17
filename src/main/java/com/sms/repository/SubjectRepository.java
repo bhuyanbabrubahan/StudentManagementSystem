@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.sms.entity.Subject;
-import com.sms.enums.SubjectStatus;
+import com.sms.enums.RecordStatus;
 
 public interface SubjectRepository extends JpaRepository<Subject, Long>, JpaSpecificationExecutor<Subject> {
 
@@ -22,9 +22,9 @@ public interface SubjectRepository extends JpaRepository<Subject, Long>, JpaSpec
 	boolean existsBySubjectCode(String subjectCode);
 
 	// Soft Delete
-	Optional<Subject> findByIdAndStatusNot(Long id, SubjectStatus status);
+	Optional<Subject> findByIdAndStatusNot(Long id, RecordStatus status);
 
-	Page<Subject> findByStatusNot(SubjectStatus status, Pageable pageable);
+	Page<Subject> findByStatusNot(RecordStatus status, Pageable pageable);
 
 	// Auto Subject Code Generator
 	Optional<Subject> findTopByOrderByIdDesc();

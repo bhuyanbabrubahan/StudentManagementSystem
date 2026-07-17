@@ -33,7 +33,7 @@ public class SubjectMapper {
         dto.setCredits(subject.getCredits());
         dto.setTheoryMarks(subject.getTheoryMarks());
         dto.setPracticalMarks(subject.getPracticalMarks());
-        dto.setStatus(subject.getStatus().name());
+        dto.setStatus(subject.getStatus());
 
         if (subject.getSemester() != null) {
 

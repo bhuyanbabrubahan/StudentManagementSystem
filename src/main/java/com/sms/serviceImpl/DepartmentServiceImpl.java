@@ -14,7 +14,7 @@ import com.sms.dto.DepartmentResponseDto;
 import com.sms.dto.DepartmentSearchRequest;
 import com.sms.dto.PageResponse;
 import com.sms.entity.Department;
-import com.sms.enums.DepartmentStatus;
+import com.sms.enums.RecordStatus;
 import com.sms.exception.BusinessException;
 import com.sms.exception.DuplicateDepartmentException;
 import com.sms.exception.ResourceNotFoundException;
@@ -55,7 +55,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         Department department = mapper.toEntity(dto);
 
         // 3. Default status set (VERY IMPORTANT in production)
-        department.setStatus(DepartmentStatus.ACTIVE);
+        department.setStatus(RecordStatus.ACTIVE);
 
         // 4. Save to DB
         Department saved = repository.save(department);
@@ -67,7 +67,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public DepartmentResponseDto getDepartmentById(Long id) {
 
-        Department department = repository.findByIdAndStatus(id, DepartmentStatus.ACTIVE)
+        Department department = repository.findByIdAndStatus(id, RecordStatus.ACTIVE)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Department not found with id: " + id));
 
@@ -91,7 +91,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         // 3. Fetch only ACTIVE departments
         Page<Department> departmentPage =
-                repository.findByStatus(DepartmentStatus.ACTIVE, pageable);
+                repository.findByStatus(RecordStatus.ACTIVE, pageable);
 
         // 4. Convert Entity → DTO
         List<DepartmentResponseDto> content = departmentPage.getContent()
@@ -117,7 +117,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     public DepartmentResponseDto updateDepartment(Long id, DepartmentRequestDto dto) {
 
         // 1. Fetch ACTIVE department from database
-        Department department = repository.findByIdAndStatus(id, DepartmentStatus.ACTIVE)
+        Department department = repository.findByIdAndStatus(id, RecordStatus.ACTIVE)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Department not found with id: " + id));
 
@@ -146,7 +146,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     public void deleteDepartment(Long id) {
 
         // 1. Fetch ACTIVE department
-        Department department = repository.findByIdAndStatus(id, DepartmentStatus.ACTIVE)
+        Department department = repository.findByIdAndStatus(id, RecordStatus.ACTIVE)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Department not found with id: " + id));
@@ -168,7 +168,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         }
 
         // 5. Soft delete
-        department.setStatus(DepartmentStatus.DELETED);
+        department.setStatus(RecordStatus.DELETED);
 
         repository.save(department);
     }
@@ -191,7 +191,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 	                DepartmentSpecification.hasStatus(request.getStatus()));
 	    } else {
 	        spec = Specification.where(
-	                DepartmentSpecification.hasStatus(DepartmentStatus.ACTIVE));
+	                DepartmentSpecification.hasStatus(RecordStatus.ACTIVE));
 	    }
 
 	    // 3. Dynamic filters

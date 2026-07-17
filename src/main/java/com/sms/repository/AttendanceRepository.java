@@ -9,39 +9,50 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.sms.entity.Attendance;
-import com.sms.enums.AttendanceRecordStatus;
+import com.sms.enums.RecordStatus;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long>, JpaSpecificationExecutor<Attendance> {
 
+	
+	
 	// ==========================
-	// Duplicate Check CREATE
-	// ==========================
+		// Duplicate Check CREATE
+		// ==========================
 
-	boolean existsByStudentIdAndFacultySubjectMappingIdAndAttendanceDateAndStatusNot(Long studentId,
-			Long facultySubjectMappingId, LocalDate attendanceDate, AttendanceRecordStatus status);
+		boolean existsByStudentIdAndFacultySubjectMappingIdAndAttendanceDateAndStatusNot(
+		        Long studentId,
+		        Long facultySubjectMappingId,
+		        LocalDate attendanceDate,
+		        RecordStatus status
+		);
 
-	/*
-	 * select count(*) from attendance where student_id=? and
-	 * faculty_subject_mapping_id=? and attendance_date=? and status!='DELETED';
-	 */
+		/*
+		 * select count(*) from attendance where student_id=? and
+		 * faculty_subject_mapping_id=? and attendance_date=? and status!='DELETED';
+		 */
 
-	// ==========================
-	// Duplicate Check UPDATE
-	// ==========================
+		// ==========================
+		// Duplicate Check UPDATE
+		// ==========================
 
-	boolean existsByStudentIdAndFacultySubjectMappingIdAndAttendanceDateAndStatusNotAndIdNot(Long studentId,
-			Long facultySubjectMappingId, LocalDate attendanceDate, AttendanceRecordStatus status, Long id);
+		boolean existsByStudentIdAndFacultySubjectMappingIdAndAttendanceDateAndStatusNotAndIdNot(
+		        Long studentId,
+		        Long facultySubjectMappingId,
+		        LocalDate attendanceDate,
+		        RecordStatus status,
+		        Long id
+		);
 
-	// ==========================
-	// Find Active Attendance
-	// ==========================
+		// ==========================
+		// Find Active Attendance
+		// ==========================
 
-	Optional<Attendance> findByIdAndStatusNot(Long id, AttendanceRecordStatus status);
+		Optional<Attendance> findByIdAndStatusNot(Long id, RecordStatus status);
 
-	// ==========================
-	// Pagination
-	// ==========================
+		// ==========================
+		// Pagination
+		// ==========================
 
-	Page<Attendance> findByStatusNot(AttendanceRecordStatus status, Pageable pageable);
+		Page<Attendance> findByStatusNot(RecordStatus status, Pageable pageable);
 
 }

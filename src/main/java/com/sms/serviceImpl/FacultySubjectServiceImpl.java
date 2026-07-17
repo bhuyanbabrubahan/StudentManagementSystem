@@ -17,9 +17,7 @@ import com.sms.dto.PageResponse;
 import com.sms.entity.Faculty;
 import com.sms.entity.FacultySubjectMapping;
 import com.sms.entity.Subject;
-import com.sms.enums.FacultyStatus;
-import com.sms.enums.FacultySubjectStatus;
-import com.sms.enums.SubjectStatus;
+import com.sms.enums.RecordStatus;
 import com.sms.exception.BusinessException;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.mapper.FacultySubjectMapper;
@@ -63,19 +61,19 @@ public class FacultySubjectServiceImpl implements FacultySubjectService {
 		        dto.getFacultyId(),
 		        dto.getSubjectId(),
 		        dto.getAcademicYear(),
-		        FacultySubjectStatus.DELETED)) {
+		        RecordStatus.DELETED)) {
 
 			throw new BusinessException("Subject already assigned to faculty for this academic year.");
 		}
 
 		// 2. Find Faculty
 
-		Faculty faculty = facultyRepository.findByIdAndStatus(dto.getFacultyId(), FacultyStatus.ACTIVE)
+		Faculty faculty = facultyRepository.findByIdAndStatus(dto.getFacultyId(), RecordStatus.ACTIVE)
 				.orElseThrow(() -> new ResourceNotFoundException("Faculty not found"));
 
 		// 3. Find Subject
 
-		Subject subject = subjectRepository.findByIdAndStatusNot(dto.getSubjectId(), SubjectStatus.DELETED)
+		Subject subject = subjectRepository.findByIdAndStatusNot(dto.getSubjectId(), RecordStatus.DELETED)
 				.orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
 
 		// 4. DTO -> Entity
@@ -90,7 +88,7 @@ public class FacultySubjectServiceImpl implements FacultySubjectService {
 
 		// 6. Default Status
 
-		mapping.setStatus(FacultySubjectStatus.ACTIVE);
+		mapping.setStatus(RecordStatus.ACTIVE);
 
 		// 7. Save
 
@@ -107,7 +105,7 @@ public class FacultySubjectServiceImpl implements FacultySubjectService {
 	public FacultySubjectResponseDto getById(Long id) {
 
 		FacultySubjectMapping mapping = repository.findByIdAndStatusNot(
-				id, FacultySubjectStatus.DELETED)
+				id, RecordStatus.DELETED)
 				.orElseThrow(() -> new ResourceNotFoundException("Faculty subject mapping not found"));
 
 		return mapper.toDto(mapping);
@@ -124,7 +122,7 @@ public class FacultySubjectServiceImpl implements FacultySubjectService {
 
 		Page<FacultySubjectMapping> result =
 		        repository.findByStatusNot(
-		                FacultySubjectStatus.DELETED,
+		        		RecordStatus.DELETED,
 		                pageable);
 
 		List<FacultySubjectResponseDto> content = result.getContent().stream().map(mapper::toDto).toList();
@@ -161,7 +159,7 @@ public class FacultySubjectServiceImpl implements FacultySubjectService {
 	    FacultySubjectMapping mapping = repository
 	            .findByIdAndStatusNot(
 	                    id,
-	                    FacultySubjectStatus.DELETED)
+	                    RecordStatus.DELETED)
 	            .orElseThrow(() ->
 	                    new ResourceNotFoundException(
 	                            "Faculty Subject Mapping not found with id : " + id));
@@ -174,7 +172,7 @@ public class FacultySubjectServiceImpl implements FacultySubjectService {
 	            dto.getFacultyId(),
 	            dto.getSubjectId(),
 	            dto.getAcademicYear(),
-	            FacultySubjectStatus.DELETED,
+	            RecordStatus.DELETED,
 	            id)) {
 
 	        throw new BusinessException(
@@ -189,7 +187,7 @@ public class FacultySubjectServiceImpl implements FacultySubjectService {
 	    Faculty faculty = facultyRepository
 	            .findByIdAndStatus(
 	                    dto.getFacultyId(),
-	                    FacultyStatus.ACTIVE)
+	                    RecordStatus.ACTIVE)
 	            .orElseThrow(() ->
 	                    new ResourceNotFoundException(
 	                            "Faculty not found with id : " + dto.getFacultyId()));
@@ -201,7 +199,7 @@ public class FacultySubjectServiceImpl implements FacultySubjectService {
 	    Subject subject = subjectRepository
 	            .findByIdAndStatusNot(
 	                    dto.getSubjectId(),
-	                    SubjectStatus.DELETED)
+	                    RecordStatus.DELETED)
 	            .orElseThrow(() ->
 	                    new ResourceNotFoundException(
 	                            "Subject not found with id : " + dto.getSubjectId()));
@@ -245,13 +243,13 @@ public class FacultySubjectServiceImpl implements FacultySubjectService {
 	    FacultySubjectMapping mapping =
 	            repository.findByIdAndStatusNot(
 	                    id,
-	                    FacultySubjectStatus.DELETED)
+	                    RecordStatus.DELETED)
 	            .orElseThrow(() ->
 	                    new ResourceNotFoundException(
 	                            "Faculty Subject Mapping not found with id : " + id));
 
 	    mapping.setStatus(
-	            FacultySubjectStatus.DELETED);
+	    		RecordStatus.DELETED);
 
 	    repository.save(mapping);
 	}
@@ -284,7 +282,7 @@ public class FacultySubjectServiceImpl implements FacultySubjectService {
 
 	        spec = spec.and(
 	                FacultySubjectSpecification.statusNot(
-	                        FacultySubjectStatus.DELETED));
+	                		RecordStatus.DELETED));
 
 	    }
 

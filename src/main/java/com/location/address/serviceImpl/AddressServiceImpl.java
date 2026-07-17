@@ -2,8 +2,6 @@ package com.location.address.serviceImpl;
 
 import java.util.List;
 
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,97 +15,135 @@ import com.location.village.entity.Village;
 import com.location.village.repository.VillageRepository;
 import com.sms.exception.ResourceNotFoundException;
 
+import lombok.AllArgsConstructor;
+
 @Service
+@AllArgsConstructor
+@Transactional
 public class AddressServiceImpl implements AddressService {
 
-	private final AddressRepository addressRepository;
+    private final AddressRepository addressRepository;
+    private final VillageRepository villageRepository;
+    private final AddressMapper addressMapper;
 
-	private final VillageRepository villageRepository;
+    // ==========================================================
+    // CREATE ADDRESS (REST API)
+    // ==========================================================
 
-	private final AddressMapper addressMapper;
+    @Override
+    public AddressResponseDto createAddress(AddressRequestDto request) {
 
-	public AddressServiceImpl(AddressRepository addressRepository, VillageRepository villageRepository,
-			AddressMapper addressMapper) {
+        Address address = saveAddress(request);
 
-		this.addressRepository = addressRepository;
+        return addressMapper.convertToResponseDto(address);
+    }
 
-		this.villageRepository = villageRepository;
+    // ==========================================================
+    // GET ADDRESS BY ID
+    // ==========================================================
 
-		this.addressMapper = addressMapper;
+    @Override
+    @Transactional(readOnly = true)
+    public AddressResponseDto getAddressById(Long id) {
 
-	}
+        Address address = addressRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Address not found with id : " + id));
 
-	// CREATE
-	@Override
-	@Transactional
-	public AddressResponseDto createAddress(AddressRequestDto request) {
+        return addressMapper.convertToResponseDto(address);
+    }
 
-		Village village = villageRepository.findById(request.getVillageId())
-				.orElseThrow(() -> new ResourceNotFoundException("Village not found"));
+    // ==========================================================
+    // GET ALL ADDRESSES
+    // ==========================================================
 
-		Address address = addressMapper.convertToEntity(request);
+    @Override
+    @Transactional(readOnly = true)
+    public List<AddressResponseDto> getAllAddresses() {
 
-		address.setVillage(village);
+        return addressRepository.findAll()
+                .stream()
+                .map(addressMapper::convertToResponseDto)
+                .toList();
+    }
 
-		Address savedAddress = addressRepository.save(address);
+    // ==========================================================
+    // UPDATE ADDRESS (REST API)
+    // ==========================================================
 
-		return addressMapper.convertToResponseDto(savedAddress);
+    @Override
+    public AddressResponseDto updateAddress(
+            Long id,
+            AddressRequestDto request
+    ) {
 
-	}
+        Address address = addressRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Address not found with id : " + id));
 
-	// GET BY ID
-	@Override
-	@Transactional(readOnly = true)
-	public AddressResponseDto getAddressById(Long id) {
+        Address updatedAddress = updateAddress(address, request);
 
-		Address address = addressRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Address not found with id : " + id));
+        return addressMapper.convertToResponseDto(updatedAddress);
+    }
 
-		return addressMapper.convertToResponseDto(address);
+    // ==========================================================
+    // DELETE ADDRESS
+    // ==========================================================
 
-	}
+    @Override
+    public void deleteAddress(Long id) {
 
-	// GET ALL
-	@Override
-	@Transactional(readOnly = true)
-	public List<AddressResponseDto> getAllAddresses() {
+        Address address = addressRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Address not found with id : " + id));
 
-		return addressRepository.findAll().stream().map(addressMapper::convertToResponseDto)
-				.collect(Collectors.toList());
+        addressRepository.delete(address);
+    }
 
-	}
+    // ==========================================================
+    // INTERNAL SAVE METHOD
+    // Used by Student, Faculty, Employee etc.
+    // ==========================================================
 
-	// UPDATE
-	@Override
-	@Transactional
-	public AddressResponseDto updateAddress(Long id, AddressRequestDto request) {
+    @Override
+    public Address saveAddress(AddressRequestDto dto) {
 
-		Address address = addressRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Address not found with id : " + id));
+        Village village = villageRepository.findById(dto.getVillageId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Village not found"));
 
-		Village village = villageRepository.findById(request.getVillageId())
-				.orElseThrow(() -> new ResourceNotFoundException("Village not found"));
+        Address address = addressMapper.convertToEntity(dto);
 
-		addressMapper.updateEntity(address, request);
+        address.setVillage(village);
 
-		address.setVillage(village);
+        return addressRepository.save(address);
+    }
 
-		Address updatedAddress = addressRepository.save(address);
+    // ==========================================================
+    // INTERNAL UPDATE METHOD
+    // Used by Student, Faculty, Employee etc.
+    // ==========================================================
 
-		return addressMapper.convertToResponseDto(updatedAddress);
+    @Override
+    public Address updateAddress(
+            Address address,
+            AddressRequestDto dto
+    ) {
 
-	}
+        Village village = villageRepository.findById(dto.getVillageId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Village not found"));
 
-	// DELETE
-	@Override
-	@Transactional
-	public void deleteAddress(Long id) {
+        addressMapper.updateEntity(address, dto);
 
-		Address address = addressRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Address not found with id : " + id));
+        address.setVillage(village);
 
-		addressRepository.delete(address);
-
-	}
+        return addressRepository.save(address);
+    }
 
 }

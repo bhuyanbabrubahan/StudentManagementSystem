@@ -2,8 +2,9 @@ package com.sms.dto;
 
 import java.math.BigDecimal;
 
-import com.sms.enums.CourseStatus;
+import com.sms.enums.RecordStatus;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -20,27 +21,61 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CourseRequestDto {
 
+	@Schema(
+	        description = "Course Code",
+	        example = "CSE101"
+	)
     @NotBlank(message = "Course code is required")
     @Size(max = 20)
     private String courseCode;
 
+    
+    @Schema(
+            description = "Course Name",
+            example = "Java Full Stack"
+    )
     @NotBlank(message = "Course name is required")
     @Size(max = 100)
     private String courseName;
 
+    
+    
+    
+    @Schema(
+            description = "Duration in Months",
+            example = "48"
+    )
     @NotNull(message = "Duration is required")
     @Min(value = 1, message = "Duration must be at least 1 month")
     private Integer durationInMonths;
 
+    
+    
+    @Schema(
+            description = "Course Fees",
+            example = "50000"
+    )
     @NotNull(message = "Fees is required")
     @DecimalMin(value = "0.0", inclusive = false)
     private BigDecimal fees;
 
+    
+    
+    @Schema(
+            description = "Course Description",
+            example = "Java Spring Boot Course"
+    )
     @Size(max = 500)
     private String description;
 
+    
+    
+    @Schema(
+            description = "Department Id",
+            example = "2"
+    )
     @NotNull(message = "Department is required")
     private Long departmentId;
 
-    private CourseStatus status;
+    private RecordStatus status;
 }

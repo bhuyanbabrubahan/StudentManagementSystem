@@ -1,6 +1,10 @@
 package com.sms.entity;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.sms.enums.RecordStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,11 +16,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.sms.enums.CourseStatus;
-
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -54,8 +53,9 @@ public class Course extends BaseEntity{
     @Column(length = 500)
     private String description;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private CourseStatus status;
+    private RecordStatus status;
 
     // 🔥 Relationship (Many courses → One department)
     @ToString.Exclude

@@ -56,8 +56,12 @@ public class Admission extends BaseEntity {
 	@JoinColumn(name = "course_id", nullable = false)
 	private Course course;
 
-	@Column(name = "academic_year", nullable = false, length = 20)
-	private String academicYear;
+	@Column(
+		    name = "academic_year",
+		    nullable = false,
+		    length = 20
+		)
+		private String academicYear;
 
 	@Column(nullable = false)
 	private Integer semester;

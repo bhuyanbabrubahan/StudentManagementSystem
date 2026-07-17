@@ -7,10 +7,22 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.location.address.entity.Address;
-import com.sms.enums.FacultyStatus;
+import com.sms.enums.RecordStatus;
 import com.sms.security.entity.User;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -90,7 +102,7 @@ public class Faculty extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
-    private FacultyStatus status;
+    private RecordStatus status;
 
 
 

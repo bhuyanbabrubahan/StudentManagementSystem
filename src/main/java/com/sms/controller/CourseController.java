@@ -20,8 +20,17 @@ import com.sms.payload.ApiResponseDto;
 import com.sms.service.CourseService;
 import com.sms.util.ResponseBuilder;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+
+@Tag(
+	    name = "Course Management",
+	    description = "APIs for managing university courses"
+	)
 @RestController
 @RequestMapping("/api/courses")
 public class CourseController {
@@ -32,6 +41,17 @@ public class CourseController {
         this.courseService = courseService;
     }
     
+    
+    @Operation(
+            summary = "Create Course",
+            description = "Creates a new course under a department."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Course created successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation failed"),
+            @ApiResponse(responseCode = "404", description = "Department not found"),
+            @ApiResponse(responseCode = "409", description = "Course code already exists")
+    })
     @PostMapping
     public ResponseEntity<ApiResponseDto<CourseResponseDto>> createCourse(
             @Valid @RequestBody CourseRequestDto dto) {
@@ -45,6 +65,19 @@ public class CourseController {
         );
     }
     
+    
+    
+    
+    
+    
+    @Operation(
+            summary = "Get Course By Id",
+            description = "Fetch course details using course id."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Course fetched successfully"),
+            @ApiResponse(responseCode = "404", description = "Course not found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseDto<CourseResponseDto>> getCourseById(
             @PathVariable Long id) {
@@ -58,6 +91,19 @@ public class CourseController {
         );
     }
     
+    
+    
+    
+    
+    @Operation(
+            summary = "Update Course",
+            description = "Updates an existing course."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Course updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Course not found"),
+            @ApiResponse(responseCode = "409", description = "Course code already exists")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDto<CourseResponseDto>> updateCourse(
             @PathVariable Long id,
@@ -73,6 +119,19 @@ public class CourseController {
     }
     
     
+    
+    
+    
+    
+    @Operation(
+            summary = "Delete Course",
+            description = "Soft deletes a course."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Course deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Course not found"),
+            @ApiResponse(responseCode = "400", description = "Course cannot be deleted")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponseDto<Void>> deleteCourse(
             @PathVariable Long id) {
@@ -87,6 +146,16 @@ public class CourseController {
     }
     
     
+    
+    
+    
+    @Operation(
+            summary = "Get All Courses",
+            description = "Returns paginated list of courses."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Courses fetched successfully")
+    })
     @GetMapping
     public ResponseEntity<ApiResponseDto<PageResponse<CourseResponseDto>>> getAllCourses(
             @RequestParam(defaultValue = "0") int page,
@@ -105,6 +174,16 @@ public class CourseController {
     }
     
     
+    
+    
+    
+    @Operation(
+            summary = "Search Courses",
+            description = "Search courses using dynamic filters."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Courses searched successfully")
+    })
     @PostMapping("/search")
     public ResponseEntity<ApiResponseDto<PageResponse<CourseResponseDto>>> searchCourses(
             @RequestBody CourseSearchRequest request,

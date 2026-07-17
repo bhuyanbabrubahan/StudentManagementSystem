@@ -20,8 +20,16 @@ import com.sms.payload.ApiResponseDto;
 import com.sms.service.DepartmentService;
 import com.sms.util.ResponseBuilder;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+@Tag(
+	    name = "Department Management",
+	    description = "APIs for managing departments"
+	)
 @RestController
 @RequestMapping("/api/departments")
 public class DepartmentController {
@@ -33,6 +41,15 @@ public class DepartmentController {
 	}
 	
 	
+	@Operation(
+	        summary = "Create Department",
+	        description = "Creates a new department."
+	)
+	@ApiResponses({
+	        @ApiResponse(responseCode = "201", description = "Department created successfully"),
+	        @ApiResponse(responseCode = "400", description = "Validation failed"),
+	        @ApiResponse(responseCode = "409", description = "Department already exists")
+	})
 	@PostMapping
 	public ResponseEntity<ApiResponseDto<DepartmentResponseDto>> createDepartment(
 	        @Valid @RequestBody DepartmentRequestDto dto) {
@@ -47,6 +64,16 @@ public class DepartmentController {
 	    );
 	}
 	
+	
+	
+	@Operation(
+	        summary = "Get Department By Id",
+	        description = "Fetch department details using department id."
+	)
+	@ApiResponses({
+	        @ApiResponse(responseCode = "200", description = "Department fetched successfully"),
+	        @ApiResponse(responseCode = "404", description = "Department not found")
+	})
 	@GetMapping("/{id}")
 	public ResponseEntity<ApiResponseDto<DepartmentResponseDto>> getDepartmentById(
 	        @PathVariable Long id) {
@@ -62,7 +89,13 @@ public class DepartmentController {
 	}
 
 	
-	
+	@Operation(
+	        summary = "Get All Departments",
+	        description = "Returns paginated department list."
+	)
+	@ApiResponses({
+	        @ApiResponse(responseCode = "200", description = "Departments fetched successfully")
+	})
 	@GetMapping
 	public ResponseEntity<ApiResponseDto<PageResponse<DepartmentResponseDto>>> getAllDepartments(
 	        @RequestParam(defaultValue = "0") int page,
@@ -81,7 +114,15 @@ public class DepartmentController {
 	}
 	
 	
-	
+	@Operation(
+	        summary = "Update Department",
+	        description = "Updates an existing department."
+	)
+	@ApiResponses({
+	        @ApiResponse(responseCode = "200", description = "Department updated successfully"),
+	        @ApiResponse(responseCode = "404", description = "Department not found"),
+	        @ApiResponse(responseCode = "409", description = "Department already exists")
+	})
 	@PutMapping("/{id}")
 	public ResponseEntity<ApiResponseDto<DepartmentResponseDto>> updateDepartment(
 	        @PathVariable Long id,
@@ -98,6 +139,15 @@ public class DepartmentController {
 	}
 	
 	
+	@Operation(
+	        summary = "Delete Department",
+	        description = "Soft deletes a department."
+	)
+	@ApiResponses({
+	        @ApiResponse(responseCode = "200", description = "Department deleted successfully"),
+	        @ApiResponse(responseCode = "404", description = "Department not found"),
+	        @ApiResponse(responseCode = "400", description = "Department cannot be deleted")
+	})
 	@DeleteMapping("/{id}")
 	public ResponseEntity<ApiResponseDto<String>> deleteDepartment(@PathVariable Long id) {
 
@@ -110,7 +160,13 @@ public class DepartmentController {
 	}
 	
 	
-	
+	@Operation(
+	        summary = "Search Departments",
+	        description = "Search departments using dynamic filters."
+	)
+	@ApiResponses({
+	        @ApiResponse(responseCode = "200", description = "Departments searched successfully")
+	})
 	@PostMapping("/search")
 	public ResponseEntity<ApiResponseDto<PageResponse<DepartmentResponseDto>>> searchDepartments(
 			@RequestBody DepartmentSearchRequest request, 

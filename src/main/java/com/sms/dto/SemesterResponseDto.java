@@ -1,30 +1,106 @@
 package com.sms.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import com.sms.enums.RecordStatus;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
+@Schema(
+        name = "Semester Response",
+        description = "Semester Response DTO"
+)
 public class SemesterResponseDto {
 
-	private Long id;
+    @Schema(
+            description = "Semester Id",
+            example = "1"
+    )
+    private Long id;
 
-	private String semesterName;
+    // ==========================
+    // Semester Details
+    // ==========================
 
-	private Integer semesterNumber;
+    @Schema(
+            description = "Semester Name",
+            example = "Semester 1"
+    )
+    private String semesterName;
 
-	private LocalDate semesterStartDate;
+    @Schema(
+            description = "Semester Number",
+            example = "1"
+    )
+    private Integer semesterNumber;
 
-	private LocalDate semesterEndDate;
+    @Schema(
+            description = "Semester Start Date",
+            example = "2026-01-01"
+    )
+    private LocalDate semesterStartDate;
 
-	private Integer totalWorkingDays;
+    @Schema(
+            description = "Semester End Date",
+            example = "2026-06-30"
+    )
+    private LocalDate semesterEndDate;
 
-	private Long courseId;
+    @Schema(
+            description = "Automatically calculated total working days in the semester",
+            example = "154"
+    )
+    private Integer totalWorkingDays;
 
-	private String courseName;
+    // ==========================
+    // Course Details
+    // ==========================
 
-	private String status;
+    @Schema(
+            description = "Course Id",
+            example = "1"
+    )
+    private Long courseId;
+
+    @Schema(
+            description = "Course Code",
+            example = "CSE101"
+    )
+    private String courseCode;
+
+    @Schema(
+            description = "Course Name",
+            example = "Java Full Stack"
+    )
+    private String courseName;
+
+    // ==========================
+    // Status
+    // ==========================
+
+    @Schema(
+            description = "Record Status",
+            example = "ACTIVE"
+    )
+    private RecordStatus status;
+
+    // ==========================
+    // Audit Fields
+    // ==========================
+
+    @Schema(
+            description = "Created Date Time"
+    )
+    private LocalDateTime createdAt;
+
+    @Schema(
+            description = "Updated Date Time"
+    )
+    private LocalDateTime updatedAt;
 
 }

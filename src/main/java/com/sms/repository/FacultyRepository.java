@@ -8,17 +8,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.sms.entity.Faculty;
-import com.sms.enums.FacultyStatus;
+import com.sms.enums.RecordStatus;
 
 public interface FacultyRepository extends JpaRepository<Faculty, Long>, JpaSpecificationExecutor<Faculty> {
 
-	Optional<Faculty> findByIdAndStatus(Long id, FacultyStatus status);
+	Optional<Faculty> findByIdAndStatus(Long id, RecordStatus status);
 
 	boolean existsByEmployeeCode(String employeeCode);
 	
 	Optional<Faculty> findByUserId(Long userId);
 
-	Page<Faculty> findByStatus(FacultyStatus status, Pageable pageable);
+	Page<Faculty> findByStatus(RecordStatus status, Pageable pageable);
 	
 
 }

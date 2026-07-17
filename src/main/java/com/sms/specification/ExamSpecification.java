@@ -4,8 +4,8 @@ package com.sms.specification;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.sms.entity.Exam;
-import com.sms.enums.ExamStatus;
 import com.sms.enums.ExamType;
+import com.sms.enums.RecordStatus;
 
 
 public class ExamSpecification {
@@ -99,7 +99,7 @@ public class ExamSpecification {
     // ==========================
 
     public static Specification<Exam> hasStatus(
-            ExamStatus status
+    		RecordStatus status
     ){
 
         return (root, query, cb) ->
@@ -120,7 +120,7 @@ public class ExamSpecification {
     // ==========================
 
     public static Specification<Exam> statusNot(
-            ExamStatus status
+    		RecordStatus status
     ){
 
         return (root, query, cb) ->

@@ -1,13 +1,21 @@
 package com.sms.entity;
 
 public enum Designation {
-
-    ASSISTANT_PROFESSOR,
+	
+    PROFESSOR,
 
     ASSOCIATE_PROFESSOR,
 
-    PROFESSOR,
+    ASSISTANT_PROFESSOR,
 
-    HOD
+    LECTURER,
 
+    HOD,
+
+    DEAN,
+
+    LAB_ASSISTANT,
+
+    GUEST_FACULTY
+    
 }

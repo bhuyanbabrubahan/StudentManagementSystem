@@ -5,91 +5,136 @@ import org.springframework.stereotype.Component;
 import com.admission.dto.AdmissionRequestDto;
 import com.admission.dto.AdmissionResponseDto;
 import com.admission.entity.Admission;
-import com.sms.entity.Course;
-import com.sms.entity.Department;
-import com.sms.entity.Student;
 
 @Component
 public class AdmissionMapper {
 
-	public Admission toEntity(AdmissionRequestDto dto) {
+    // ==========================================================
+    // Request DTO -> Entity
+    // ==========================================================
 
-		Admission admission = new Admission();
+    public Admission toEntity(AdmissionRequestDto dto) {
 
-		admission.setAcademicYear(dto.getAcademicYear());
-		admission.setSemester(dto.getSemester());
-		if(dto.getAdmissionDate()!=null){
-	        admission.setAdmissionDate(dto.getAdmissionDate());
-	    }
+        Admission admission = new Admission();
 
-		admission.setRemarks(dto.getRemarks());
+        admission.setAcademicYear(dto.getAcademicYear().trim());
 
-		return admission;
-	}
+        admission.setSemester(dto.getSemester());
 
-	public AdmissionResponseDto toDto(Admission admission) {
+        admission.setAdmissionDate(dto.getAdmissionDate());
 
-		AdmissionResponseDto dto = new AdmissionResponseDto();
+        admission.setRemarks(dto.getRemarks());
 
-		dto.setId(admission.getId());
+        return admission;
+    }
 
-		dto.setAdmissionNumber(admission.getAdmissionNumber());
+    // ==========================================================
+    // Entity -> Response DTO
+    // ==========================================================
 
-		dto.setStudentId(admission.getStudent().getId());
+    public AdmissionResponseDto toDto(Admission admission) {
 
-		dto.setStudentRollNumber(admission.getStudent().getRollNumber());
+        AdmissionResponseDto dto = new AdmissionResponseDto();
 
-		dto.setStudentName(admission.getStudent().getFirstName() + " " + admission.getStudent().getLastName());
+        // ==========================================================
+        // Basic Details
+        // ==========================================================
 
-		dto.setDepartmentId(admission.getDepartment().getId());
+        dto.setId(admission.getId());
 
-		dto.setDepartmentName(admission.getDepartment().getDepartmentName());
+        dto.setAdmissionNumber(admission.getAdmissionNumber());
 
-		dto.setCourseId(admission.getCourse().getId());
+        dto.setAcademicYear(admission.getAcademicYear());
 
-		dto.setCourseName(admission.getCourse().getCourseName());
+        dto.setSemester(admission.getSemester());
 
-		dto.setAcademicYear(admission.getAcademicYear());
+        dto.setAdmissionDate(admission.getAdmissionDate());
 
-		dto.setSemester(admission.getSemester());
+        dto.setStatus(admission.getStatus());
 
-		dto.setAdmissionDate(admission.getAdmissionDate());
+        dto.setRemarks(admission.getRemarks());
 
-		dto.setStatus(admission.getStatus());
+        dto.setCreatedAt(admission.getCreatedAt());
 
-		dto.setRemarks(admission.getRemarks());
+        dto.setUpdatedAt(admission.getUpdatedAt());
 
-		dto.setCreatedAt(admission.getCreatedAt());
+        // ==========================================================
+        // Student Details
+        // ==========================================================
 
-		dto.setUpdatedAt(admission.getUpdatedAt());
+        if (admission.getStudent() != null) {
 
-		return dto;
-	}
+            dto.setStudentId(
+                    admission.getStudent().getId()
+            );
 
-	public void updateEntity(Admission admission, AdmissionRequestDto dto) {
+            dto.setStudentRollNumber(
+                    admission.getStudent().getRollNumber()
+            );
 
-		Student student = new Student();
-		student.setId(dto.getStudentId());
-		admission.setStudent(student);
+            dto.setStudentName(
+                    admission.getStudent().getFullName()
+            );
+        }
 
-		Department department = new Department();
-		department.setId(dto.getDepartmentId());
-		admission.setDepartment(department);
+        // ==========================================================
+        // Department Details
+        // ==========================================================
 
-		Course course = new Course();
-		course.setId(dto.getCourseId());
-		admission.setCourse(course);
+        if (admission.getDepartment() != null) {
 
-		admission.setAcademicYear(dto.getAcademicYear());
-		admission.setSemester(dto.getSemester());
-		if(dto.getAdmissionDate()!=null){
+            dto.setDepartmentId(
+                    admission.getDepartment().getId()
+            );
 
-	        admission.setAdmissionDate(
-	                dto.getAdmissionDate()
-	        );
-	    }
+            dto.setDepartmentName(
+                    admission.getDepartment().getDepartmentName()
+            );
+        }
 
-		admission.setRemarks(dto.getRemarks());
-	}
+        // ==========================================================
+        // Course Details
+        // ==========================================================
+
+        if (admission.getCourse() != null) {
+
+            dto.setCourseId(
+                    admission.getCourse().getId()
+            );
+
+            dto.setCourseName(
+                    admission.getCourse().getCourseName()
+            );
+        }
+
+        return dto;
+    }
+
+    // ==========================================================
+    // Update Existing Entity
+    // ==========================================================
+
+    public void updateEntity(
+            Admission admission,
+            AdmissionRequestDto dto
+    ) {
+
+        admission.setAcademicYear(
+                dto.getAcademicYear().trim()
+        );
+
+        admission.setSemester(
+                dto.getSemester()
+        );
+
+        admission.setAdmissionDate(
+                dto.getAdmissionDate()
+        );
+
+        admission.setRemarks(
+                dto.getRemarks()
+        );
+
+    }
 
 }

@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.sms.entity.Semester;
-import com.sms.enums.SemesterStatus;
+import com.sms.enums.RecordStatus;
 
 
 public interface SemesterRepository 
@@ -27,7 +27,7 @@ public interface SemesterRepository
 
     Optional<Semester> findByIdAndStatusNot(
             Long id,
-            SemesterStatus status
+            RecordStatus status
     );
 
 
@@ -38,7 +38,7 @@ public interface SemesterRepository
     // ==========================
 
     Page<Semester> findByStatusNot(
-            SemesterStatus status,
+    		RecordStatus status,
             Pageable pageable
     );
 
@@ -76,7 +76,7 @@ public interface SemesterRepository
             FROM Semester s
             WHERE s.course.id = :courseId
 
-            AND s.status <> com.sms.enums.SemesterStatus.DELETED
+            AND s.status <> com.sms.enums.RecordStatus.DELETED
 
             AND (
                     :startDate <= s.semesterEndDate
@@ -109,7 +109,7 @@ public interface SemesterRepository
 
             AND s.id <> :id
 
-            AND s.status <> com.sms.enums.SemesterStatus.DELETED
+            AND s.status <> com.sms.enums.RecordStatus.DELETED
 
             AND (
                     :startDate <= s.semesterEndDate

@@ -21,10 +21,8 @@ import com.sms.dto.ResultSearchRequest;
 import com.sms.entity.Exam;
 import com.sms.entity.Result;
 import com.sms.entity.Student;
-import com.sms.enums.ExamStatus;
 import com.sms.enums.RecordStatus;
 import com.sms.enums.ResultStatus;
-import com.sms.enums.StudentStatus;
 import com.sms.exception.BusinessException;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.mapper.ResultMapper;
@@ -65,7 +63,7 @@ public class ResultServiceImpl implements ResultService {
                 studentRepository
                 .findByIdAndStatus(
                         request.getStudentId(),
-                        StudentStatus.ACTIVE
+                        RecordStatus.ACTIVE
                 )
                 .orElseThrow(() ->
 
@@ -85,7 +83,7 @@ public class ResultServiceImpl implements ResultService {
                 examRepository
                 .findByIdAndStatusNot(
                         request.getExamId(),
-                        ExamStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 

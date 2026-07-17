@@ -15,8 +15,7 @@ import com.sms.dto.CourseSearchRequest;
 import com.sms.dto.PageResponse;
 import com.sms.entity.Course;
 import com.sms.entity.Department;
-import com.sms.enums.CourseStatus;
-import com.sms.enums.DepartmentStatus;
+import com.sms.enums.RecordStatus;
 import com.sms.exception.BusinessException;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.mapper.CourseMapper;
@@ -58,7 +57,7 @@ public class CourseServiceImpl implements CourseService {
 
         // 3. Fetch ACTIVE department
         Department department = departmentRepository
-                .findByIdAndStatus(dto.getDepartmentId(), DepartmentStatus.ACTIVE)
+                .findByIdAndStatus(dto.getDepartmentId(), RecordStatus.ACTIVE)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Department not found with id: "
@@ -81,7 +80,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseResponseDto getCourseById(Long id) {
 
-        Course course = repository.findByIdAndStatusNot(id, CourseStatus.DELETED)
+        Course course = repository.findByIdAndStatusNot(id, RecordStatus.DELETED)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Course not found with id: " + id));
 
@@ -93,7 +92,7 @@ public class CourseServiceImpl implements CourseService {
     public CourseResponseDto updateCourse(Long id, CourseRequestDto dto) {
 
         // 1. Fetch existing ACTIVE course
-        Course course = repository.findByIdAndStatusNot(id, CourseStatus.DELETED)
+        Course course = repository.findByIdAndStatusNot(id, RecordStatus.DELETED)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Course not found with id: " + id));
 
@@ -109,7 +108,7 @@ public class CourseServiceImpl implements CourseService {
 
         // 4. Fetch ACTIVE department
         Department department = departmentRepository
-                .findByIdAndStatus(dto.getDepartmentId(), DepartmentStatus.ACTIVE)
+                .findByIdAndStatus(dto.getDepartmentId(), RecordStatus.ACTIVE)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Department not found with id: " + dto.getDepartmentId()));
@@ -131,11 +130,11 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public void deleteCourse(Long id) {
 
-        Course course = repository.findByIdAndStatusNot(id, CourseStatus.DELETED)
+        Course course = repository.findByIdAndStatusNot(id, RecordStatus.DELETED)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Course not found with id: " + id));
 
-        course.setStatus(CourseStatus.DELETED);
+        course.setStatus(RecordStatus.DELETED);
 
         repository.save(course);
     }
@@ -154,7 +153,7 @@ public class CourseServiceImpl implements CourseService {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         // 🔥 FIX: exclude deleted
-        Page<Course> coursePage = repository.findByStatusNot(CourseStatus.DELETED, pageable);
+        Page<Course> coursePage = repository.findByStatusNot(RecordStatus.DELETED, pageable);
 
         List<CourseResponseDto> content = coursePage.getContent()
                 .stream()
@@ -175,54 +174,64 @@ public class CourseServiceImpl implements CourseService {
 
     // ---------------- SEARCH (PRODUCTION OPTIMIZED) ----------------
     @Override
-    public PageResponse<CourseResponseDto> searchCourses(CourseSearchRequest request,
-                                                         int page,
-                                                         int size,
-                                                         String sortBy,
-                                                         String direction) {
+    public PageResponse<CourseResponseDto> searchCourses(
+            CourseSearchRequest request,
+            int page,
+            int size,
+            String sortBy,
+            String direction) {
 
         Specification<Course> spec = Specification.where(null);
 
-        // 🔥 DEFAULT ACTIVE FILTER
+        // Status
         if (request.getStatus() != null) {
             spec = spec.and(CourseSpecification.hasStatus(request.getStatus()));
         } else {
-            spec = spec.and(CourseSpecification.hasStatus(CourseStatus.ACTIVE));
+            spec = spec.and(CourseSpecification.hasStatus(RecordStatus.ACTIVE));
         }
 
-        // COURSE NAME
+        // Course Name
         if (request.getCourseName() != null && !request.getCourseName().isBlank()) {
-            spec = spec.and(CourseSpecification.hasCourseName(request.getCourseName()));
+            spec = spec.and(
+                    CourseSpecification.hasCourseName(request.getCourseName()));
         }
 
-        // COURSE CODE
+        // Course Code
         if (request.getCourseCode() != null && !request.getCourseCode().isBlank()) {
-            spec = spec.and(CourseSpecification.hasCourseCode(request.getCourseCode()));
+            spec = spec.and(
+                    CourseSpecification.hasCourseCode(request.getCourseCode()));
         }
 
-        // DEPARTMENT
+        // Department
         if (request.getDepartmentId() != null) {
-            spec = spec.and(CourseSpecification.hasDepartment(request.getDepartmentId()));
+            spec = spec.and(
+                    CourseSpecification.hasDepartment(request.getDepartmentId()));
         }
 
-		// FEES RANGE (CORRECT LOGIC)
-		if (request.getMinFees() != null && request.getMaxFees() != null) {
+        // Minimum Fees
+        if (request.getMinFees() != null) {
+            spec = spec.and(
+                    CourseSpecification.hasFeesGreaterThan(request.getMinFees()));
+        }
 
-			spec = spec.and(CourseSpecification.hasFeesGreaterThan(request.getMinFees())
-					.and(CourseSpecification.hasFeesLessThan(request.getMaxFees())));
+        // Maximum Fees
+        if (request.getMaxFees() != null) {
+            spec = spec.and(
+                    CourseSpecification.hasFeesLessThan(request.getMaxFees()));
+        }
 
-		} else {
+        // Minimum Duration
+        if (request.getMinDuration() != null) {
+            spec = spec.and(
+                    CourseSpecification.hasMinDuration(request.getMinDuration()));
+        }
 
-			if (request.getMinFees() != null) {
-				spec = spec.and(CourseSpecification.hasFeesGreaterThan(request.getMinFees()));
-			}
+        // Maximum Duration
+        if (request.getMaxDuration() != null) {
+            spec = spec.and(
+                    CourseSpecification.hasMaxDuration(request.getMaxDuration()));
+        }
 
-			if (request.getMaxFees() != null) {
-				spec = spec.and(CourseSpecification.hasFeesLessThan(request.getMaxFees()));
-			}
-		}
-
-        // SORT
         Sort sort = direction.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
@@ -237,7 +246,6 @@ public class CourseServiceImpl implements CourseService {
                 .toList();
 
         PageResponse<CourseResponseDto> response = new PageResponse<>();
-
         response.setContent(content);
         response.setPageNumber(coursePage.getNumber());
         response.setPageSize(coursePage.getSize());

@@ -12,122 +12,164 @@ import jakarta.persistence.criteria.Join;
 
 public class AdmissionSpecification {
 
-    //Admission Number ke basis par search karna.
-    public static Specification<Admission>
-    hasAdmissionNumber(String admissionNumber){
-
-        return (root,query,cb)->
-
-                cb.like(
-                        root.get("admissionNumber"),
-                        "%" + admissionNumber + "%"
-                );
-
+    private AdmissionSpecification() {
     }
 
+    // ==========================================================
+    // Admission Number
+    // ==========================================================
 
-    //Academic Year ke basis par search karna.
-    public static Specification<Admission>
-    hasAcademicYear(String academicYear){
+    public static Specification<Admission> hasAdmissionNumber(String admissionNumber) {
 
-        return (root,query,cb)->
+        return (root, query, cb) ->
 
-                cb.equal(
-                        root.get("academicYear"),
-                        academicYear
-                );
-
+                admissionNumber == null || admissionNumber.isBlank()
+                        ? null
+                        : cb.like(
+                                cb.lower(root.get("admissionNumber")),
+                                "%" + admissionNumber.toLowerCase() + "%"
+                        );
     }
 
+    // ==========================================================
+    // Student ID
+    // ==========================================================
 
-    //Semester ke basis par search karna.
-    public static Specification<Admission>
-    hasSemester(Integer semester){
+    public static Specification<Admission> hasStudentId(Long studentId) {
 
-        return (root,query,cb)->
+        return (root, query, cb) ->
 
-                cb.equal(
-                        root.get("semester"),
-                        semester
-                );
-
+                studentId == null
+                        ? null
+                        : cb.equal(
+                                root.get("student").get("id"),
+                                studentId
+                        );
     }
 
+    // ==========================================================
+    // Student Name
+    // ==========================================================
 
-    //Admission Status ke basis par search karna.
-    public static Specification<Admission>
-    hasStatus(AdmissionStatus status){
+    public static Specification<Admission> hasStudentName(String studentName) {
 
-        return (root,query,cb)->
+        return (root, query, cb) -> {
 
-                cb.equal(
-                        root.get("status"),
-                        status
-                );
+            if (studentName == null || studentName.isBlank()) {
+                return null;
+            }
 
-    }
+            Join<Admission, Student> student = root.join("student");
 
+            String keyword = "%" + studentName.toLowerCase() + "%";
 
-    //Student ke First Name ke basis par search karna.
-    public static Specification<Admission>
-    hasStudentName(String name){
+            return cb.or(
 
-        return (root,query,cb)->{
+                    cb.like(
+                            cb.lower(student.get("firstName")),
+                            keyword
+                    ),
 
-            //Admission aur Student table ko join karna.
-            Join<Admission,Student> student =
-                    root.join("student");
+                    cb.like(
+                            cb.lower(student.get("lastName")),
+                            keyword
+                    )
 
-            //Student ke first name par case-insensitive search karna.
-            return cb.like(
-                    cb.lower(student.get("firstName")),
-                    "%" + name.toLowerCase() + "%"
             );
 
         };
-
     }
 
+    // ==========================================================
+    // Department
+    // ==========================================================
 
-    //Department Id ke basis par search karna.
-    public static Specification<Admission>
-    hasDepartment(Long departmentId){
+    public static Specification<Admission> hasDepartmentId(Long departmentId) {
 
-        return (root,query,cb)->{
+        return (root, query, cb) -> {
 
-            //Admission aur Department table ko join karna.
-            Join<Admission,Department> department =
-                    root.join("department");
+            if (departmentId == null) {
+                return null;
+            }
 
-            //Department Id match karna.
+            Join<Admission, Department> department = root.join("department");
+
             return cb.equal(
                     department.get("id"),
                     departmentId
             );
 
         };
-
     }
 
+    // ==========================================================
+    // Course
+    // ==========================================================
 
-    //Course Id ke basis par search karna.
-    public static Specification<Admission>
-    hasCourse(Long courseId){
+    public static Specification<Admission> hasCourseId(Long courseId) {
 
-        return (root,query,cb)->{
+        return (root, query, cb) -> {
 
-            //Admission aur Course table ko join karna.
-            Join<Admission,Course> course =
-                    root.join("course");
+            if (courseId == null) {
+                return null;
+            }
 
-            //Course Id match karna.
+            Join<Admission, Course> course = root.join("course");
+
             return cb.equal(
                     course.get("id"),
                     courseId
             );
 
         };
+    }
 
+    // ==========================================================
+    // Academic Year
+    // ==========================================================
+
+    public static Specification<Admission> hasAcademicYear(String academicYear) {
+
+        return (root, query, cb) ->
+
+                academicYear == null || academicYear.isBlank()
+                        ? null
+                        : cb.equal(
+                                cb.lower(root.get("academicYear")),
+                                academicYear.toLowerCase()
+                        );
+    }
+
+    // ==========================================================
+    // Semester
+    // ==========================================================
+
+    public static Specification<Admission> hasSemester(Integer semester) {
+
+        return (root, query, cb) ->
+
+                semester == null
+                        ? null
+                        : cb.equal(
+                                root.get("semester"),
+                                semester
+                        );
+    }
+
+    // ==========================================================
+    // Status
+    // ==========================================================
+
+    public static Specification<Admission> hasStatus(AdmissionStatus status) {
+
+        return (root, query, cb) ->
+
+                status == null
+                        ? null
+                        : cb.equal(
+                                root.get("status"),
+                                status
+                        );
     }
 
 }

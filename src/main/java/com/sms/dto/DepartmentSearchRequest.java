@@ -1,7 +1,8 @@
 package com.sms.dto;
 
-import com.sms.enums.DepartmentStatus;
+import com.sms.enums.RecordStatus;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +14,18 @@ import lombok.Setter;
 @AllArgsConstructor
 public class DepartmentSearchRequest {
 
+	@Schema(
+	        description = "Department Name",
+	        example = "Computer"
+	)
 	private String departmentName;
+	
 	private String departmentCode;
-	private DepartmentStatus status;
+	
+	@Schema(
+	        description = "Department Status",
+	        example = "ACTIVE"
+	)
+	private RecordStatus status;
 
 }

@@ -3,14 +3,14 @@ package com.sms.specification;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.sms.entity.Subject;
-import com.sms.enums.SubjectStatus;
+import com.sms.enums.RecordStatus;
 
 public class SubjectSpecification {
 
 	// ==========================
 	// STATUS
 	// ==========================
-	public static Specification<Subject> hasStatus(SubjectStatus status) {
+	public static Specification<Subject> hasStatus(RecordStatus status) {
 
 		return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("status"), status);
 	}

@@ -6,7 +6,7 @@ import com.sms.dto.CourseRequestDto;
 import com.sms.dto.CourseResponseDto;
 import com.sms.entity.Course;
 import com.sms.entity.Department;
-import com.sms.enums.CourseStatus;
+import com.sms.enums.RecordStatus;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.repository.DepartmentRepository;
 
@@ -29,7 +29,7 @@ public class CourseMapper {
         course.setDurationInMonths(dto.getDurationInMonths());
         course.setFees(dto.getFees());
         course.setDescription(dto.getDescription());
-        course.setStatus(dto.getStatus() != null ? dto.getStatus() : CourseStatus.ACTIVE);
+        course.setStatus(dto.getStatus() != null ? dto.getStatus() : RecordStatus.ACTIVE);
 
         // 🔥 Department mapping (only reference set)
         Department department = departmentRepository

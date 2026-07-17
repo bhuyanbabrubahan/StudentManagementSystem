@@ -1,45 +1,38 @@
 package com.sms.serviceImpl;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.location.address.entity.Address;
-import com.location.address.repository.AddressRepository;
-import com.location.village.repository.VillageRepository;
-import com.location.village.entity.Village;
-
-import com.sms.dto.FacultyRequestDto;
-import com.sms.dto.FacultyResponseDto;
-import com.sms.dto.FacultySearchRequest;
-import com.sms.dto.PageResponse;
-import com.sms.entity.Department;
-import com.sms.entity.Faculty;
-import com.sms.enums.DepartmentStatus;
-import com.sms.enums.FacultyStatus;
-import com.sms.exception.ResourceAlreadyExistsException;
-import com.sms.exception.ResourceNotFoundException;
-
-import com.sms.mapper.FacultyMapper;
-
-import com.sms.repository.DepartmentRepository;
-import com.sms.repository.FacultyRepository;
-import com.sms.security.entity.Role;
-import com.sms.security.entity.User;
-import com.sms.security.entity.UserStatus;
-import com.sms.security.repository.UserRepository;
-
-import com.sms.sequence.enums.ModuleType;
-import com.sms.sequence.service.CodeGeneratorService;
-
-import com.sms.service.FacultyService;
-import com.sms.specification.FacultySpecification;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.location.address.entity.Address;
+import com.location.address.repository.AddressRepository;
+import com.location.village.entity.Village;
+import com.location.village.repository.VillageRepository;
+import com.sms.dto.FacultyRequestDto;
+import com.sms.dto.FacultyResponseDto;
+import com.sms.dto.FacultySearchRequest;
+import com.sms.dto.PageResponse;
+import com.sms.entity.Department;
+import com.sms.entity.Faculty;
+import com.sms.enums.RecordStatus;
+import com.sms.exception.ResourceAlreadyExistsException;
+import com.sms.exception.ResourceNotFoundException;
+import com.sms.mapper.FacultyMapper;
+import com.sms.repository.DepartmentRepository;
+import com.sms.repository.FacultyRepository;
+import com.sms.security.entity.Role;
+import com.sms.security.entity.User;
+import com.sms.security.entity.UserStatus;
+import com.sms.security.repository.UserRepository;
+import com.sms.sequence.enums.ModuleType;
+import com.sms.sequence.service.CodeGeneratorService;
+import com.sms.service.FacultyService;
+import com.sms.specification.FacultySpecification;
 
 @Service
 public class FacultyServiceImpl implements FacultyService {
@@ -87,7 +80,7 @@ public class FacultyServiceImpl implements FacultyService {
 
 		Department department =
 
-				departmentRepository.findByIdAndStatus(request.getDepartmentId(), DepartmentStatus.ACTIVE)
+				departmentRepository.findByIdAndStatus(request.getDepartmentId(), RecordStatus.ACTIVE)
 
 						.orElseThrow(() ->
 
@@ -129,7 +122,7 @@ public class FacultyServiceImpl implements FacultyService {
 
 		address.setLandmark(request.getAddress().getLandmark());
 
-		address.setPostalCode(request.getAddress().getPostalCode());
+		//address.setPostalCode(request.getAddress().getPostalCode());
 
 		address.setAddressType(request.getAddress().getAddressType());
 
@@ -157,7 +150,7 @@ public class FacultyServiceImpl implements FacultyService {
 
 		);
 
-		faculty.setStatus(FacultyStatus.ACTIVE);
+		faculty.setStatus(RecordStatus.ACTIVE);
 
 		// 7. Save Faculty
 
@@ -178,7 +171,7 @@ public class FacultyServiceImpl implements FacultyService {
 	    Faculty faculty =
 	        facultyRepository.findByIdAndStatus(
 	                id,
-	                FacultyStatus.ACTIVE
+	                RecordStatus.ACTIVE
 	        )
 	        .orElseThrow(
 	             () -> new ResourceNotFoundException("Faculty not found")
@@ -216,7 +209,7 @@ public class FacultyServiceImpl implements FacultyService {
 	    Page<Faculty> facultyPage =
 	            facultyRepository
 	            .findByStatus(
-	                    FacultyStatus.ACTIVE,
+	            		RecordStatus.ACTIVE,
 	                    pageable
 	            );
 
@@ -275,7 +268,7 @@ public class FacultyServiceImpl implements FacultyService {
 	            facultyRepository
 	            .findByIdAndStatus(
 	                    id,
-	                    FacultyStatus.ACTIVE
+	                    RecordStatus.ACTIVE
 	            )
 
 	            .orElseThrow(() ->
@@ -291,7 +284,7 @@ public class FacultyServiceImpl implements FacultyService {
 	            departmentRepository
 	            .findByIdAndStatus(
 	                    request.getDepartmentId(),
-	                    DepartmentStatus.ACTIVE
+	                    RecordStatus.ACTIVE
 	            )
 
 	            .orElseThrow(() ->
@@ -336,7 +329,7 @@ public class FacultyServiceImpl implements FacultyService {
 	            facultyRepository
 	            .findByIdAndStatus(
 	                    id,
-	                    FacultyStatus.ACTIVE
+	                    RecordStatus.ACTIVE
 	            )
 
 	            .orElseThrow(() ->
@@ -347,7 +340,7 @@ public class FacultyServiceImpl implements FacultyService {
 
 
 	    faculty.setStatus(
-	            FacultyStatus.DELETED
+	    		RecordStatus.DELETED
 	    );
 
 
@@ -395,7 +388,7 @@ public class FacultyServiceImpl implements FacultyService {
 
 	        spec = spec.and(
 	                FacultySpecification.hasStatus(
-	                        FacultyStatus.ACTIVE
+	                		RecordStatus.ACTIVE
 	                )
 	        );
 

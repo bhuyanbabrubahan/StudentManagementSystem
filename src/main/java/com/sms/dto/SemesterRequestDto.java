@@ -1,44 +1,74 @@
 package com.sms.dto;
 
-
 import java.time.LocalDate;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Getter
 @Setter
+@Schema(
+        name = "Semester Request",
+        description = "Request body for creating or updating a semester"
+)
 public class SemesterRequestDto {
 
-    @NotBlank(message = "Semester name is required")
-    @Size(max = 50, message = "Semester name cannot exceed 50 characters")
+    @Schema(
+            description = "Semester Name",
+            example = "Semester 1"
+    )
+    @NotBlank(message = "Semester name is required.")
     private String semesterName;
+    
+    
 
-    @NotNull(message = "Semester number is required")
-    @Min(value = 1, message = "Semester number must be at least 1")
-    @Max(value = 20, message = "Semester number cannot exceed 20")
+    @Schema(
+            description = "Semester Number",
+            example = "1"
+    )
+    @NotNull(message = "Semester number is required.")
+    @Min(value = 1, message = "Semester number must be at least 1.")
+    @Max(value = 12, message = "Semester number cannot be greater than 12.")
     private Integer semesterNumber;
+    
+    
 
-    @NotNull(message = "Semester start date is required")
+    @Schema(
+            description = "Semester Start Date",
+            example = "2026-01-01"
+    )
+    @NotNull(message = "Semester start date is required.")
     private LocalDate semesterStartDate;
+    
+    
 
-    @NotNull(message = "Semester end date is required")
+    @Schema(
+            description = "Semester End Date",
+            example = "2026-06-30"
+    )
+    @NotNull(message = "Semester end date is required.")
     private LocalDate semesterEndDate;
+    
+    
 
-    @NotNull(message = "Total working days is required")
-    @Min(value = 1, message = "Total working days must be greater than 0")
-    @Max(value = 366, message = "Total working days cannot exceed 366")
+    @Schema(
+            description = "Automatically calculated total working days in the semester",
+            example = "154"
+    )
     private Integer totalWorkingDays;
+    
+    
 
-    @NotNull(message = "Course id is required")
-    @Positive(message = "Course id must be greater than zero")
+    @Schema(
+            description = "Course Id",
+            example = "1"
+    )
+    @NotNull(message = "Course id is required.")
     private Long courseId;
 
 }

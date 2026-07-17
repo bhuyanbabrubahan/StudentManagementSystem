@@ -2,9 +2,12 @@ package com.sms.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.location.address.entity.Address;
-import com.sms.enums.StudentStatus;
+import com.sms.enums.RecordStatus;
 import com.sms.security.entity.User;
 
 import jakarta.persistence.Column;
@@ -43,30 +46,51 @@ public class Student extends BaseEntity {
 	@Column(name = "last_name", nullable = false, length = 50)
 	private String lastName;
 
-	@Column(name = "phone_number", nullable = false, length = 10)
-	private String phoneNumber;
+	@Column(
+		    name = "phone_number",
+		    nullable = false,
+		    unique = true,
+		    length = 10
+		)
+		private String phoneNumber;
 
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private Gender gender;
 
-	@Column(name = "date_of_birth")
+	@Column(
+		    name="date_of_birth",
+		    nullable=false
+		)
 	private LocalDate dateOfBirth;
 
-	@Column(name = "admission_date")
+	@Column(
+		    name="admission_date",
+		    nullable=false
+		)
 	private LocalDate admissionDate;
 
-	@Column(name = "roll_number", nullable = false, unique = true, length = 20)
+	@Column(
+		    name = "roll_number",
+		    nullable = false,
+		    unique = true,
+		    length = 20
+		)
 	private String rollNumber;
 
 	@Column(name = "profile_image")
 	private String profileImage;
 
-	@Column(nullable = false)
-	private BigDecimal fees;
+	@Column(
+		    nullable=false,
+		    precision=10,
+		    scale=2
+		)
+		private BigDecimal fees;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status")
-	private StudentStatus status;
+	private RecordStatus status;
 
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -74,7 +98,10 @@ public class Student extends BaseEntity {
 	private Department department;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", unique = true)
+	@JoinColumn(
+	        name = "user_id",
+	        unique = true
+	)
 	@ToString.Exclude
 	private User user;
 
@@ -83,11 +110,15 @@ public class Student extends BaseEntity {
 	@ToString.Exclude
 	private Address address;
 	
+	
+	
 	public String getFullName() {
-	    String first = firstName != null ? firstName.trim() : "";
-	    String last = lastName != null ? lastName.trim() : "";
 
-	    return (first + " " + last).trim();
+	    return Stream.of(firstName,lastName)
+	            .filter(Objects::nonNull)
+	            .map(String::trim)
+	            .filter(s->!s.isBlank())
+	            .collect(Collectors.joining(" "));
 	}
 
 }

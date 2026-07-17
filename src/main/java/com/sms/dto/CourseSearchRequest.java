@@ -2,8 +2,9 @@ package com.sms.dto;
 
 import java.math.BigDecimal;
 
-import com.sms.enums.CourseStatus;
+import com.sms.enums.RecordStatus;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,16 +16,60 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CourseSearchRequest {
 
+    @Schema(
+            description = "Course Name",
+            example = "Java"
+    )
     private String courseName;
 
+    @Schema(
+            description = "Course Code",
+            example = "CSE101"
+    )
     private String courseCode;
 
+    @Schema(
+            description = "Department Id",
+            example = "2"
+    )
     private Long departmentId;
 
-    private CourseStatus status;
+    @Schema(
+            description = "Record Status",
+            example = "ACTIVE"
+    )
+    private RecordStatus status;
 
-    // optional filtering (future scalable)
+    // ==========================
+    // Fees Filter
+    // ==========================
+
+    @Schema(
+            description = "Minimum Fees",
+            example = "10000"
+    )
     private BigDecimal minFees;
 
+    @Schema(
+            description = "Maximum Fees",
+            example = "60000"
+    )
     private BigDecimal maxFees;
+
+    // ==========================
+    // Duration Filter
+    // ==========================
+
+    @Schema(
+            description = "Minimum Duration (Months)",
+            example = "12"
+    )
+    private Integer minDuration;
+
+    @Schema(
+            description = "Maximum Duration (Months)",
+            example = "48"
+    )
+    private Integer maxDuration;
+
 }

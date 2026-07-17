@@ -8,24 +8,29 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.sms.entity.Student;
-import com.sms.enums.StudentStatus;
+import com.sms.enums.RecordStatus;
 
-public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpecificationExecutor<Student>{
+public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpecificationExecutor<Student> {
 
+	Optional<Student> findByIdAndStatus(Long id, RecordStatus status);
 	
-	Optional<Student> findByIdAndStatus(Long id, StudentStatus status);
-	
-	Page<Student> findByStatus(StudentStatus status, Pageable pageable);
-	
-	
-	long countByDepartmentIdAndStatus(Long departmentId, StudentStatus status);
-	
+	Optional<Student> findByIdAndStatusNot(Long id, RecordStatus status);
+
+	Page<Student> findByStatus(RecordStatus status, Pageable pageable);
+
+	long countByDepartmentIdAndStatus(Long departmentId, RecordStatus status);
+
 	boolean existsByDepartment_Id(Long departmentId);
-	
 
 	long countByDepartment_Id(Long departmentId);
-	
-	
-	
-	Optional<Student> findByIdAndStatusNot(Long id, StudentStatus status);
+
+	boolean existsByPhoneNumber(String phoneNumber);
+
+	boolean existsByPhoneNumberAndIdNot(String phoneNumber, Long id);
+
+	Optional<Student> findByRollNumberAndStatus(String rollNumber, RecordStatus status);
+
+	boolean existsByUserId(Long userId);
+
+	boolean existsByAddressId(Long addressId);
 }

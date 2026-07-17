@@ -2,8 +2,9 @@ package com.sms.dto;
 
 import java.time.LocalDateTime;
 
-import com.sms.enums.DepartmentStatus;
+import com.sms.enums.RecordStatus;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,10 +16,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class DepartmentResponseDto {
 
+	@Schema(description = "Department Id", example = "1")
     private Long id;
 
+	@Schema(description = "Department Name", example = "Computer Science")
     private String departmentName;
 
+	@Schema(description = "Department Code", example = "CSE")
     private String departmentCode;
 
     private String description;
@@ -27,5 +31,5 @@ public class DepartmentResponseDto {
 
     private LocalDateTime updatedAt;
     
-    private DepartmentStatus status;
+    private RecordStatus status;
 }

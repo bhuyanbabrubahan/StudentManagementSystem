@@ -1,7 +1,7 @@
 package com.sms.serviceImpl;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,19 +15,14 @@ import com.sms.dto.PageResponse;
 import com.sms.dto.SemesterRequestDto;
 import com.sms.dto.SemesterResponseDto;
 import com.sms.dto.SemesterSearchRequest;
-
 import com.sms.entity.Course;
 import com.sms.entity.Semester;
-import com.sms.enums.CourseStatus;
-import com.sms.enums.SemesterStatus;
+import com.sms.enums.RecordStatus;
 import com.sms.exception.BusinessException;
 import com.sms.exception.ResourceNotFoundException;
-
 import com.sms.mapper.SemesterMapper;
-
 import com.sms.repository.CourseRepository;
 import com.sms.repository.SemesterRepository;
-
 import com.sms.service.SemesterService;
 import com.sms.specification.SemesterSpecification;
 
@@ -74,7 +69,7 @@ public class SemesterServiceImpl implements SemesterService {
                 courseRepository
                 .findByIdAndStatus(
                         dto.getCourseId(),
-                        CourseStatus.ACTIVE
+                        RecordStatus.ACTIVE
                 )
                 .orElseThrow(() ->
 
@@ -84,25 +79,36 @@ public class SemesterServiceImpl implements SemesterService {
                         )
                 );
 
-		// 3. DTO -> Entity
+     // 3. DTO -> Entity
 
-		Semester semester = mapper.toEntity(dto);
+        Semester semester = mapper.toEntity(dto);
 
-		// 4. Relationship
+        // 4. Relationship
 
-		semester.setCourse(course);
+        semester.setCourse(course);
 
-		// 5. Default Status
+        // 5. Default Status
 
-		semester.setStatus(SemesterStatus.ACTIVE);
+        semester.setStatus(RecordStatus.ACTIVE);
 
-		// 6. Save
+        // 6. Auto Calculate Total Working Days
 
-		Semester saved = repository.save(semester);
+        int totalWorkingDays =
 
-		// 7. Response
+                (int) ChronoUnit.DAYS.between(
+                        semester.getSemesterStartDate(),
+                        semester.getSemesterEndDate()
+                ) + 1;
 
-		return mapper.toDto(saved);
+        semester.setTotalWorkingDays(totalWorkingDays);
+
+        // 7. Save
+
+        Semester saved = repository.save(semester);
+
+        // 8. Response
+
+        return mapper.toDto(saved);
 
     }
 
@@ -123,7 +129,7 @@ public class SemesterServiceImpl implements SemesterService {
                 repository
                 .findByIdAndStatusNot(
                         id,
-                        SemesterStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -141,13 +147,6 @@ public class SemesterServiceImpl implements SemesterService {
     }
 
 
-
-
-
-
-    // ================= UPDATE =================
-
-
  // ================= UPDATE =================
 
     @Override
@@ -157,26 +156,27 @@ public class SemesterServiceImpl implements SemesterService {
             SemesterRequestDto dto
     ) {
 
-
-        // 1. Existing Semester Fetch
+        // ==========================
+        // 1. Fetch Existing Semester
+        // ==========================
 
         Semester semester =
                 repository
                 .findByIdAndStatusNot(
                         id,
-                        SemesterStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
                         new ResourceNotFoundException(
-                                "Semester not found with id: "
-                                + id
+                                "Semester not found with id: " + id
                         )
                 );
 
 
-
+        // ==========================
         // 2. Common Validation
+        // ==========================
 
         validateSemester(
                 dto,
@@ -185,37 +185,68 @@ public class SemesterServiceImpl implements SemesterService {
         );
 
 
-
+        // ==========================
         // 3. Fetch ACTIVE Course
+        // ==========================
 
         Course course =
                 courseRepository
                 .findByIdAndStatus(
                         dto.getCourseId(),
-                        CourseStatus.ACTIVE
+                        RecordStatus.ACTIVE
                 )
                 .orElseThrow(() ->
 
                         new ResourceNotFoundException(
                                 "Course not found with id: "
-                                + dto.getCourseId()
+                                        + dto.getCourseId()
                         )
                 );
 
-		// 4. Update Fields
-		mapper.updateEntity(semester, dto);
 
-		// 5. Update Relationship
-		semester.setCourse(course);
+        // ==========================
+        // 4. Update Entity
+        // ==========================
 
-		// 6. Save
-		Semester updated = repository.save(semester);
+        mapper.updateEntity(semester, dto);
 
-		// 7. Response
-		return mapper.toDto(updated);
+
+        // ==========================
+        // 5. Update Relationship
+        // ==========================
+
+        semester.setCourse(course);
+
+
+        // ==========================
+        // 6. Auto Calculate Working Days
+        // ==========================
+
+        semester.setTotalWorkingDays(
+
+                calculateTotalWorkingDays(
+                        semester.getSemesterStartDate(),
+                        semester.getSemesterEndDate()
+                )
+
+        );
+
+
+        // ==========================
+        // 7. Save
+        // ==========================
+
+        Semester updated =
+                repository.save(semester);
+
+
+        // ==========================
+        // 8. Response
+        // ==========================
+
+        return mapper.toDto(updated);
 
     }
-
 
 
 
@@ -234,7 +265,7 @@ public class SemesterServiceImpl implements SemesterService {
                 repository
                 .findByIdAndStatusNot(
                         id,
-                        SemesterStatus.DELETED
+                        RecordStatus.DELETED
                 )
                 .orElseThrow(() ->
 
@@ -247,7 +278,7 @@ public class SemesterServiceImpl implements SemesterService {
 
 
         semester.setStatus(
-                SemesterStatus.DELETED
+        		RecordStatus.DELETED
         );
 
 
@@ -296,7 +327,7 @@ public class SemesterServiceImpl implements SemesterService {
 
         Page<Semester> semesterPage =
                 repository.findByStatusNot(
-                        SemesterStatus.DELETED,
+                		RecordStatus.DELETED,
                         pageable
                 );
 
@@ -348,313 +379,456 @@ public class SemesterServiceImpl implements SemesterService {
 
 
 
-    // ================= SEARCH =================
+ // ==================================================
+ // SEARCH
+ // ==================================================
 
+ @Override
+ @Transactional(readOnly = true)
+ public PageResponse<SemesterResponseDto> searchSemesters(
 
-    @Override
-    public PageResponse<SemesterResponseDto> searchSemesters(
-            SemesterSearchRequest request,
-            int page,
-            int size,
-            String sortBy,
-            String direction
-    ) {
+         SemesterSearchRequest request,
 
+         int page,
 
+         int size,
 
-        Specification<Semester> spec =
-                Specification.where(null);
+         String sortBy,
 
+         String direction
 
+ ) {
 
-        if(request.getStatus()!=null) {
+     Specification<Semester> spec =
+             Specification.where(null);
 
-            spec =
-            spec.and(
-              SemesterSpecification.hasStatus(
-                      request.getStatus()
-              )
-            );
 
 
-        }else {
+     // ==================================================
+     // Default ACTIVE Records
+     // ==================================================
 
+     if (request.getStatus() != null) {
 
-            spec =
-            spec.and(
-              SemesterSpecification.hasStatus(
-                      SemesterStatus.ACTIVE
-              )
-            );
+         spec = spec.and(
 
-        }
+                 SemesterSpecification.hasStatus(
+                         request.getStatus()
+                 )
 
+         );
 
+     } else {
 
+         spec = spec.and(
 
+                 SemesterSpecification.hasStatus(
+                         RecordStatus.ACTIVE
+                 )
 
-        if(request.getSemesterName()!=null &&
-           !request.getSemesterName().isBlank()) {
+         );
 
+     }
 
-            spec =
-            spec.and(
-              SemesterSpecification.hasSemesterName(
-                      request.getSemesterName()
-              )
-            );
 
-        }
 
+     // ==================================================
+     // Semester Id
+     // ==================================================
 
+     if (request.getSemesterId() != null) {
 
+         spec = spec.and(
 
-        if(request.getSemesterNumber()!=null) {
+                 SemesterSpecification.hasSemesterId(
+                         request.getSemesterId()
+                 )
 
+         );
 
-            spec =
-            spec.and(
-              SemesterSpecification.hasSemesterNumber(
-                      request.getSemesterNumber()
-              )
-            );
+     }
 
-        }
 
 
+     // ==================================================
+     // Semester Name
+     // ==================================================
 
+     if (request.getSemesterName() != null
+             && !request.getSemesterName().isBlank()) {
 
+         spec = spec.and(
 
-        if(request.getCourseId()!=null) {
+                 SemesterSpecification.hasSemesterName(
+                         request.getSemesterName()
+                 )
 
+         );
 
-            spec =
-            spec.and(
-              SemesterSpecification.hasCourse(
-                      request.getCourseId()
-              )
-            );
+     }
 
-        }
 
 
+     // ==================================================
+     // Semester Number
+     // ==================================================
 
+     if (request.getSemesterNumber() != null) {
 
+         spec = spec.and(
 
+                 SemesterSpecification.hasSemesterNumber(
+                         request.getSemesterNumber()
+                 )
 
-        Sort sort =
-                direction.equalsIgnoreCase("asc")
-                ?
-                Sort.by(sortBy).ascending()
-                :
-                Sort.by(sortBy).descending();
+         );
 
+     }
 
 
 
-        Pageable pageable =
-                PageRequest.of(
-                        page,
-                        size,
-                        sort
-                );
+     // ==================================================
+     // Course Id
+     // ==================================================
 
+     if (request.getCourseId() != null) {
 
+         spec = spec.and(
 
+                 SemesterSpecification.hasCourse(
+                         request.getCourseId()
+                 )
 
-        Page<Semester> pageResult =
-                repository.findAll(
-                        spec,
-                        pageable
-                );
+         );
 
+     }
 
 
 
-        List<SemesterResponseDto> content =
-                pageResult.getContent()
-                .stream()
-                .map(mapper::toDto)
-                .toList();
+     // ==================================================
+     // Course Code
+     // ==================================================
 
+     if (request.getCourseCode() != null
+             && !request.getCourseCode().isBlank()) {
 
+         spec = spec.and(
 
+                 SemesterSpecification.hasCourseCode(
+                         request.getCourseCode()
+                 )
 
-        PageResponse<SemesterResponseDto> response =
-                new PageResponse<>();
+         );
 
+     }
 
-        response.setContent(content);
-        response.setPageNumber(pageResult.getNumber());
-        response.setPageSize(pageResult.getSize());
-        response.setTotalElements(pageResult.getTotalElements());
-        response.setTotalPages(pageResult.getTotalPages());
-        response.setLast(pageResult.isLast());
 
 
-        return response;
+     // ==================================================
+     // Course Name
+     // ==================================================
 
-    }
+     if (request.getCourseName() != null
+             && !request.getCourseName().isBlank()) {
+
+         spec = spec.and(
+
+                 SemesterSpecification.hasCourseName(
+                         request.getCourseName()
+                 )
+
+         );
+
+     }
+
+
+
+     // ==================================================
+     // Minimum Working Days
+     // ==================================================
+
+     if (request.getMinWorkingDays() != null) {
+
+         spec = spec.and(
+
+                 SemesterSpecification.hasMinWorkingDays(
+                         request.getMinWorkingDays()
+                 )
+
+         );
+
+     }
+
+
+
+     // ==================================================
+     // Maximum Working Days
+     // ==================================================
+
+     if (request.getMaxWorkingDays() != null) {
+
+         spec = spec.and(
+
+                 SemesterSpecification.hasMaxWorkingDays(
+                         request.getMaxWorkingDays()
+                 )
+
+         );
+
+     }
+
+
+
+     // ==================================================
+     // Semester Start Date From
+     // ==================================================
+
+     if (request.getStartDateFrom() != null) {
+
+         spec = spec.and(
+
+                 SemesterSpecification.hasStartDateFrom(
+                         request.getStartDateFrom()
+                 )
+
+         );
+
+     }
+
+
+
+     // ==================================================
+     // Semester Start Date To
+     // ==================================================
+
+     if (request.getStartDateTo() != null) {
+
+         spec = spec.and(
+
+                 SemesterSpecification.hasStartDateTo(
+                         request.getStartDateTo()
+                 )
+
+         );
+
+     }
+
+
+
+     // ==================================================
+     // Semester End Date From
+     // ==================================================
+
+     if (request.getEndDateFrom() != null) {
+
+         spec = spec.and(
+
+                 SemesterSpecification.hasEndDateFrom(
+                         request.getEndDateFrom()
+                 )
+
+         );
+
+     }
+
+
+
+     // ==================================================
+     // Semester End Date To
+     // ==================================================
+
+     if (request.getEndDateTo() != null) {
+
+         spec = spec.and(
+
+                 SemesterSpecification.hasEndDateTo(
+                         request.getEndDateTo()
+                 )
+
+         );
+
+     }
+
+
+
+     // ==================================================
+     // Sorting
+     // ==================================================
+
+     Sort sort =
+             direction.equalsIgnoreCase("asc")
+
+                     ? Sort.by(sortBy).ascending()
+
+                     : Sort.by(sortBy).descending();
+
+
+
+     // ==================================================
+     // Pageable
+     // ==================================================
+
+     Pageable pageable =
+             PageRequest.of(
+                     page,
+                     size,
+                     sort
+             );
+
+
+
+     // ==================================================
+     // Fetch Data
+     // ==================================================
+
+     Page<Semester> pageResult =
+             repository.findAll(
+                     spec,
+                     pageable
+             );
+
+
+
+     // ==================================================
+     // Entity -> DTO
+     // ==================================================
+
+     List<SemesterResponseDto> content =
+             pageResult
+                     .getContent()
+                     .stream()
+                     .map(mapper::toDto)
+                     .toList();
+
+
+
+     // ==================================================
+     // Response
+     // ==================================================
+
+     PageResponse<SemesterResponseDto> response =
+             new PageResponse<>();
+
+     response.setContent(content);
+
+     response.setPageNumber(pageResult.getNumber());
+
+     response.setPageSize(pageResult.getSize());
+
+     response.setTotalElements(pageResult.getTotalElements());
+
+     response.setTotalPages(pageResult.getTotalPages());
+
+     response.setLast(pageResult.isLast());
+
+     return response;
+ }
 
     
-    private void validateSemester(
-            SemesterRequestDto dto,
-            Long id,
-            boolean update
-    ) {
-
-
-        // ==========================
-        // 1. Date Validation
-        // ==========================
-
-
-        if(dto.getSemesterStartDate()
-                .isAfter(dto.getSemesterEndDate())) {
-
-
-            throw new BusinessException(
-                    "Semester start date cannot be after end date."
-            );
-        }
-
-
-
-        if(dto.getSemesterStartDate()
-                .isEqual(dto.getSemesterEndDate())) {
-
-
-            throw new BusinessException(
-                    "Semester start date and end date cannot be same."
-            );
-        }
-
-
-
-        // ==========================
-        // 2. Working Days Validation
-        // ==========================
-
-
-        if(dto.getTotalWorkingDays() == null ||
-                dto.getTotalWorkingDays() <= 0) {
-
-
-            throw new BusinessException(
-                    "Total working days must be greater than zero."
-            );
-        }
-
-
-
-        long semesterDuration =
-
-                ChronoUnit.DAYS.between(
-                        dto.getSemesterStartDate(),
-                        dto.getSemesterEndDate()
-                ) + 1;
-
-
-
-        if(dto.getTotalWorkingDays()
-                > semesterDuration) {
-
-
-            throw new BusinessException(
-                    "Working days cannot exceed semester duration."
-            );
-        }
-
-
-
-        // ==========================
-        // 3. Duplicate Semester Number
-        // ==========================
-
-
-        boolean duplicateSemester;
-
-
-
-        if(update) {
-
-
-            duplicateSemester =
-                    repository
-                    .existsByCourseIdAndSemesterNumberAndIdNot(
-                            dto.getCourseId(),
-                            dto.getSemesterNumber(),
-                            id
-                    );
-
-
-        } else {
-
-
-            duplicateSemester =
-                    repository
-                    .existsByCourseIdAndSemesterNumber(
-                            dto.getCourseId(),
-                            dto.getSemesterNumber()
-                    );
-
-        }
-
-
-
-        if(duplicateSemester) {
-
-
-            throw new BusinessException(
-                    "Semester number already exists for this course."
-            );
-        }
-
-
-
-        // ==========================
-        // 4. Date Overlap Validation
-        // ==========================
-
-
-        boolean overlap;
-
-
-
-        if(update) {
-
-
-            overlap =
-                    repository.existsSemesterOverlapForUpdate(
-                            id,
-                            dto.getCourseId(),
-                            dto.getSemesterStartDate(),
-                            dto.getSemesterEndDate()
-                    );
-
-
-        } else {
-
-
-            overlap =
-                    repository.existsSemesterOverlap(
-                            dto.getCourseId(),
-                            dto.getSemesterStartDate(),
-                            dto.getSemesterEndDate()
-                    );
-
-        }
-
-
-
-        if(overlap) {
-
-
-            throw new BusinessException(
-                    "Semester date range overlaps with existing semester."
-            );
-        }
-
-    }
+ private void validateSemester(
+	        SemesterRequestDto dto,
+	        Long id,
+	        boolean update
+	) {
+
+	    // ==========================
+	    // 1. Date Validation
+	    // ==========================
+
+	    if (dto.getSemesterStartDate()
+	            .isAfter(dto.getSemesterEndDate())) {
+
+	        throw new BusinessException(
+	                "Semester start date cannot be after end date."
+	        );
+	    }
+
+	    if (dto.getSemesterStartDate()
+	            .isEqual(dto.getSemesterEndDate())) {
+
+	        throw new BusinessException(
+	                "Semester start date and end date cannot be same."
+	        );
+	    }
+
+	    // ==========================
+	    // 2. Duplicate Semester Number
+	    // ==========================
+
+	    boolean duplicateSemester;
+
+	    if (update) {
+
+	        duplicateSemester =
+	                repository.existsByCourseIdAndSemesterNumberAndIdNot(
+	                        dto.getCourseId(),
+	                        dto.getSemesterNumber(),
+	                        id
+	                );
+
+	    } else {
+
+	        duplicateSemester =
+	                repository.existsByCourseIdAndSemesterNumber(
+	                        dto.getCourseId(),
+	                        dto.getSemesterNumber()
+	                );
+	    }
+
+	    if (duplicateSemester) {
+
+	        throw new BusinessException(
+	                "Semester number already exists for this course."
+	        );
+	    }
+
+	    // ==========================
+	    // 3. Date Overlap Validation
+	    // ==========================
+
+	    boolean overlap;
+
+	    if (update) {
+
+	        overlap =
+	                repository.existsSemesterOverlapForUpdate(
+	                        id,
+	                        dto.getCourseId(),
+	                        dto.getSemesterStartDate(),
+	                        dto.getSemesterEndDate()
+	                );
+
+	    } else {
+
+	        overlap =
+	                repository.existsSemesterOverlap(
+	                        dto.getCourseId(),
+	                        dto.getSemesterStartDate(),
+	                        dto.getSemesterEndDate()
+	                );
+	    }
+
+	    if (overlap) {
+
+	        throw new BusinessException(
+	                "Semester date range overlaps with existing semester."
+	        );
+	    }
+	    
+	    
+
+	}
+ 
+	 private Integer calculateTotalWorkingDays(
+		        LocalDate semesterStartDate,
+		        LocalDate semesterEndDate
+		) {
+	
+		    return (int) ChronoUnit.DAYS.between(
+		            semesterStartDate,
+		            semesterEndDate
+		    ) + 1;
+	
+		}
 
 }

@@ -52,12 +52,6 @@ public class Address extends BaseEntity {
     private String landmark;
 
 
-    @Column(
-            name = "postal_code",
-            nullable = false,
-            length = 10)
-    private String postalCode;
-
 
     @Enumerated(EnumType.STRING)
     @Column(
