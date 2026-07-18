@@ -2,7 +2,7 @@ package com.admission.entity;
 
 import java.time.LocalDate;
 
-import com.sms.entity.BaseEntity;
+import com.sms.common.entity.BaseEntity;
 import com.sms.entity.Course;
 import com.sms.entity.Department;
 import com.sms.entity.Student;

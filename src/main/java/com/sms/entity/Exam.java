@@ -3,6 +3,7 @@ package com.sms.entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.sms.common.entity.BaseEntity;
 import com.sms.enums.ExamType;
 import com.sms.enums.RecordStatus;
 

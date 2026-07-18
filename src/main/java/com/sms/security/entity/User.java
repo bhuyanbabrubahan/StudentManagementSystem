@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.sms.entity.BaseEntity;
+import com.sms.common.entity.BaseEntity;
 import com.sms.entity.Faculty;
 import com.sms.entity.Student;
 

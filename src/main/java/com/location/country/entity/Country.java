@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.location.enums.MasterStatus;
 import com.location.state.entity.State;
-import com.sms.entity.BaseEntity;
+import com.sms.common.entity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

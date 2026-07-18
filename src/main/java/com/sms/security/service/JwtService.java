@@ -1,5 +1,6 @@
 package com.sms.security.service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -15,86 +16,149 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-	private static final String SECRET_KEY = "mysecretkeymysecretkeymysecretkey12345";
+    // =====================================
+    // JWT CONFIGURATION
+    // =====================================
 
-	// Generate JWT Token
+    private static final String SECRET_KEY =
+            "mysecretkeymysecretkeymysecretkey12345";
 
-	public String generateToken(UserDetails userDetails) {
+    private static final long ACCESS_TOKEN_EXPIRATION =
+            1000L * 60 * 60; // 1 Hour
 
-		return Jwts.builder()
+    private static final long REFRESH_TOKEN_EXPIRATION =
+            1000L * 60 * 60 * 24 * 7; // 7 Days
 
-				.subject(userDetails.getUsername())
+    // =====================================
+    // GENERATE ACCESS TOKEN
+    // =====================================
 
-				.claim("role", userDetails.getAuthorities())
+    public String generateToken(UserDetails userDetails) {
 
-				.issuedAt(new Date())
+        return Jwts.builder()
 
-				.expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .subject(userDetails.getUsername())
 
-				.signWith(getSignKey())
+                .claim("role", userDetails.getAuthorities())
 
-				.compact();
+                .issuedAt(new Date())
 
-	}
+                .expiration(
+                        new Date(System.currentTimeMillis()
+                                + ACCESS_TOKEN_EXPIRATION)
+                )
 
-	// Extract username from JWT
+                .signWith(getSignKey())
 
-	public String extractUsername(String token) {
+                .compact();
+    }
 
-		return extractClaim(token, Claims::getSubject);
+    // =====================================
+    // GENERATE REFRESH TOKEN
+    // =====================================
 
-	}
+    public String generateRefreshToken(UserDetails userDetails) {
 
-	// Extract any claim
+        return Jwts.builder()
 
-	public <T> T extractClaim(String token, Function<Claims, T> resolver) {
+                .subject(userDetails.getUsername())
 
-		final Claims claims = extractAllClaims(token);
+                .issuedAt(new Date())
 
-		return resolver.apply(claims);
+                .expiration(
+                        new Date(System.currentTimeMillis()
+                                + REFRESH_TOKEN_EXPIRATION)
+                )
 
-	}
+                .signWith(getSignKey())
 
-	// Extract all claims
+                .compact();
+    }
 
-	private Claims extractAllClaims(String token) {
+    // =====================================
+    // ACCESS TOKEN EXPIRY (SECONDS)
+    // =====================================
 
-		return Jwts.parser()
+    public long getAccessTokenExpirationInSeconds() {
 
-				.verifyWith(getSignKey())
+        return ACCESS_TOKEN_EXPIRATION / 1000;
+    }
 
-				.build()
+    // =====================================
+    // EXTRACT USERNAME
+    // =====================================
 
-				.parseSignedClaims(token)
+    public String extractUsername(String token) {
 
-				.getPayload();
+        return extractClaim(token, Claims::getSubject);
+    }
 
-	}
+    // =====================================
+    // EXTRACT CLAIM
+    // =====================================
 
-	// Validate Token
+    public <T> T extractClaim(
+            String token,
+            Function<Claims, T> resolver) {
 
-	public boolean isTokenValid(String token, String username) {
+        Claims claims = extractAllClaims(token);
 
-		String tokenUsername = extractUsername(token);
+        return resolver.apply(claims);
+    }
 
-		return (tokenUsername.equals(username) && !isTokenExpired(token));
+    // =====================================
+    // EXTRACT ALL CLAIMS
+    // =====================================
 
-	}
+    private Claims extractAllClaims(String token) {
 
-	// Check expiration
+        return Jwts.parser()
 
-	private boolean isTokenExpired(String token) {
+                .verifyWith(getSignKey())
 
-		Date expiration = extractClaim(token, Claims::getExpiration);
+                .build()
 
-		return expiration.before(new Date());
+                .parseSignedClaims(token)
 
-	}
+                .getPayload();
+    }
 
-	private SecretKey getSignKey() {
+    // =====================================
+    // VALIDATE TOKEN
+    // =====================================
 
-		return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    public boolean isTokenValid(
+            String token,
+            String username) {
 
-	}
+        String tokenUsername = extractUsername(token);
 
+        return tokenUsername.equals(username)
+                && !isTokenExpired(token);
+    }
+
+    // =====================================
+    // CHECK TOKEN EXPIRATION
+    // =====================================
+
+    private boolean isTokenExpired(String token) {
+
+        Date expiration = extractClaim(
+                token,
+                Claims::getExpiration
+        );
+
+        return expiration.before(new Date());
+    }
+
+    // =====================================
+    // SIGNING KEY
+    // =====================================
+
+    private SecretKey getSignKey() {
+
+        return Keys.hmacShaKeyFor(
+                SECRET_KEY.getBytes(StandardCharsets.UTF_8)
+        );
+    }
 }

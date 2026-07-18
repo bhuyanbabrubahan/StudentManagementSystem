@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.location.address.entity.Address;
+import com.sms.common.entity.BaseEntity;
 import com.sms.enums.RecordStatus;
 import com.sms.security.entity.User;
 

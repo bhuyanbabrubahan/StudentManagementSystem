@@ -2,7 +2,7 @@ package com.location.address.entity;
 
 import com.location.address.enums.AddressType;
 import com.location.village.entity.Village;
-import com.sms.entity.BaseEntity;
+import com.sms.common.entity.BaseEntity;
 import com.sms.entity.Faculty;
 
 import jakarta.persistence.Column;

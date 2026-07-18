@@ -2,7 +2,7 @@ package com.location.village.entity;
 
 import com.location.enums.MasterStatus;
 import com.location.tehsil.entity.Tehsil;
-import com.sms.entity.BaseEntity;
+import com.sms.common.entity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

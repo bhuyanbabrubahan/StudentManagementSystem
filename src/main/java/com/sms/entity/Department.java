@@ -3,6 +3,7 @@ package com.sms.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sms.common.entity.BaseEntity;
 import com.sms.enums.RecordStatus;
 
 import jakarta.persistence.Column;

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.sms.entity.Student;
 import com.sms.enums.RecordStatus;
+import com.sms.security.entity.User;
 
 public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpecificationExecutor<Student> {
 
@@ -33,4 +34,13 @@ public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpec
 	boolean existsByUserId(Long userId);
 
 	boolean existsByAddressId(Long addressId);
+	
+	
+	Optional<Student> findByUser(User user);
+	
+	Optional<Student> findByUserIdAndStatus(
+	        Long userId,
+	        RecordStatus status
+	);
+	
 }

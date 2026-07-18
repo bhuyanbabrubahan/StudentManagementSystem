@@ -2,6 +2,7 @@ package com.sms.entity;
 
 import java.time.LocalDate;
 
+import com.sms.common.entity.BaseEntity;
 import com.sms.enums.AttendanceStatus;
 import com.sms.enums.RecordStatus;
 

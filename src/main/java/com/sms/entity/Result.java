@@ -3,6 +3,7 @@ package com.sms.entity;
 
 import java.math.BigDecimal;
 
+import com.sms.common.entity.BaseEntity;
 import com.sms.enums.RecordStatus;
 import com.sms.enums.ResultStatus;
 

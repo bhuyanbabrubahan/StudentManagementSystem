@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,6 +17,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.sms.security.filter.JwtAuthenticationFilter;
 import com.sms.security.service.CustomUserDetailsService;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
 
@@ -24,38 +28,60 @@ public class SecurityConfig {
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
-	public SecurityConfig(CustomUserDetailsService userDetailsService, PasswordEncoder passwordEncoder,
-			JwtAuthenticationFilter jwtAuthenticationFilter, JwtAuthenticationEntryPoint authenticationEntryPoint) {
-
-		this.userDetailsService = userDetailsService;
-		this.passwordEncoder = passwordEncoder;
-		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-		this.authenticationEntryPoint = authenticationEntryPoint;
-
-	}
 
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 
-	    return http
+		return http
 
-	            // REST API में CSRF नहीं चाहिए
-	            .csrf(csrf -> csrf.disable())
+		        .csrf(csrf -> csrf.disable())
+
+		        .cors(Customizer.withDefaults())
+
+		        .headers(headers -> headers
+
+		                .frameOptions(frame -> frame.sameOrigin())
+
+		                .contentTypeOptions(Customizer.withDefaults())
+
+		                .httpStrictTransportSecurity(hsts ->
+
+		                        hsts.includeSubDomains(true)
+
+		                )
+
+		        )
+
+		        .authorizeHttpRequests(auth -> auth
 
 
-	            .authorizeHttpRequests(auth -> auth
+	            		// ==========================
+	            		// PUBLIC APIs
+	            		// ==========================
 
+		        		.requestMatchers(
 
-	                    // ==========================
-	                    // PUBLIC APIs
-	                    // ==========================
+		        		        "/api/auth/register",
+		        		        "/api/auth/login",
+		        		        "/api/auth/forgot-password",
+		        		        "/api/auth/reset-password",
+		        		        "/api/auth/refresh-token",
 
-	                    .requestMatchers(
-	                            "/api/auth/**"
-	                    )
-	                    .permitAll()
+		        		        "/swagger-ui/**",
+		        		        "/swagger-ui.html",
+		        		        "/v3/api-docs/**",
+		        		        "/swagger-resources/**",
+		        		        "/webjars/**"
 
+		        		)
+		        		.permitAll()
+
+		        		.requestMatchers(
+		        		        HttpMethod.OPTIONS,
+		        		        "/**"
+		        		)
+		        		.permitAll()
 
 
 	                    // ==========================
@@ -78,10 +104,19 @@ public class SecurityConfig {
 
 	                    // CREATE UPDATE DELETE Department
 	                    .requestMatchers(
-	                            "/api/departments",
+	                            HttpMethod.POST,
+	                            "/api/departments"
+	                    ).hasRole("ADMIN")
+
+	                    .requestMatchers(
+	                            HttpMethod.PUT,
 	                            "/api/departments/**"
-	                    )
-	                    .hasRole("ADMIN")
+	                    ).hasRole("ADMIN")
+
+	                    .requestMatchers(
+	                            HttpMethod.DELETE,
+	                            "/api/departments/**"
+	                    ).hasRole("ADMIN")
 
 
 
@@ -191,7 +226,7 @@ public class SecurityConfig {
 
 	                 
 	                 
-	              // SEARCH
+	                 // SEARCH
 	                 .requestMatchers(
 	                         HttpMethod.POST,
 	                         "/api/semesters/search"
@@ -433,47 +468,52 @@ public class SecurityConfig {
 	        )
 
 	        
-	        .requestMatchers(
-	                HttpMethod.POST,
-	                "/api/results"
-	        )
-	        .hasRole("ADMIN")
+	     // ==========================
+	     // RESULT
+	     // ==========================
 
+	     // SEARCH
+	     .requestMatchers(
+	             HttpMethod.POST,
+	             "/api/results/search"
+	     )
+	     .hasAnyRole(
+	             "ADMIN",
+	             "FACULTY"
+	     )
 
-	        .requestMatchers(
-	                HttpMethod.PUT,
-	                "/api/results/**"
-	        )
-	        .hasRole("ADMIN")
+	     // CREATE
+	     .requestMatchers(
+	             HttpMethod.POST,
+	             "/api/results"
+	     )
+	     .hasRole("ADMIN")
 
+	     // UPDATE
+	     .requestMatchers(
+	             HttpMethod.PUT,
+	             "/api/results/**"
+	     )
+	     .hasRole("ADMIN")
 
-	        .requestMatchers(
-	                HttpMethod.DELETE,
-	                "/api/results/**"
-	        )
-	        .hasRole("ADMIN")
+	     // DELETE
+	     .requestMatchers(
+	             HttpMethod.DELETE,
+	             "/api/results/**"
+	     )
+	     .hasRole("ADMIN")
 
-
-	        .requestMatchers(
-	                HttpMethod.GET,
-	                "/api/results/**"
-	        )
-	        .hasAnyRole(
-	                "ADMIN",
-	                "FACULTY",
-	                "STUDENT"
-	        )
-
-
-	        .requestMatchers(
-	                HttpMethod.POST,
-	                "/api/results/search"
-	        )
-	        .hasAnyRole(
-	                "ADMIN",
-	                "FACULTY"
-	        )
-
+	     // GET
+	     .requestMatchers(
+	             HttpMethod.GET,
+	             "/api/results",
+	             "/api/results/**"
+	     )
+	     .hasAnyRole(
+	             "ADMIN",
+	             "FACULTY",
+	             "STUDENT"
+	     )
 
 	        // DELETE
 
@@ -486,35 +526,57 @@ public class SecurityConfig {
 	        )
 	                 
 
-	                    // ==========================
-	                    // ADMIN
-	                    // ==========================
+			     	// ==========================
+		            // ADMIN
+		            // ==========================
+		
+		            .requestMatchers(
+		                    "/api/admin/create"
+		            )
+		            .hasRole("ADMIN")         
 
-	                    .requestMatchers(
-	                            "/api/admin/create"
-	                    )
-	                    .hasRole("ADMIN")
+		         // ==========================
+		         // PROFILE
+		         // ==========================
 
-	                    // ==========================
-	                    // ANY OTHER API
-	                    // ==========================
+		         .requestMatchers(
+		                 HttpMethod.GET,
+		                 "/api/profile/me"
+		         )
+		         .hasAnyRole(
+		                 "ADMIN",
+		                 "STUDENT",
+		                 "FACULTY"
+		         )
+
+		         .requestMatchers(
+		        	        HttpMethod.POST,
+		        	        "/api/profile/change-password"
+		        	)
+		        	.hasAnyRole(
+		        	        "ADMIN",
+		        	        "STUDENT",
+		        	        "FACULTY"
+		        	)
+		        	
+		        	
+		        	.requestMatchers(
+		        	        HttpMethod.POST,
+		        	        "/api/auth/logout"
+		        	)
+		        	.hasAnyRole(
+		        	        "ADMIN",
+		        	        "STUDENT",
+		        	        "FACULTY"
+		        	)
+
+		        	.anyRequest()
+		        	.authenticated()
 	                    
 	                    
-	                 // ==========================
-	                 // SWAGGER OPEN API
-	                 // ==========================
+	                
 
-	                 .requestMatchers(
-	                         "/swagger-ui/**",
-	                         "/swagger-ui.html",
-	                         "/v3/api-docs/**"
-	                 )
-	                 .permitAll()
-
-	                    .anyRequest()
-	                    .authenticated()
-
-	            )
+	       )
 
 
 

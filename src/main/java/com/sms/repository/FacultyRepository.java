@@ -15,10 +15,12 @@ public interface FacultyRepository extends JpaRepository<Faculty, Long>, JpaSpec
 	Optional<Faculty> findByIdAndStatus(Long id, RecordStatus status);
 
 	boolean existsByEmployeeCode(String employeeCode);
-	
-	Optional<Faculty> findByUserId(Long userId);
 
 	Page<Faculty> findByStatus(RecordStatus status, Pageable pageable);
 	
+	Optional<Faculty> findByUserIdAndStatus(
+	        Long userId,
+	        RecordStatus status
+	);
 
 }
