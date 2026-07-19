@@ -11,22 +11,49 @@ import com.sms.dto.SemesterRequestDto;
 import com.sms.dto.SemesterResponseDto;
 import com.sms.entity.Semester;
 
+
 @Mapper(componentModel = "spring")
 public interface SemesterMapper {
+
 
     // ==================================================
     // DTO -> ENTITY
     // ==================================================
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(
+            target = "id",
+            ignore = true
+    )
 
-    @Mapping(target = "course", ignore = true)
+    @Mapping(
+            target = "course",
+            ignore = true
+    )
 
-    @Mapping(target = "status", ignore = true)
+    @Mapping(
+            target = "subjects",
+            ignore = true
+    )
+
+    @Mapping(
+            target = "status",
+            ignore = true
+    )
+
+    @Mapping(
+            target = "createdAt",
+            ignore = true
+    )
+
+    @Mapping(
+            target = "updatedAt",
+            ignore = true
+    )
 
     Semester toEntity(
             SemesterRequestDto dto
     );
+
 
 
 
@@ -55,6 +82,7 @@ public interface SemesterMapper {
 
 
 
+
     // ==================================================
     // UPDATE
     // ==================================================
@@ -64,11 +92,35 @@ public interface SemesterMapper {
                     NullValuePropertyMappingStrategy.IGNORE
     )
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(
+            target = "id",
+            ignore = true
+    )
 
-    @Mapping(target = "course", ignore = true)
+    @Mapping(
+            target = "course",
+            ignore = true
+    )
 
-    @Mapping(target = "status", ignore = true)
+    @Mapping(
+            target = "subjects",
+            ignore = true
+    )
+
+    @Mapping(
+            target = "status",
+            ignore = true
+    )
+
+    @Mapping(
+            target = "createdAt",
+            ignore = true
+    )
+
+    @Mapping(
+            target = "updatedAt",
+            ignore = true
+    )
 
     void updateEntity(
 

@@ -143,7 +143,20 @@ public class ExamServiceImpl implements ExamService {
         Exam saved =
                 repository.save(exam);
 
-        return mapper.toDto(saved);
+
+        Exam responseExam =
+                repository.findByIdAndStatusNot(
+                        saved.getId(),
+                        RecordStatus.DELETED
+                )
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Exam not found"
+                        )
+                );
+
+
+        return mapper.toDto(responseExam);
 
     }
     
@@ -415,8 +428,20 @@ public class ExamServiceImpl implements ExamService {
         Exam updated =
                 repository.save(exam);
 
-        return mapper.toDto(updated);
 
+        Exam responseExam =
+                repository.findByIdAndStatusNot(
+                        updated.getId(),
+                        RecordStatus.DELETED
+                )
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Exam not found"
+                        )
+                );
+
+
+        return mapper.toDto(responseExam);
     }
     
     

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.sms.audit.annotation.AuditLog;
+import com.sms.audit.enums.AuditAction;
 
 import com.sms.dto.CourseRequestDto;
 import com.sms.dto.CourseResponseDto;
@@ -52,6 +54,11 @@ public class CourseController {
             @ApiResponse(responseCode = "404", description = "Department not found"),
             @ApiResponse(responseCode = "409", description = "Course code already exists")
     })
+    @AuditLog(
+            action = AuditAction.CREATE,
+            module = "COURSE",
+            description = "Create course"
+    )
     @PostMapping
     public ResponseEntity<ApiResponseDto<CourseResponseDto>> createCourse(
             @Valid @RequestBody CourseRequestDto dto) {
@@ -104,6 +111,11 @@ public class CourseController {
             @ApiResponse(responseCode = "404", description = "Course not found"),
             @ApiResponse(responseCode = "409", description = "Course code already exists")
     })
+    @AuditLog(
+            action = AuditAction.UPDATE,
+            module = "COURSE",
+            description = "Update course"
+    )
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDto<CourseResponseDto>> updateCourse(
             @PathVariable Long id,
@@ -132,6 +144,11 @@ public class CourseController {
             @ApiResponse(responseCode = "404", description = "Course not found"),
             @ApiResponse(responseCode = "400", description = "Course cannot be deleted")
     })
+    @AuditLog(
+            action = AuditAction.DELETE,
+            module = "COURSE",
+            description = "Delete course"
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponseDto<Void>> deleteCourse(
             @PathVariable Long id) {

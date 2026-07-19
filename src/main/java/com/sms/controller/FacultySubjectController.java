@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.sms.audit.annotation.AuditLog;
+import com.sms.audit.enums.AuditAction;
 
 import com.sms.dto.FacultySubjectRequestDto;
 import com.sms.dto.FacultySubjectResponseDto;
@@ -53,6 +55,11 @@ public class FacultySubjectController {
     	    @ApiResponse(responseCode = "404", description = "Faculty or Subject not found"),
     	    @ApiResponse(responseCode = "409", description = "Faculty subject assignment already exists")
     	})
+	    @AuditLog(
+	            action = AuditAction.CREATE,
+	            module = "FACULTY_SUBJECT",
+	            description = "Create faculty subject mapping"
+	    )
     	@PostMapping
     	public ResponseEntity<ApiResponseDto<FacultySubjectResponseDto>> assignSubject(
 
@@ -150,6 +157,11 @@ public class FacultySubjectController {
     	    @ApiResponse(responseCode = "404", description = "Faculty subject mapping not found"),
     	    @ApiResponse(responseCode = "409", description = "Duplicate faculty subject assignment")
     	})
+	    @AuditLog(
+	            action = AuditAction.UPDATE,
+	            module = "FACULTY_SUBJECT",
+	            description = "Update faculty subject mapping"
+	    )
     	@PutMapping("/{id}")
     	public ResponseEntity<ApiResponseDto<FacultySubjectResponseDto>> update(
 
@@ -181,6 +193,11 @@ public class FacultySubjectController {
     	    @ApiResponse(responseCode = "200", description = "Faculty subject deleted successfully"),
     	    @ApiResponse(responseCode = "404", description = "Faculty subject mapping not found")
     	})
+	    @AuditLog(
+	            action = AuditAction.DELETE,
+	            module = "FACULTY_SUBJECT",
+	            description = "Delete faculty subject mapping"
+	    )    	
     	@DeleteMapping("/{id}")
     	public ResponseEntity<ApiResponseDto<Void>> delete(
 

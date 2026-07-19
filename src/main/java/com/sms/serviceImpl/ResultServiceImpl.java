@@ -100,7 +100,7 @@ public class ResultServiceImpl implements ResultService {
      // ==================================================
 
         if(resultRepository
-                .existsByStudentIdAndExamIdAndRecordStatus(
+                .existsByStudentIdAndExamIdAndStatus(
                         student.getId(),
                         exam.getId(),
                         RecordStatus.ACTIVE
@@ -200,7 +200,7 @@ public class ResultServiceImpl implements ResultService {
         // 9. Default Record Status
         // ==================================================
 
-        result.setRecordStatus(
+        result.setStatus(
                 RecordStatus.ACTIVE
         );
 
@@ -250,7 +250,7 @@ public class ResultServiceImpl implements ResultService {
         Result result =
 
                 resultRepository
-                .findByIdAndRecordStatus(
+                .findByIdAndStatus(
                         id,
                         RecordStatus.ACTIVE
                 )
@@ -391,7 +391,7 @@ public class ResultServiceImpl implements ResultService {
         Result result =
 
                 resultRepository
-                .findByIdAndRecordStatus(
+                .findByIdAndStatus(
                         id,
                         RecordStatus.ACTIVE
                 )
@@ -434,7 +434,7 @@ public class ResultServiceImpl implements ResultService {
         Result result =
 
                 resultRepository
-                .findByIdAndRecordStatus(
+                .findByIdAndStatus(
                         id,
                         RecordStatus.ACTIVE
                 )
@@ -455,7 +455,7 @@ public class ResultServiceImpl implements ResultService {
         // 2. Soft Delete
         // ==================================================
 
-        result.setRecordStatus(
+        result.setStatus(
                 RecordStatus.DELETED
         );
 
@@ -526,7 +526,7 @@ public class ResultServiceImpl implements ResultService {
         Page<Result> resultPage =
 
                 resultRepository
-                .findByRecordStatus(
+                .findByStatus(
                         RecordStatus.ACTIVE,
                         pageable
                 );

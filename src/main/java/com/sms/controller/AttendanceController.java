@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.sms.audit.annotation.AuditLog;
+import com.sms.audit.enums.AuditAction;
 
 import com.sms.dto.AttendanceRequestDto;
 import com.sms.dto.AttendanceResponseDto;
@@ -79,7 +81,12 @@ public class AttendanceController {
 	                 description = "Attendance already exists for the given student and date"
 	         )
 	 })
-	 @PostMapping
+	 @AuditLog(
+		        action = AuditAction.CREATE,
+		        module = "ATTENDANCE",
+		        description = "Create attendance"
+		)
+		@PostMapping
 	 public ResponseEntity<ApiResponseDto<AttendanceResponseDto>> createAttendance(
 	
 	         @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -258,6 +265,11 @@ public class AttendanceController {
 	                description = "Attendance already exists for the given student and date"
 	        )
 	})
+	@AuditLog(
+	        action = AuditAction.UPDATE,
+	        module = "ATTENDANCE",
+	        description = "Update attendance"
+	)
 	@PutMapping("/{id:\\d+}")
 	public ResponseEntity<ApiResponseDto<AttendanceResponseDto>> updateAttendance(
 
@@ -312,6 +324,11 @@ public class AttendanceController {
 	                description = "Attendance record not found"
 	        )
 	})
+	@AuditLog(
+	        action = AuditAction.DELETE,
+	        module = "ATTENDANCE",
+	        description = "Delete attendance"
+	)
 	@DeleteMapping("/{id:\\d+}")
 	public ResponseEntity<ApiResponseDto<Void>> deleteAttendance(
 

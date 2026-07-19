@@ -34,7 +34,7 @@ public class ResultSpecification {
             predicates.add(
 
                     cb.equal(
-                            root.get("recordStatus"),
+                            root.get("status"),
                             RecordStatus.ACTIVE
                     )
 
@@ -239,7 +239,7 @@ public class ResultSpecification {
 
 
             // ==================================================
-            // Percentage Range
+            // Percentage Range 
             // ==================================================
 
             if (request.getMinPercentage() != null) {

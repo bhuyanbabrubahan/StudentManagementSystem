@@ -140,6 +140,6 @@ public class Result extends BaseEntity {
             nullable = false,
             length = 20
     )
-    private RecordStatus recordStatus = RecordStatus.ACTIVE;
+    private RecordStatus status = RecordStatus.ACTIVE;
 
 }

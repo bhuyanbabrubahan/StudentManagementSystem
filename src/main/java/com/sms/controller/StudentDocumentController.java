@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import com.sms.audit.annotation.AuditLog;
+import com.sms.audit.enums.AuditAction;
 
 import com.sms.dto.studentdocument.StudentDocumentResponseDto;
 import com.sms.dto.studentdocument.StudentDocumentSearchRequestDto;
@@ -84,6 +86,11 @@ public class StudentDocumentController {
             )
 
     })
+    @AuditLog(
+            action = AuditAction.CREATE,
+            module = "STUDENT_DOCUMENT",
+            description = "Upload student document"
+    )
     @PostMapping(
             value = "/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -233,8 +240,12 @@ public class StudentDocumentController {
 	 }
 	 
 	 
-	 
-	 @PutMapping(
+	 	@AuditLog(
+		        action = AuditAction.UPDATE,
+		        module = "STUDENT_DOCUMENT",
+		        description = "Update student document"
+		)
+	 	@PutMapping(
 		        value = "/{id}",
 		        consumes = MediaType.MULTIPART_FORM_DATA_VALUE
 		)
@@ -291,7 +302,11 @@ public class StudentDocumentController {
 	// DELETE DOCUMENT
 	// =====================================
 
-
+	 @AuditLog(
+	 	       action = AuditAction.DELETE,
+	 	       module = "STUDENT_DOCUMENT",
+	 	       description = "Delete student document"
+	 )
 	@DeleteMapping("/{id}")
 	@Operation(
 	        summary = "Delete Student Document",

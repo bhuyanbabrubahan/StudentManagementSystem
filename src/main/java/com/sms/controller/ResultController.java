@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.sms.audit.annotation.AuditLog;
+import com.sms.audit.enums.AuditAction;
 
 import com.sms.dto.PageResponse;
 import com.sms.dto.ResultRequestDto;
@@ -82,6 +84,11 @@ public class ResultController {
 	                 description = "Duplicate result already exists"
 	         )
 	 })
+	 @AuditLog(
+		        action = AuditAction.CREATE,
+		        module = "RESULT",
+		        description = "Create result"
+		)
 	 @PostMapping
 	 public ResponseEntity<ApiResponseDto<ResultResponseDto>> createResult(
 	
@@ -143,6 +150,11 @@ public class ResultController {
 	                description = "Duplicate result already exists"
 	        )
 	})
+	@AuditLog(
+	        action = AuditAction.UPDATE,
+	        module = "RESULT",
+	        description = "Update result"
+	)
 	@PutMapping("/{id:\\d+}")
 	public ResponseEntity<ApiResponseDto<ResultResponseDto>> updateResult(
 
@@ -416,6 +428,11 @@ public class ResultController {
 	                description = "Result not found"
 	        )
 	})
+	@AuditLog(
+	        action = AuditAction.DELETE,
+	        module = "RESULT",
+	        description = "Delete result"
+	)
 	@DeleteMapping("/{id:\\d+}")
 	public ResponseEntity<ApiResponseDto<Void>> delete(
 

@@ -22,5 +22,11 @@ public interface FacultyRepository extends JpaRepository<Faculty, Long>, JpaSpec
 	        Long userId,
 	        RecordStatus status
 	);
-
+	
+	
+	//DASHBOARD
+	long countByStatusNot(RecordStatus status);
+	
+	
+	
 }

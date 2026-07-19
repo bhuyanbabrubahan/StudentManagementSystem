@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.sms.entity.Attendance;
+import com.sms.enums.AttendanceStatus;
 import com.sms.enums.RecordStatus;
 
 
@@ -114,11 +115,28 @@ public class AttendanceSpecification {
 
 
     // ==========================
-    // Attendance Status
+    // Attendance Status (PRESENT / ABSENT)
+    // ==========================
+
+    public static Specification<Attendance> hasAttendanceStatus(
+            AttendanceStatus attendanceStatus
+    ) {
+        return (root, query, cb) ->
+                cb.equal(
+                        root.get("attendanceStatus"),
+                        attendanceStatus
+                );
+    }
+
+
+
+
+    // ==========================
+    // Record Status
     // ==========================
 
     public static Specification<Attendance> hasStatus(
-    		RecordStatus status) {
+            RecordStatus status) {
 
 
         return (root, query, cb) ->
@@ -134,38 +152,18 @@ public class AttendanceSpecification {
 
 
     // ==========================
-    // Record Status
-    // ==========================
-
-    public static Specification<Attendance> hasRecordStatus(
-            RecordStatus recordStatus) {
-
-
-        return (root, query, cb) ->
-
-                cb.equal(
-                        root.get("recordStatus"),
-                        recordStatus
-                );
-
-    }
-
-
-
-
-    // ==========================
     // Exclude Deleted
     // ==========================
 
-    public static Specification<Attendance> recordStatusNot(
-            RecordStatus recordStatus) {
+    public static Specification<Attendance> statusNot(
+            RecordStatus status) {
 
 
         return (root, query, cb) ->
 
                 cb.notEqual(
-                        root.get("recordStatus"),
-                        recordStatus
+                        root.get("status"),
+                        status
                 );
 
     }

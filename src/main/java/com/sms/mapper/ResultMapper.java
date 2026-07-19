@@ -17,8 +17,11 @@ public interface ResultMapper {
     @Mapping(target = "percentage", ignore = true)
     @Mapping(target = "grade", ignore = true)
     @Mapping(target = "resultStatus", ignore = true)
-    @Mapping(target = "recordStatus", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Result toEntity(ResultRequestDto dto);
+
 
     // Entity -> Response DTO
     @Mapping(source = "student.id", target = "studentId")
@@ -29,15 +32,13 @@ public interface ResultMapper {
     @Mapping(source = "exam.examName", target = "examName")
 
     @Mapping(source = "exam.subject.subjectName", target = "subjectName")
-    @Mapping(source="exam.subject.id",target="subjectId")
-    
-    @Mapping(source="exam.semester.id",target="semesterId")
+    @Mapping(source = "exam.subject.id", target = "subjectId")
+
+    @Mapping(source = "exam.semester.id", target = "semesterId")
     @Mapping(source = "exam.semester.semesterName", target = "semesterName")
 
     @Mapping(source = "exam.maximumMarks", target = "maximumMarks")
 
     ResultResponseDto toResponseDto(Result result);
-
-    
 
 }

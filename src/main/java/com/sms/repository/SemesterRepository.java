@@ -127,5 +127,8 @@ public interface SemesterRepository
             @Param("endDate") LocalDate endDate
     );
 
+    
+    //DASHBOARD
+    long countByStatusNot(RecordStatus status);
 
 }

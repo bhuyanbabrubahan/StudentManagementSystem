@@ -6,16 +6,18 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.ReportingPolicy;
 
 import com.sms.dto.ExamRequestDto;
 import com.sms.dto.ExamResponseDto;
 import com.sms.entity.Exam;
 
 
-
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
 public interface ExamMapper {
-
 
 
     // ==========================
@@ -23,20 +25,28 @@ public interface ExamMapper {
     // ==========================
 
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(
+            target = "id",
+            ignore = true
+    )
 
-    @Mapping(target = "subject", ignore = true)
+    @Mapping(
+            target = "subject",
+            ignore = true
+    )
 
-    @Mapping(target = "semester", ignore = true)
+    @Mapping(
+            target = "semester",
+            ignore = true
+    )
 
-    @Mapping(target = "status", ignore = true)
-    
-    
-
+    @Mapping(
+            target = "status",
+            ignore = true
+    )
     Exam toEntity(
             ExamRequestDto dto
     );
-
 
 
 
@@ -50,7 +60,6 @@ public interface ExamMapper {
             target = "subjectId"
     )
 
-
     @Mapping(
             source = "subject.subjectName",
             target = "subjectName"
@@ -62,7 +71,6 @@ public interface ExamMapper {
             target = "semesterId"
     )
 
-
     @Mapping(
             source = "semester.semesterName",
             target = "semesterName"
@@ -72,7 +80,6 @@ public interface ExamMapper {
     ExamResponseDto toDto(
             Exam exam
     );
-
 
 
 
@@ -87,13 +94,28 @@ public interface ExamMapper {
     )
 
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(
+            target = "id",
+            ignore = true
+    )
 
-    @Mapping(target = "subject", ignore = true)
 
-    @Mapping(target = "semester", ignore = true)
+    @Mapping(
+            target = "subject",
+            ignore = true
+    )
 
-    @Mapping(target = "status", ignore = true)
+
+    @Mapping(
+            target = "semester",
+            ignore = true
+    )
+
+
+    @Mapping(
+            target = "status",
+            ignore = true
+    )
 
 
     void updateEntity(

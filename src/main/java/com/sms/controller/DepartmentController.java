@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.sms.audit.annotation.AuditLog;
+import com.sms.audit.enums.AuditAction;
 
 import com.sms.dto.DepartmentRequestDto;
 import com.sms.dto.DepartmentResponseDto;
@@ -50,6 +52,11 @@ public class DepartmentController {
 	        @ApiResponse(responseCode = "400", description = "Validation failed"),
 	        @ApiResponse(responseCode = "409", description = "Department already exists")
 	})
+	@AuditLog(
+	        action = AuditAction.CREATE,
+	        module = "DEPARTMENT",
+	        description = "Create department"
+	)
 	@PostMapping
 	public ResponseEntity<ApiResponseDto<DepartmentResponseDto>> createDepartment(
 	        @Valid @RequestBody DepartmentRequestDto dto) {
@@ -123,6 +130,11 @@ public class DepartmentController {
 	        @ApiResponse(responseCode = "404", description = "Department not found"),
 	        @ApiResponse(responseCode = "409", description = "Department already exists")
 	})
+	@AuditLog(
+	        action = AuditAction.UPDATE,
+	        module = "DEPARTMENT",
+	        description = "Update department"
+	)
 	@PutMapping("/{id}")
 	public ResponseEntity<ApiResponseDto<DepartmentResponseDto>> updateDepartment(
 	        @PathVariable Long id,
@@ -148,6 +160,11 @@ public class DepartmentController {
 	        @ApiResponse(responseCode = "404", description = "Department not found"),
 	        @ApiResponse(responseCode = "400", description = "Department cannot be deleted")
 	})
+	@AuditLog(
+	        action = AuditAction.DELETE,
+	        module = "DEPARTMENT",
+	        description = "Delete department"
+	)
 	@DeleteMapping("/{id}")
 	public ResponseEntity<ApiResponseDto<String>> deleteDepartment(@PathVariable Long id) {
 

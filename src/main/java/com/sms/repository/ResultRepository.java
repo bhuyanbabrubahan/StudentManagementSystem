@@ -1,14 +1,18 @@
 package com.sms.repository;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.sms.entity.Result;
 import com.sms.enums.RecordStatus;
+import com.sms.enums.ResultStatus;
 
 public interface ResultRepository extends JpaRepository<Result, Long>, JpaSpecificationExecutor<Result> {
 
@@ -16,7 +20,7 @@ public interface ResultRepository extends JpaRepository<Result, Long>, JpaSpecif
 	// Get Active Result By Id
 	// ==============================
 
-	Optional<Result> findByIdAndRecordStatus(Long id, RecordStatus recordStatus);
+	Optional<Result> findByIdAndStatus(Long id, RecordStatus status);
 
 	
 	// ==============================
@@ -24,17 +28,34 @@ public interface ResultRepository extends JpaRepository<Result, Long>, JpaSpecif
 	// Active / Deleted Result Filter
 	// ==============================
 
-	Page<Result> findByRecordStatus(RecordStatus recordStatus, Pageable pageable);
+	Page<Result> findByStatus(RecordStatus status, Pageable pageable);
 	
 	// ==============================
 	// Duplicate Result Check
 	// Student + Exam Combination
 	// ==============================
 	
-	 boolean existsByStudentIdAndExamIdAndRecordStatus(
+	 boolean existsByStudentIdAndExamIdAndStatus(
 	            Long studentId,
 	            Long examId,
-	            RecordStatus recordStatus
+	            RecordStatus status
 	    );
 
+	//DASHBOARD
+	 long countByStatusNot(RecordStatus status);
+
+	 long countByResultStatusAndStatusNot(
+	         ResultStatus resultStatus,
+	         RecordStatus status
+	 );
+
+	 @Query("""
+	        SELECT AVG(r.percentage)
+	        FROM Result r
+	        WHERE r.status <> :status
+	        """)
+	 BigDecimal findAveragePercentage(
+	         @Param("status")
+	         RecordStatus status
+	 );
 }

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.sms.audit.annotation.AuditLog;
+import com.sms.audit.enums.AuditAction;
 
 import com.sms.dto.FacultyRequestDto;
 import com.sms.dto.FacultyResponseDto;
@@ -63,6 +65,11 @@ public class FacultyController {
     	    @ApiResponse(responseCode = "404", description = "Department or Address reference not found"),
     	    @ApiResponse(responseCode = "409", description = "Email, Phone Number or Employee Code already exists")
     	})
+    @AuditLog(
+            action = AuditAction.CREATE,
+            module = "FACULTY",
+            description = "Create faculty"
+    )
     @PostMapping
     public ResponseEntity<ApiResponseDto<FacultyResponseDto>> createFaculty(
             @Valid @RequestBody FacultyRequestDto dto
@@ -199,6 +206,11 @@ public class FacultyController {
     	    @ApiResponse(responseCode = "404", description = "Faculty not found"),
     	    @ApiResponse(responseCode = "409", description = "Duplicate email or phone number")
     	})
+	    @AuditLog(
+	            action = AuditAction.UPDATE,
+	            module = "FACULTY",
+	            description = "Update faculty"
+	    )
     	@PutMapping("/{id:\\d+}")
     	public ResponseEntity<ApiResponseDto<FacultyResponseDto>> updateFaculty(
 
@@ -253,6 +265,11 @@ public class FacultyController {
     	    @ApiResponse(responseCode = "200", description = "Faculty deleted successfully"),
     	    @ApiResponse(responseCode = "404", description = "Faculty not found")
     	})
+	    @AuditLog(
+	            action = AuditAction.DELETE,
+	            module = "FACULTY",
+	            description = "Delete faculty"
+	    )
     	@DeleteMapping("/{id:\\d+}")
     	public ResponseEntity<ApiResponseDto<Void>> deleteFaculty(
 

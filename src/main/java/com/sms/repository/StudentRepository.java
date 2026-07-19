@@ -43,4 +43,6 @@ public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpec
 	        RecordStatus status
 	);
 	
+	//DASHBOARD
+	long countByStatus(RecordStatus status);
 }

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -33,14 +34,34 @@ public interface ExamRepository extends JpaRepository<Exam, Long>, JpaSpecificat
 	// Find Active Exam
 	// ==========================
 
+	@EntityGraph(attributePaths = {
+	        "semester",
+	        "subject"
+	})
 	Optional<Exam> findByIdAndStatusNot(Long id, RecordStatus status);
 
 	// ==========================
 	// ==========================
 
+	@EntityGraph(attributePaths = {
+	        "semester",
+	        "subject"
+	})
 	Page<Exam> findByStatusNot(RecordStatus status, Pageable pageable);
 
 	Optional<Student> findByIdAndStatus(Long examId, RecordStatus active);
 	
+	//DASHBOARD
+	long countByStatusNot(RecordStatus status);
+
+	long countByExamDateAfterAndStatusNot(
+	        LocalDate examDate,
+	        RecordStatus status
+	);
+
+	long countByExamDateBeforeAndStatusNot(
+	        LocalDate examDate,
+	        RecordStatus status
+	);
 
 }

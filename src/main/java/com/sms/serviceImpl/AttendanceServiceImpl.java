@@ -412,116 +412,123 @@ public class AttendanceServiceImpl implements AttendanceService {
                 Specification.where(null);
 
 
-
         // ==========================
         // Default Active Filter
         // ==========================
 
-        if(request.getStatus()!=null){
+        if (request.getStatus() != null) {
 
-            spec =
-            spec.and(
-            AttendanceSpecification.hasRecordStatus(
-                    request.getStatus()
-            ));
+            spec = spec.and(
+                    AttendanceSpecification.hasStatus(
+                            request.getStatus()
+                    )
+            );
+
+        } else {
+
+            spec = spec.and(
+                    AttendanceSpecification.statusNot(
+                            RecordStatus.DELETED
+                    )
+            );
 
         }
-        else{
-
-            spec =
-            spec.and(
-            AttendanceSpecification.recordStatusNot(
-            		RecordStatus.DELETED
-            ));
-
-        }
 
 
-
+        // ==========================
         // Student
+        // ==========================
 
-        if(request.getStudentId()!=null){
+        if (request.getStudentId() != null) {
 
-            spec =
-            spec.and(
-            AttendanceSpecification.hasStudent(
-                    request.getStudentId()
-            ));
+            spec = spec.and(
+                    AttendanceSpecification.hasStudent(
+                            request.getStudentId()
+                    )
+            );
 
         }
 
 
-
+        // ==========================
         // Faculty Subject
+        // ==========================
 
-        if(request.getFacultySubjectMappingId()!=null){
+        if (request.getFacultySubjectMappingId() != null) {
 
-            spec =
-            spec.and(
-            AttendanceSpecification.hasFacultySubject(
-                    request.getFacultySubjectMappingId()
-            ));
-
-        }
-
-
-        if(request.getFacultyId()!=null){
-
-            spec =
-            spec.and(
-            AttendanceSpecification.hasFaculty(
-                    request.getFacultyId()
-            ));
+            spec = spec.and(
+                    AttendanceSpecification.hasFacultySubject(
+                            request.getFacultySubjectMappingId()
+                    )
+            );
 
         }
 
 
+        // ==========================
+        // Faculty
+        // ==========================
 
-        if(request.getSubjectId()!=null){
+        if (request.getFacultyId() != null) {
 
-            spec =
-            spec.and(
-            AttendanceSpecification.hasSubject(
-                    request.getSubjectId()
-            ));
-
-        }
-
-        // Date
-
-        if(request.getAttendanceDate()!=null){
-
-            spec =
-            spec.and(
-            AttendanceSpecification.hasDate(
-                    request.getAttendanceDate()
-            ));
+            spec = spec.and(
+                    AttendanceSpecification.hasFaculty(
+                            request.getFacultyId()
+                    )
+            );
 
         }
 
 
+        // ==========================
+        // Subject
+        // ==========================
 
-        // Present/Absent
+        if (request.getSubjectId() != null) {
 
-        if(request.getStatus()!=null){
-
-            spec =
-            spec.and(
-            AttendanceSpecification.hasStatus(
-                    request.getStatus()
-            ));
+            spec = spec.and(
+                    AttendanceSpecification.hasSubject(
+                            request.getSubjectId()
+                    )
+            );
 
         }
 
+
+        // ==========================
+        // Attendance Date
+        // ==========================
+
+        if (request.getAttendanceDate() != null) {
+
+            spec = spec.and(
+                    AttendanceSpecification.hasDate(
+                            request.getAttendanceDate()
+                    )
+            );
+
+        }
+
+
+        // ==========================
+        // Attendance Status
+        // ==========================
+
+        if (request.getAttendanceStatus() != null) {
+
+            spec = spec.and(
+                    AttendanceSpecification.hasAttendanceStatus(
+                            request.getAttendanceStatus()
+                    )
+            );
+
+        }
 
 
         Sort sort =
                 direction.equalsIgnoreCase("asc")
-
-                ? Sort.by(sortBy).ascending()
-
-                : Sort.by(sortBy).descending();
-
+                        ? Sort.by(sortBy).ascending()
+                        : Sort.by(sortBy).descending();
 
 
         Pageable pageable =
@@ -532,7 +539,6 @@ public class AttendanceServiceImpl implements AttendanceService {
                 );
 
 
-
         Page<Attendance> result =
                 repository.findAll(
                         spec,
@@ -540,34 +546,24 @@ public class AttendanceServiceImpl implements AttendanceService {
                 );
 
 
-
         List<AttendanceResponseDto> content =
                 result.getContent()
-                .stream()
-                .map(mapper::toDto)
-                .toList();
-
+                        .stream()
+                        .map(mapper::toDto)
+                        .toList();
 
 
         PageResponse<AttendanceResponseDto> response =
                 new PageResponse<>();
 
-
         response.setContent(content);
-
         response.setPageNumber(result.getNumber());
-
         response.setPageSize(result.getSize());
-
         response.setTotalElements(result.getTotalElements());
-
         response.setTotalPages(result.getTotalPages());
-
         response.setLast(result.isLast());
 
-
         return response;
-
     }
 
     

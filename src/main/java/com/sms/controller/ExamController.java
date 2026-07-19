@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.sms.audit.annotation.AuditLog;
+import com.sms.audit.enums.AuditAction;
 
 import com.sms.dto.ExamRequestDto;
 import com.sms.dto.ExamResponseDto;
@@ -82,7 +84,12 @@ public class ExamController {
 	                 description = "Duplicate examination already exists"
 	         )
 	 })
-	 @PostMapping
+	 @AuditLog(
+		        action = AuditAction.CREATE,
+		        module = "EXAM",
+		        description = "Create exam"
+		)
+		@PostMapping
 	 public ResponseEntity<ApiResponseDto<ExamResponseDto>> createExam(
 	
 	         @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -261,6 +268,11 @@ public class ExamController {
 	                description = "Duplicate examination already exists"
 	        )
 	})
+	@AuditLog(
+	        action = AuditAction.UPDATE,
+	        module = "EXAM",
+	        description = "Update exam"
+	)
 	@PutMapping("/{id:\\d+}")
 	public ResponseEntity<ApiResponseDto<ExamResponseDto>> update(
 
@@ -322,6 +334,11 @@ public class ExamController {
 	                description = "Exam not found"
 	        )
 	})
+	@AuditLog(
+	        action = AuditAction.DELETE,
+	        module = "EXAM",
+	        description = "Delete exam"
+	)
 	@DeleteMapping("/{id:\\d+}")
 	public ResponseEntity<ApiResponseDto<Void>> delete(
 

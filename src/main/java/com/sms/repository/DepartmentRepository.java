@@ -26,4 +26,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Long>, J
 	
 	boolean existsById(Long departmentId); 
 
+	
+	//DASHBOARD
+	long countByStatusNot(RecordStatus status);
 }

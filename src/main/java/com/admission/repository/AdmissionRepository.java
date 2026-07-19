@@ -46,5 +46,11 @@ public interface AdmissionRepository extends JpaRepository<Admission, Long>, Jpa
 	 * Code generator safety ke liye.
 	 */
 	boolean existsByAdmissionNumber(String admissionNumber);
+	
+	
+	//DASHBOARD
+	long count();
+
+	long countByStatus(AdmissionStatus status);
 
 }

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.sms.entity.Attendance;
+import com.sms.enums.AttendanceStatus;
 import com.sms.enums.RecordStatus;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long>, JpaSpecificationExecutor<Attendance> {
@@ -54,5 +55,20 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>, J
 		// ==========================
 
 		Page<Attendance> findByStatusNot(RecordStatus status, Pageable pageable);
+		
+		
+		//DASHBOARD
+		long countByStatusNot(RecordStatus status);
+
+		long countByAttendanceDateAndStatusNot(
+		        LocalDate attendanceDate,
+		        RecordStatus status
+		);
+
+		long countByAttendanceStatusAndAttendanceDateAndStatusNot(
+		        AttendanceStatus attendanceStatus,
+		        LocalDate attendanceDate,
+		        RecordStatus status
+		);
 
 }

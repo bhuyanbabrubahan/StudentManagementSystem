@@ -12,7 +12,6 @@ import com.sms.dto.AttendanceResponseDto;
 import com.sms.entity.Attendance;
 
 
-
 @Mapper(componentModel = "spring")
 public interface AttendanceMapper {
 
@@ -38,11 +37,20 @@ public interface AttendanceMapper {
         ignore = true
     )
 
+    @Mapping(
+        target = "status",
+        ignore = true
+    )
 
     @Mapping(
-    		 target = "status",
-    		 ignore = true
-    		)
+        target = "createdAt",
+        ignore = true
+    )
+
+    @Mapping(
+        target = "updatedAt",
+        ignore = true
+    )
 
     Attendance toEntity(
             AttendanceRequestDto dto
@@ -84,8 +92,7 @@ public interface AttendanceMapper {
 
 
     @Mapping(
-        source =
-        "facultySubjectMapping.subject.subjectName",
+        source = "facultySubjectMapping.subject.subjectName",
         target = "subjectName"
     )
 
@@ -93,6 +100,7 @@ public interface AttendanceMapper {
     AttendanceResponseDto toDto(
             Attendance attendance
     );
+
 
 
 
@@ -110,26 +118,38 @@ public interface AttendanceMapper {
 
 
     @Mapping(
-        target="id",
-        ignore=true
+        target = "id",
+        ignore = true
     )
 
 
     @Mapping(
-        target="student",
-        ignore=true
+        target = "student",
+        ignore = true
     )
 
 
     @Mapping(
-        target="facultySubjectMapping",
-        ignore=true
+        target = "facultySubjectMapping",
+        ignore = true
     )
 
 
     @Mapping(
-    		 target="status",
-    		 ignore=true
+        target = "status",
+        ignore = true
+    )
+
+
+    @Mapping(
+        target = "createdAt",
+        ignore = true
+    )
+
+
+    @Mapping(
+        target = "updatedAt",
+        ignore = true
     )
 
 

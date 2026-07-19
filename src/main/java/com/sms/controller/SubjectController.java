@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.sms.audit.annotation.AuditLog;
+import com.sms.audit.enums.AuditAction;
 
 import com.sms.dto.PageResponse;
 import com.sms.dto.SubjectRequestDto;
@@ -70,6 +72,11 @@ public class SubjectController {
     	)
 
     	})
+    @AuditLog(
+            action = AuditAction.CREATE,
+            module = "SUBJECT",
+            description = "Create subject"
+    )
     @PostMapping
     public ResponseEntity<ApiResponseDto<SubjectResponseDto>> createSubject(
             @Valid @RequestBody SubjectRequestDto dto) {
@@ -196,6 +203,11 @@ public class SubjectController {
                     description = "Duplicate subject"
             )
     })
+    @AuditLog(
+            action = AuditAction.UPDATE,
+            module = "SUBJECT",
+            description = "Update subject"
+    )
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDto<SubjectResponseDto>> updateSubject(
 
@@ -239,6 +251,11 @@ public class SubjectController {
                     description = "Subject not found"
             )
     })
+    @AuditLog(
+            action = AuditAction.DELETE,
+            module = "SUBJECT",
+            description = "Delete subject"
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponseDto<Void>> deleteSubject(
 

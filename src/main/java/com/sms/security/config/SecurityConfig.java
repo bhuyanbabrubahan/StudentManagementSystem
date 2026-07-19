@@ -590,6 +590,18 @@ public class SecurityConfig {
 		        	        "STUDENT",
 		        	        "FACULTY"
 		        	)
+		        	
+		        	// ===============================
+		            // Dashboard
+		            // ===============================
+
+		            .requestMatchers(
+		                    "/api/dashboard/**"
+		            )
+		            .hasAnyRole(
+		                    "ADMIN",
+		                    "SUPER_ADMIN"
+		            )
 
 		        	.anyRequest()
 		        	.authenticated()

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sms.audit.annotation.AuditLog;
+import com.sms.audit.enums.AuditAction;
 import com.sms.dto.PageResponse;
 import com.sms.dto.StudentRequestDto;
 import com.sms.dto.StudentResponseDto;
@@ -76,6 +78,11 @@ public class StudentController {
 	                 description = "Student with the same mobile number already exists"
 	         )
 	 })
+	 @AuditLog(
+			 action = AuditAction.CREATE,
+			 module = "STUDENT",
+			 description = "Create student"
+			)
 	 @PostMapping
 	 public ResponseEntity<ApiResponseDto<StudentResponseDto>> saveStudent(
 	
@@ -175,6 +182,11 @@ public class StudentController {
 	                description = "Student with the same mobile number already exists"
 	        )
 	})
+	@AuditLog(
+			 action = AuditAction.UPDATE,
+			 module = "STUDENT",
+			 description = "Update student details"
+			)
 	@PutMapping("/{id:\\d+}")
 	public ResponseEntity<ApiResponseDto<StudentResponseDto>> updateStudent(
 
@@ -230,6 +242,11 @@ public class StudentController {
 	                description = "Student not found"
 	        )
 	})
+	@AuditLog(
+			 action = AuditAction.DELETE,
+			 module = "STUDENT",
+			 description = "Delete student"
+			)
 	@DeleteMapping("/{id:\\d+}")
 	public ResponseEntity<ApiResponseDto<Void>> deleteStudent(
 

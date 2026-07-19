@@ -30,6 +30,7 @@ public interface SubjectRepository extends JpaRepository<Subject, Long>, JpaSpec
 	Optional<Subject> findTopByOrderByIdDesc();
 	
 	
-	
+	//DASHBOARD
+	long countByStatusNot(RecordStatus status);
 
 }

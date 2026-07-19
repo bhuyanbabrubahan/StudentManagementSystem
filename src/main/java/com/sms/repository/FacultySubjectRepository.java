@@ -37,5 +37,10 @@ public interface FacultySubjectRepository
 			RecordStatus status,
 	        Pageable pageable
 	);
+	
+	
+	
+	//DASHBOARD
+	long countByStatusNot(RecordStatus status);
 
 }

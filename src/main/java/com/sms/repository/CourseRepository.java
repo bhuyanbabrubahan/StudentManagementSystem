@@ -35,4 +35,8 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
 	long countByDepartment_Id(Long departmentId);
 	
 	Optional<Course> findByIdAndStatus(Long id, RecordStatus status);
+	
+	
+	//DASHBOARD
+	long countByStatusNot(RecordStatus status);
 }
