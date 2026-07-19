@@ -19,11 +19,14 @@ import com.sms.security.dto.RegisterRequestDto;
 import com.sms.security.dto.RegisterResponseDto;
 import com.sms.security.dto.ResetPasswordRequestDto;
 import com.sms.security.service.AuthenticationService;
+import com.sms.security.util.JwtTokenUtil;
 import com.sms.util.ResponseBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthenticationController {
 
 	private final AuthenticationService authenticationService;
-
+	private final JwtTokenUtil jwtTokenUtil;
 
 	// ============================
 	// REGISTER API
@@ -232,10 +235,15 @@ public class AuthenticationController {
 	// =====================================
 	// LOGOUT
 	// =====================================
-	
+
 	@Operation(
 	        summary = "Logout",
-	        description = "Logs out the authenticated user by removing refresh token."
+	        description = "Logs out the authenticated user by invalidating access token and removing refresh token.",
+	        security = {
+	                @SecurityRequirement(
+	                        name = "bearerAuth"
+	                )
+	        }
 	)
 	@ApiResponses({
 
@@ -246,22 +254,39 @@ public class AuthenticationController {
 
 	        @ApiResponse(
 	                responseCode = "401",
-	                description = "Unauthorized"
+	                description = "Unauthorized - Invalid or missing JWT token"
 	        )
+
 	})
 	@PostMapping("/logout")
-	public ResponseEntity<ApiResponseDto<LogoutResponseDto>> logout() {
+	public ResponseEntity<ApiResponseDto<LogoutResponseDto>> logout(
 
-	    log.info("Logout request received.");
+	        HttpServletRequest request
+
+	) {
+
+
+	    String token =
+	            jwtTokenUtil
+	            .getTokenFromRequest(request);
+
+
 
 	    LogoutResponseDto response =
-	            authenticationService.logout();
+	            authenticationService.logout(token);
+
+
 
 	    return ResponseBuilder.success(
+
 	            response,
+
 	            "Logout successful.",
+
 	            HttpStatus.OK
 	    );
+
+
 	}
 	
 	

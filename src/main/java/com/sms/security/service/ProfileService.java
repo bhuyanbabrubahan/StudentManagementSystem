@@ -9,9 +9,9 @@ public interface ProfileService {
 
     ProfileResponseDto getMyProfile();
 
-    ChangePasswordResponseDto  changePassword(
-            ChangePasswordRequestDto request
-    );
+    ChangePasswordResponseDto changePassword(
+            ChangePasswordRequestDto request,
+            String token);
 
 
 }

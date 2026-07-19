@@ -514,6 +514,27 @@ public class SecurityConfig {
 	             "FACULTY",
 	             "STUDENT"
 	     )
+	     
+	     
+	     
+	  // ==========================
+	  // STUDENT DOCUMENT
+	  // ==========================
+
+
+	  // Upload
+
+	  .requestMatchers(
+	          HttpMethod.POST,
+	          "/api/student-documents/upload"
+	  )
+	  .hasAnyRole(
+	          "ADMIN",
+	          "STUDENT"
+	  )
+
+	     
+	     
 
 	        // DELETE
 

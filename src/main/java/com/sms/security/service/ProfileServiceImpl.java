@@ -47,9 +47,12 @@ public class ProfileServiceImpl implements ProfileService {
 	private final PasswordEncoder passwordEncoder;
 
 	private final AdminProfileRepository adminProfileRepository;
+	
+	private final RefreshTokenService refreshTokenService;
 
-
-    @Override
+	private final JwtBlacklistService jwtBlacklistService;
+	
+	@Override
     public ProfileResponseDto getMyProfile() {
 
 
@@ -193,88 +196,166 @@ public class ProfileServiceImpl implements ProfileService {
 	 // CHANGE PASSWORD
 	 // =====================================
 	
-	 @Override
-	 @Transactional
-	 public ChangePasswordResponseDto changePassword(
-	         ChangePasswordRequestDto request) {
-	
-	
-	
-	     Authentication authentication =
-	             SecurityContextHolder
-	             .getContext()
-	             .getAuthentication();
-	
-	
-	     String email = authentication.getName();
-	
-	     User user = userRepository.findByEmail(email)
-	             .orElseThrow(() ->
-	                     new ResourceNotFoundException(
-	                             "User not found"
-	                     ));
-	
-	     boolean currentPasswordMatch =
-	             passwordEncoder.matches(
-	                     request.getCurrentPassword(),
-	                     user.getPassword()
-	             );
-	
-	
-	
-	     if (!currentPasswordMatch) {
-	
-	         throw new BusinessException(
-	                 "Current password is incorrect."
-	         );
-	     }
-	
-	
-	
-	     boolean newPasswordSame =
-	             passwordEncoder.matches(
-	                     request.getNewPassword(),
-	                     user.getPassword()
-	             );
-	
-	
-	
-	     if (newPasswordSame) {
-	
-	         throw new BusinessException(
-	                 "New password cannot be same as current password."
-	         );
-	     }
-	
-	
-	
-	     boolean confirmPasswordMatch =
-	             request.getNewPassword()
-	             .equals(request.getConfirmPassword());
-	
-	
-	     if (!confirmPasswordMatch) {
-	
-	         throw new BusinessException(
-	                 "New password and confirm password do not match."
-	         );
-	     }
-	
-	
-	     String encodedPassword =
-	             passwordEncoder.encode(
-	                     request.getNewPassword()
-	             );
-	
-	
-	     user.setPassword(encodedPassword);
-	
-	     userRepository.save(user);
-	
-	     return new ChangePasswordResponseDto(
-	             "Password changed successfully.",
-	             LocalDateTime.now()
-	     );
-	 }
+    @Override
+    @Transactional
+    public ChangePasswordResponseDto changePassword(
+
+            ChangePasswordRequestDto request,
+            String token
+
+    ) {
+
+
+        Authentication authentication =
+                SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+
+
+        String email =
+                authentication.getName();
+
+
+
+        User user =
+
+                userRepository
+                .findByEmail(email)
+
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found"
+                        )
+                );
+
+
+
+        // =====================================
+        // VERIFY OLD PASSWORD
+        // =====================================
+
+        boolean currentPasswordMatch =
+
+                passwordEncoder.matches(
+
+                        request.getCurrentPassword(),
+
+                        user.getPassword()
+
+                );
+
+
+
+        if(!currentPasswordMatch) {
+
+            throw new BusinessException(
+                    "Current password is incorrect."
+            );
+        }
+
+
+
+
+        // =====================================
+        // CHECK SAME PASSWORD
+        // =====================================
+
+        boolean samePassword =
+
+                passwordEncoder.matches(
+
+                        request.getNewPassword(),
+
+                        user.getPassword()
+
+                );
+
+
+
+        if(samePassword) {
+
+            throw new BusinessException(
+                    "New password cannot be same as old password."
+            );
+
+        }
+
+
+
+
+        // =====================================
+        // CONFIRM PASSWORD CHECK
+        // =====================================
+
+        if(!request.getNewPassword()
+                .equals(request.getConfirmPassword())) {
+
+
+            throw new BusinessException(
+                    "New password and confirm password do not match."
+            );
+
+        }
+
+
+
+
+        // =====================================
+        // UPDATE PASSWORD
+        // =====================================
+
+
+        user.setPassword(
+
+                passwordEncoder.encode(
+                        request.getNewPassword()
+                )
+
+        );
+
+
+        userRepository.save(user);
+
+
+
+
+
+        // =====================================
+        // SECURITY INVALIDATION
+        // =====================================
+
+
+        // Remove refresh token
+
+        refreshTokenService
+                .deleteByUser(user);
+
+
+
+
+        // Blacklist current access token
+
+        if(token != null && !token.isBlank()) {
+
+
+            jwtBlacklistService
+                    .blacklistToken(token);
+
+        }
+
+
+
+
+
+        return new ChangePasswordResponseDto(
+
+                "Password changed successfully. Please login again.",
+
+                LocalDateTime.now()
+
+        );
+
+    }
 
 }

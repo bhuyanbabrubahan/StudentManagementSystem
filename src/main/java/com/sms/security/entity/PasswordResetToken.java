@@ -56,5 +56,7 @@ public class PasswordResetToken extends BaseEntity {
     
     @Column(nullable = false)
     private boolean used = false;
+    
+    
 
 }

@@ -21,7 +21,7 @@ public interface AuthenticationService {
 
 	PasswordResetResponseDto resetPassword(ResetPasswordRequestDto request);
 
-	LogoutResponseDto logout();
+	LogoutResponseDto logout(String token);
 
 	RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto request);
 }

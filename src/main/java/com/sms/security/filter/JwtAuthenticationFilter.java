@@ -1,97 +1,273 @@
 package com.sms.security.filter;
 
+
 import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.sms.security.service.CustomUserDetailsService;
+import com.sms.security.service.JwtBlacklistService;
 import com.sms.security.service.JwtService;
+
+import com.sms.util.SecurityResponseWriter;
+import io.jsonwebtoken.JwtException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+
+import lombok.RequiredArgsConstructor;
+
+
+
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+@RequiredArgsConstructor
+public class JwtAuthenticationFilter 
+        extends OncePerRequestFilter {
 
-	private final JwtService jwtService;
 
-	private final CustomUserDetailsService userDetailsService;
 
-	public JwtAuthenticationFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
+    private static final Logger log =
+            LoggerFactory.getLogger(
+                    JwtAuthenticationFilter.class
+            );
 
-		this.jwtService = jwtService;
 
-		this.userDetailsService = userDetailsService;
 
-	}
+    private final JwtService jwtService;
 
-	@Override
-	protected void doFilterInternal(
+    private final CustomUserDetailsService userDetailsService;
 
-			HttpServletRequest request,
+    private final JwtBlacklistService jwtBlacklistService;
 
-			HttpServletResponse response,
 
-			FilterChain filterChain
+    @Override
+    protected void doFilterInternal(
 
-	) throws ServletException, IOException {
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
 
-		System.out.println("===== JWT FILTER START =====");
-		String authHeader = request.getHeader("Authorization");
-		System.out.println("Authorization Header : " + authHeader);
 
-		String token = null;
+    ) throws ServletException, IOException {
 
-		String username = null;
 
-		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        try {
 
-			token = authHeader.substring(7);
 
-			System.out.println("JWT Token Found");
-			username = jwtService.extractUsername(token);
-			System.out.println("JWT Username : " + username);
+            String authHeader =
+                    request.getHeader("Authorization");
 
-		}
 
-		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            
+            /*
+             * No JWT Token
+             */
+            if(authHeader == null ||
+                    !authHeader.startsWith("Bearer ")) {
 
-			UserDetails userDetails =
 
-					userDetailsService.loadUserByUsername(username);
+                filterChain.doFilter(
+                        request,
+                        response
+                );
 
-			System.out.println("Authorities : " + userDetails.getAuthorities());
+                return;
 
-			if (jwtService.isTokenValid(token, userDetails.getUsername())) {
+            }
 
-				UsernamePasswordAuthenticationToken authentication =
 
-						new UsernamePasswordAuthenticationToken(
 
-								userDetails,
 
-								null,
+            String token =
+                    authHeader.substring(7);
 
-								userDetails.getAuthorities()
+            
 
-						);
 
-				SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.debug(
+                    "JWT Token received"
+            );
 
-				System.out.println("Authentication Set Successfully");
 
-			}
 
-		}
 
-		filterChain.doFilter(request, response);
+            /*
+             * Check Logout Token
+             */
 
-	}
+            if(jwtBlacklistService
+                    .isBlacklisted(token)) {
+
+
+                log.warn(
+                    "Blocked blacklisted token"
+                );
+
+
+                SecurityResponseWriter.sendError(
+                        response,
+                        "Token expired or logged out"
+                );
+
+                return;
+
+            }
+
+
+
+
+            String username =
+                    jwtService.extractUsername(
+                            token
+                    );
+
+
+
+            log.debug(
+                    "JWT username : {}",
+                    username
+            );
+
+
+
+
+
+            if(username != null &&
+
+              SecurityContextHolder
+              .getContext()
+              .getAuthentication()==null) {
+
+
+
+                UserDetails userDetails =
+
+                        userDetailsService
+                        .loadUserByUsername(
+                                username
+                        );
+
+
+
+
+                if(jwtService.isTokenValid(
+
+                        token,
+
+                        userDetails.getUsername()
+
+                )) {
+
+
+
+                    UsernamePasswordAuthenticationToken authentication =
+
+
+                            new UsernamePasswordAuthenticationToken(
+
+
+                                    userDetails,
+
+
+                                    null,
+
+
+                                    userDetails
+                                    .getAuthorities()
+
+                            );
+
+
+
+
+                    SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(
+                            authentication
+                    );
+
+
+
+                    log.debug(
+                        "Authentication set successfully for {}",
+                        username
+                    );
+
+
+                }
+
+                else {
+
+
+                    log.warn(
+                        "Invalid JWT token for {}",
+                        username
+                    );
+
+                }
+
+            }
+
+
+        }
+
+
+        catch(JwtException e) {
+
+
+            log.error(
+                    "JWT exception : {}",
+                    e.getMessage()
+            );
+
+
+            SecurityResponseWriter.sendError(
+                    response,
+                    "Token expired or logged out"
+            );
+
+            return;
+
+        }
+
+
+        catch(Exception e) {
+
+
+            log.error(
+                    "JWT authentication failed",
+                    e
+            );
+
+
+            SecurityResponseWriter.sendError(
+                    response,
+                    "Token expired or logged out"
+            );
+
+            return;
+
+        }
+
+
+
+        filterChain.doFilter(
+                request,
+                response
+        );
+
+    }
+
 
 }

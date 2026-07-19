@@ -4,11 +4,13 @@ package com.sms.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+
 
 
 @Configuration
@@ -19,49 +21,76 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
 
 
-        String securitySchemeName = "bearerAuth";
+        final String securitySchemeName =
+                "bearerAuth";
 
 
         return new OpenAPI()
 
-                .addSecurityItem(
-                        new SecurityRequirement()
-                                .addList(securitySchemeName)
-                )
-
-                .components(
-                        new Components()
-                                .addSecuritySchemes(
-                                        securitySchemeName,
-                                        new SecurityScheme()
-
-                                                .name(securitySchemeName)
-
-                                                .type(
-                                                    SecurityScheme.Type.HTTP
-                                                )
-
-                                                .scheme("bearer")
-
-                                                .bearerFormat("JWT")
-                                )
-                )
 
                 .info(
 
-                    new Info()
+                        new Info()
 
-                    .title(
-                        "University Admission Management System API"
-                    )
+                        .title(
+                                "University Admission Management System API"
+                        )
 
-                    .version("1.0")
+                        .description(
+                                "Enterprise level Student Management System APIs with JWT Security"
+                        )
 
-                    .description(
-                        "REST API documentation with JWT Authentication"
-                    )
+                        .version(
+                                "1.0"
+                        )
+
+                )
+
+
+                // IMPORTANT
+                // Apply JWT globally to all APIs
+
+                .addSecurityItem(
+
+                        new SecurityRequirement()
+
+                        .addList(
+                                securitySchemeName
+                        )
+
+                )
+
+
+                .components(
+
+                        new Components()
+
+                        .addSecuritySchemes(
+
+                                securitySchemeName,
+
+                                new SecurityScheme()
+
+                                .name(
+                                        securitySchemeName
+                                )
+
+                                .type(
+                                        SecurityScheme.Type.HTTP
+                                )
+
+                                .scheme(
+                                        "bearer"
+                                )
+
+                                .bearerFormat(
+                                        "JWT"
+                                )
+
+                        )
 
                 );
+
 
     }
 

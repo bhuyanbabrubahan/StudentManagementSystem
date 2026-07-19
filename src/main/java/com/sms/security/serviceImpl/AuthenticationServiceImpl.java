@@ -8,12 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.sms.security.entity.RefreshToken;
-import com.sms.security.service.RefreshTokenService;
 
 import com.location.address.entity.Address;
 import com.location.address.repository.AddressRepository;
@@ -40,13 +37,16 @@ import com.sms.security.dto.RegisterRequestDto;
 import com.sms.security.dto.RegisterResponseDto;
 import com.sms.security.dto.ResetPasswordRequestDto;
 import com.sms.security.entity.PasswordResetToken;
+import com.sms.security.entity.RefreshToken;
 import com.sms.security.entity.Role;
 import com.sms.security.entity.User;
 import com.sms.security.entity.UserStatus;
 import com.sms.security.repository.PasswordResetTokenRepository;
 import com.sms.security.repository.UserRepository;
 import com.sms.security.service.AuthenticationService;
+import com.sms.security.service.JwtBlacklistService;
 import com.sms.security.service.JwtService;
+import com.sms.security.service.RefreshTokenService;
 import com.sms.sequence.enums.ModuleType;
 import com.sms.sequence.service.CodeGeneratorService;
 
@@ -83,6 +83,8 @@ public class AuthenticationServiceImpl
 	private final EmailService emailService;
 	
 	private final RefreshTokenService refreshTokenService;
+	
+	private final JwtBlacklistService jwtBlacklistService;
 	
 	private static final Logger log =
 	        LoggerFactory.getLogger(AuthenticationServiceImpl.class);
@@ -298,7 +300,7 @@ public class AuthenticationServiceImpl
 
                 "Bearer",
 
-                900,
+                jwtService.getAccessTokenExpirationInSeconds(),
 
                 user.getEmail(),
 
@@ -481,32 +483,51 @@ public class AuthenticationServiceImpl
 
     @Override
     @Transactional
-    public LogoutResponseDto logout() {
+    public LogoutResponseDto logout(String token) {
 
-        String email = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
 
-        User user = userRepository
+        if(token == null) {
+
+            throw new BusinessException(
+                    "JWT token missing"
+            );
+
+        }
+
+		String email = jwtService.extractUsername(token);
+
+        User user =
+                userRepository
                 .findByEmail(email)
-                .orElseThrow(() -> {
-                    log.warn("Logout failed. User not found: {}", email);
-                    return new ResourceNotFoundException("User not found");
-                });
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found"
+                        )
+                );
 
-        // Delete refresh token
-        refreshTokenService.deleteByUser(user);
 
-        // Clear current authentication context
-        SecurityContextHolder.clearContext();
+        // Add access token into blacklist
+        jwtBlacklistService
+                .blacklistToken(token);
 
-        log.info("User logged out successfully: {}", user.getEmail());
+        // Remove refresh token
+        refreshTokenService
+                .deleteByUser(user);
+
+        log.info(
+            "User logout successful : {}",
+            email
+        );
+
 
         return LogoutResponseDto.builder()
-                .message("Logout successful.")
-                .timestamp(LocalDateTime.now())
-                .build();
+
+				.message("Logout successful.")
+
+				.timestamp(LocalDateTime.now())
+
+				.build();
+
     }
 
 
@@ -514,25 +535,25 @@ public class AuthenticationServiceImpl
 
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public RefreshTokenResponseDto refreshToken(
             RefreshTokenRequestDto request) {
 
         log.info("Refresh token request received.");
 
-        /*
-         * Step 1:
-         * Find Refresh Token
-         */
+        // =====================================
+        // STEP 1 : Find Refresh Token
+        // =====================================
+
         RefreshToken refreshToken =
                 refreshTokenService.findByToken(
                         request.getRefreshToken()
                 );
 
-        /*
-         * Step 2:
-         * Check whether token is revoked
-         */
+        // =====================================
+        // STEP 2 : Check Revoked
+        // =====================================
+
         if (refreshToken.isRevoked()) {
 
             log.warn("Refresh token is revoked.");
@@ -540,72 +561,96 @@ public class AuthenticationServiceImpl
             throw new BusinessException(
                     "Refresh token has been revoked."
             );
+
         }
 
-        /*
-         * Step 3:
-         * Check token expiry
-         */
+        // =====================================
+        // STEP 3 : Check Expiry
+        // =====================================
+
         if (refreshTokenService.isExpired(refreshToken)) {
 
-            log.warn("Refresh token has expired.");
+            log.warn("Refresh token expired.");
 
             throw new BusinessException(
                     "Refresh token has expired."
             );
+
         }
 
-        /*
-         * Step 4:
-         * Fetch associated user
-         */
+        // =====================================
+        // STEP 4 : User Validation
+        // =====================================
+
         User user = refreshToken.getUser();
 
-        /*
-         * Step 5:
-         * Check user status
-         */
         if (user.getStatus() != UserStatus.ACTIVE) {
 
             log.warn(
-                    "Inactive user attempted refresh token login: {}",
+                    "Inactive user attempted refresh token login : {}",
                     user.getEmail()
             );
 
             throw new BusinessException(
                     "User account is inactive."
             );
+
         }
 
-        /*
-         * Step 6:
-         * Generate new Access Token
-         */
+        // =====================================
+        // STEP 5 : ROTATE REFRESH TOKEN
+        // =====================================
+
+        refreshTokenService.deleteByUser(user);
+
+        RefreshToken newRefreshToken =
+                refreshTokenService.createRefreshToken(user);
+
+        // =====================================
+        // STEP 6 : Generate New Access Token
+        // =====================================
+
         String accessToken =
                 jwtService.generateToken(user);
 
         log.info(
-                "New access token generated for user: {}",
+                "Access token rotated successfully for user : {}",
                 user.getEmail()
         );
 
-        /*
-         * Step 7:
-         * Return response
-         */
+        // =====================================
+        // STEP 7 : Return Response
+        // =====================================
+
         return RefreshTokenResponseDto.builder()
 
                 .accessToken(accessToken)
 
+                .refreshToken(
+                        newRefreshToken.getToken()
+                )
+
                 .tokenType("Bearer")
 
-                .expiresIn(900L)
+                .expiresIn(
+                        jwtService.getAccessTokenExpirationInSeconds()
+                )
 
-                .timestamp(LocalDateTime.now())
+                .email(
+                        user.getEmail()
+                )
+
+                .role(
+                        user.getRole().name()
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
 
                 .build();
-    }
 
+    }
 
 
 

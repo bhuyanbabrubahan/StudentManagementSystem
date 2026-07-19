@@ -39,7 +39,7 @@ public class LoginResponseDto {
 
     @Schema(
             description = "Access token expiry time in seconds",
-            example = "900"
+            example = "3600"
     )
     private long expiresIn;
 
