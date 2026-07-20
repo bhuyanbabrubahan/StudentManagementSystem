@@ -1,6 +1,7 @@
 package com.admission.dto;
 
 import com.admission.entity.AdmissionStatus;
+import com.sms.entity.Semester;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -28,9 +29,9 @@ public class AdmissionSearchRequest {
 	private String academicYear;
 
 	// Semester filter
-	private Integer semester;
+	private Long semesterId;
 
 	// Admission lifecycle filter
-	private AdmissionStatus status;
+	private AdmissionStatus admissionStatus;
 
 }

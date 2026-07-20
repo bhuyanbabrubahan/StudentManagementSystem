@@ -1,7 +1,5 @@
 package com.sms.specification;
 
-import java.math.BigDecimal;
-
 import org.springframework.data.jpa.domain.Specification;
 
 import com.sms.entity.Course;
@@ -54,29 +52,6 @@ public class CourseSpecification {
                 );
     }
 
-    // ==========================================
-    // Minimum Fees
-    // ==========================================
-
-    public static Specification<Course> hasFeesGreaterThan(BigDecimal minFees) {
-        return (root, query, cb) ->
-                cb.greaterThanOrEqualTo(
-                        root.get("fees"),
-                        minFees
-                );
-    }
-
-    // ==========================================
-    // Maximum Fees
-    // ==========================================
-
-    public static Specification<Course> hasFeesLessThan(BigDecimal maxFees) {
-        return (root, query, cb) ->
-                cb.lessThanOrEqualTo(
-                        root.get("fees"),
-                        maxFees
-                );
-    }
 
     // ==========================================
     // Minimum Duration

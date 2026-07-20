@@ -144,15 +144,15 @@ public class AdmissionSpecification {
     // Semester
     // ==========================================================
 
-    public static Specification<Admission> hasSemester(Integer semester) {
+    public static Specification<Admission> hasSemester(Long semesterId) {
 
         return (root, query, cb) ->
 
-                semester == null
+        semesterId == null
                         ? null
                         : cb.equal(
-                                root.get("semester"),
-                                semester
+                                root.get("semesterId"),
+                                semesterId
                         );
     }
 
@@ -160,15 +160,15 @@ public class AdmissionSpecification {
     // Status
     // ==========================================================
 
-    public static Specification<Admission> hasStatus(AdmissionStatus status) {
+    public static Specification<Admission> hasStatus(AdmissionStatus admissionStatus) {
 
         return (root, query, cb) ->
 
-                status == null
+        admissionStatus == null
                         ? null
                         : cb.equal(
-                                root.get("status"),
-                                status
+                                root.get("admissionStatus"),
+                                admissionStatus
                         );
     }
 

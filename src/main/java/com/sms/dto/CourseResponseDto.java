@@ -1,6 +1,5 @@
 package com.sms.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.sms.enums.RecordStatus;
@@ -28,9 +27,6 @@ public class CourseResponseDto {
 
     @Schema(description = "Duration In Months", example = "48")
     private Integer durationInMonths;
-
-    @Schema(description = "Fees", example = "50000.00")
-    private BigDecimal fees;
 
     @Schema(description = "Description", example = "Bachelor of Technology in Electronics Engineering")
     private String description;

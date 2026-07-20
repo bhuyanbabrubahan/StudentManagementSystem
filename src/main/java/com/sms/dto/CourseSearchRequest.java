@@ -1,7 +1,5 @@
 package com.sms.dto;
 
-import java.math.BigDecimal;
-
 import com.sms.enums.RecordStatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,21 +38,6 @@ public class CourseSearchRequest {
     )
     private RecordStatus status;
 
-    // ==========================
-    // Fees Filter
-    // ==========================
-
-    @Schema(
-            description = "Minimum Fees",
-            example = "10000"
-    )
-    private BigDecimal minFees;
-
-    @Schema(
-            description = "Maximum Fees",
-            example = "60000"
-    )
-    private BigDecimal maxFees;
 
     // ==========================
     // Duration Filter

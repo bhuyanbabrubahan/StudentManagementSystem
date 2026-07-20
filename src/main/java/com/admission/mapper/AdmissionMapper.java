@@ -19,8 +19,6 @@ public class AdmissionMapper {
 
         admission.setAcademicYear(dto.getAcademicYear().trim());
 
-        admission.setSemester(dto.getSemester());
-
         admission.setAdmissionDate(dto.getAdmissionDate());
 
         admission.setRemarks(dto.getRemarks());
@@ -46,11 +44,21 @@ public class AdmissionMapper {
 
         dto.setAcademicYear(admission.getAcademicYear());
 
-        dto.setSemester(admission.getSemester());
+        if (admission.getSemester() != null) {
+
+            dto.setSemesterId(
+                    admission.getSemester().getId()
+            );
+
+            dto.setSemesterName(
+                    admission.getSemester().getSemesterName()
+            );
+
+        }
 
         dto.setAdmissionDate(admission.getAdmissionDate());
 
-        dto.setStatus(admission.getStatus());
+        dto.setAdmissionStatus(admission.getAdmissionStatus());
 
         dto.setRemarks(admission.getRemarks());
 
@@ -123,9 +131,6 @@ public class AdmissionMapper {
                 dto.getAcademicYear().trim()
         );
 
-        admission.setSemester(
-                dto.getSemester()
-        );
 
         admission.setAdmissionDate(
                 dto.getAdmissionDate()

@@ -165,19 +165,19 @@ public class DashboardServiceImpl implements DashboardService {
 	    );
 
 	    dto.setActiveAdmissions(
-	            admissionRepository.countByStatus(
+	            admissionRepository.countByAdmissionStatus(
 	                    AdmissionStatus.ACTIVE
 	            )
 	    );
 
 	    dto.setCancelledAdmissions(
-	            admissionRepository.countByStatus(
+	            admissionRepository.countByAdmissionStatus(
 	                    AdmissionStatus.CANCELLED
 	            )
 	    );
 
 	    dto.setCompletedAdmissions(
-	            admissionRepository.countByStatus(
+	            admissionRepository.countByAdmissionStatus(
 	                    AdmissionStatus.COMPLETED
 	            )
 	    );

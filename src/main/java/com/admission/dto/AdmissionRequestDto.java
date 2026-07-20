@@ -34,8 +34,9 @@ public class AdmissionRequestDto {
 	@NotNull(message = "Semester is required")
 	@Min(value = 1, message = "Semester must be at least 1")
 	@Max(value = 8, message = "Semester cannot be greater than 8")
-	private Integer semester;
-
+	private Long semesterId;
+	
+	
 	
 	@NotNull(message = "Admission date is required")
 	private LocalDate admissionDate;

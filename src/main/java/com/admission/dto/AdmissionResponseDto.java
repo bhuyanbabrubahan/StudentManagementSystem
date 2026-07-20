@@ -28,11 +28,13 @@ public class AdmissionResponseDto {
 
     private String academicYear;
 
-    private Integer semester;
+    private Long semesterId;
+
+    private String semesterName;
 
     private LocalDate admissionDate;
 
-    private AdmissionStatus status;
+    private AdmissionStatus admissionStatus;
 
     private String remarks;
 

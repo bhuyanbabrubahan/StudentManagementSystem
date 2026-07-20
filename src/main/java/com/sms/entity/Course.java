@@ -1,6 +1,5 @@
 package com.sms.entity;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,9 +46,6 @@ public class Course extends BaseEntity{
     // production best practice (months)
     @Column(nullable = false)
     private Integer durationInMonths;
-
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal fees;
 
     @Column(length = 500)
     private String description;

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import com.sms.common.entity.BaseEntity;
 import com.sms.entity.Course;
 import com.sms.entity.Department;
+import com.sms.entity.Semester;
 import com.sms.entity.Student;
 
 import jakarta.persistence.*;
@@ -63,16 +64,19 @@ public class Admission extends BaseEntity {
 		)
 		private String academicYear;
 
-	@Column(nullable = false)
-	private Integer semester;
+	@ToString.Exclude
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "semester_id", nullable = false)
+	private Semester semester;
 
 	@Column(name = "admission_date", nullable = false)
 	private LocalDate admissionDate;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private AdmissionStatus status;
-
+	@Column(name = "admission_status", nullable = false)
+	private AdmissionStatus admissionStatus;
+	
+	
 	@Column(length = 500)
 	private String remarks;
 

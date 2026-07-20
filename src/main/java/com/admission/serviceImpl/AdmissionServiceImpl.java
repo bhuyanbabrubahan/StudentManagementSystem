@@ -24,12 +24,14 @@ import com.admission.specification.AdmissionSpecification;
 import com.sms.dto.PageResponse;
 import com.sms.entity.Course;
 import com.sms.entity.Department;
+import com.sms.entity.Semester;
 import com.sms.entity.Student;
 import com.sms.enums.RecordStatus;
 import com.sms.exception.BusinessException;
 import com.sms.exception.ResourceNotFoundException;
 import com.sms.repository.CourseRepository;
 import com.sms.repository.DepartmentRepository;
+import com.sms.repository.SemesterRepository;
 import com.sms.repository.StudentRepository;
 import com.sms.sequence.enums.ModuleType;
 import com.sms.sequence.service.CodeGeneratorService;
@@ -50,6 +52,7 @@ public class AdmissionServiceImpl implements AdmissionService {
     private final CourseRepository courseRepository;
     private final AdmissionMapper admissionMapper;
     private final CodeGeneratorService codeGeneratorService;
+    private final SemesterRepository semesterRepository;
 
 
 
@@ -106,6 +109,11 @@ public class AdmissionServiceImpl implements AdmissionService {
 
         admission.setCourse(course);
 
+        Semester semester =
+                getActiveSemester(dto.getSemesterId());
+        
+        admission.setSemester(semester);
+        
         admission.setAdmissionNumber(
                 codeGeneratorService
                 .generateCode(
@@ -115,7 +123,7 @@ public class AdmissionServiceImpl implements AdmissionService {
         );
 
 
-        admission.setStatus(
+        admission.setAdmissionStatus(
                 AdmissionStatus.ACTIVE
         );
 
@@ -149,7 +157,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 	
 	     Admission admission =
 	             admissionRepository
-	             .findByIdAndStatusNot(
+	             .findByIdAndAdmissionStatusNot(
 	                     id,
 	                     AdmissionStatus.CANCELLED
 	             )
@@ -231,7 +239,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 
 	    Page<Admission> admissionPage =
 	            admissionRepository
-	            .findByStatusNot(
+	            .findByAdmissionStatusNot(
 	                    AdmissionStatus.CANCELLED,
 	                    pageable
 	            );
@@ -301,7 +309,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 
 	    Admission admission =
 	            admissionRepository
-	            .findByIdAndStatusNot(
+	            .findByIdAndAdmissionStatusNot(
 	                    id,
 	                    AdmissionStatus.CANCELLED
 	            )
@@ -413,6 +421,11 @@ public class AdmissionServiceImpl implements AdmissionService {
 	    admission.setDepartment(department);
 
 	    admission.setCourse(course);
+	    
+	    Semester semester =
+	            getActiveSemester(dto.getSemesterId());
+	    
+	    admission.setSemester(semester);
 
 	    // Step 10: Save updated admission
 
@@ -447,7 +460,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 	            ));
 
 
-	    if(admission.getStatus()
+	    if(admission.getAdmissionStatus()
 	            == AdmissionStatus.CANCELLED){
 
 
@@ -458,7 +471,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 	    }
 
 
-	    if(admission.getStatus()
+	    if(admission.getAdmissionStatus()
 	            == AdmissionStatus.COMPLETED){
 
 
@@ -468,7 +481,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 
 	    }
 
-	    admission.setStatus(
+	    admission.setAdmissionStatus(
 	            AdmissionStatus.CANCELLED
 	    );
 
@@ -525,14 +538,14 @@ public class AdmissionServiceImpl implements AdmissionService {
 	     */
 
 
-	    if(request.getStatus() != null){
+	    if(request.getAdmissionStatus() != null){
 
 
 	        specification =
 	                specification.and(
 	                AdmissionSpecification
 	                .hasStatus(
-	                        request.getStatus()
+	                        request.getAdmissionStatus()
 	                ));
 
 	    }
@@ -722,15 +735,14 @@ public class AdmissionServiceImpl implements AdmissionService {
 	     */
 
 
-	    if(request.getSemester() != null){
-
+	    if (request.getSemesterId() != null) {
 
 	        specification =
 	                specification.and(
-	                AdmissionSpecification
-	                .hasSemester(
-	                        request.getSemester()
-	                ));
+	                        AdmissionSpecification.hasSemester(
+	                                request.getSemesterId()
+	                        )
+	                );
 
 	    }
 
@@ -976,7 +988,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 
 	    boolean exists =
 	            admissionRepository
-	            .existsByStudent_IdAndStatus(
+	            .existsByStudent_IdAndAdmissionStatus(
 	                    studentId,
 	                    AdmissionStatus.ACTIVE
 	            );
@@ -1003,7 +1015,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 
 	    boolean exists =
 	            admissionRepository
-	            .existsByStudent_IdAndStatus(
+	            .existsByStudent_IdAndAdmissionStatus(
 	                    studentId,
 	                    AdmissionStatus.ACTIVE
 	            );
@@ -1054,6 +1066,21 @@ public class AdmissionServiceImpl implements AdmissionService {
 
 		return response;
 
+	}
+	
+	private Semester getActiveSemester(Long semesterId) {
+
+	    return semesterRepository
+	            .findByIdAndStatusNot(
+	                    semesterId,
+	                    RecordStatus.DELETED
+	            )
+	            .orElseThrow(() ->
+	                    new ResourceNotFoundException(
+	                            "Semester not found with id : "
+	                            + semesterId
+	                    )
+	            );
 	}
 
 

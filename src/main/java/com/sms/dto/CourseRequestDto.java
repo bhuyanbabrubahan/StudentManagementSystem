@@ -1,11 +1,8 @@
 package com.sms.dto;
 
-import java.math.BigDecimal;
-
 import com.sms.enums.RecordStatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -50,15 +47,6 @@ public class CourseRequestDto {
     private Integer durationInMonths;
 
     
-    
-    @Schema(
-            description = "Course Fees",
-            example = "50000"
-    )
-    @NotNull(message = "Fees is required")
-    @DecimalMin(value = "0.0", inclusive = false)
-    private BigDecimal fees;
-
     
     
     @Schema(

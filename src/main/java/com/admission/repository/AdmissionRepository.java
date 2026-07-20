@@ -12,45 +12,29 @@ import com.admission.entity.AdmissionStatus;
 
 public interface AdmissionRepository extends JpaRepository<Admission, Long>, JpaSpecificationExecutor<Admission> {
 
-	/*
-	 * Find admission by id
-	 *
-	 * Cancelled admission normal fetch me nahi chahiye.
-	 */
-	Optional<Admission> findByIdAndStatusNot(Long id, AdmissionStatus status);
+	// Find admission by id excluding cancelled admission
+	Optional<Admission> findByIdAndAdmissionStatusNot(Long id, AdmissionStatus admissionStatus);
 
-	/*
-	 * Check duplicate active admission
-	 *
-	 * One student can have only one ACTIVE admission.
-	 */
-	boolean existsByStudent_IdAndStatus(Long studentId, AdmissionStatus status);
+	// Find admission by id and specific status
+	Optional<Admission> findByIdAndAdmissionStatus(Long id, AdmissionStatus admissionStatus);
 
-	/*
-	 * Pagination with status filtering
-	 *
-	 * Cancelled admission exclude karne ke liye.
-	 */
-	Page<Admission> findByStatusNot(AdmissionStatus status, Pageable pageable);
+	// Check duplicate active admission for student
+	// One student can have only one ACTIVE admission
+	boolean existsByStudent_IdAndAdmissionStatus(Long studentId, AdmissionStatus admissionStatus);
 
-	/*
-	 * Find admission by admission number
-	 *
-	 * Admission number unique hona chahiye.
-	 */
+	// Pagination with status filtering excluding cancelled admission
+	Page<Admission> findByAdmissionStatusNot(AdmissionStatus admissionStatus, Pageable pageable);
+
+	// Find admission by admission number
 	Optional<Admission> findByAdmissionNumber(String admissionNumber);
 
-	/*
-	 * Check duplicate admission number
-	 *
-	 * Code generator safety ke liye.
-	 */
+	// Check duplicate admission number for generator safety
 	boolean existsByAdmissionNumber(String admissionNumber);
-	
-	
-	//DASHBOARD
+
+	// Dashboard count of all admissions
 	long count();
 
-	long countByStatus(AdmissionStatus status);
+	// Dashboard count by admission status
+	long countByAdmissionStatus(AdmissionStatus admissionStatus);
 
 }

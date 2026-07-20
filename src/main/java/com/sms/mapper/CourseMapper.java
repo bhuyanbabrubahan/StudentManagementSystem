@@ -27,7 +27,6 @@ public class CourseMapper {
         course.setCourseCode(dto.getCourseCode());
         course.setCourseName(dto.getCourseName());
         course.setDurationInMonths(dto.getDurationInMonths());
-        course.setFees(dto.getFees());
         course.setDescription(dto.getDescription());
         course.setStatus(dto.getStatus() != null ? dto.getStatus() : RecordStatus.ACTIVE);
 
@@ -51,7 +50,6 @@ public class CourseMapper {
         dto.setCourseCode(course.getCourseCode());
         dto.setCourseName(course.getCourseName());
         dto.setDurationInMonths(course.getDurationInMonths());
-        dto.setFees(course.getFees());
         dto.setDescription(course.getDescription());
         dto.setStatus(course.getStatus());
 
@@ -72,7 +70,6 @@ public class CourseMapper {
         course.setCourseCode(dto.getCourseCode());
         course.setCourseName(dto.getCourseName());
         course.setDurationInMonths(dto.getDurationInMonths());
-        course.setFees(dto.getFees());
         course.setDescription(dto.getDescription());
         course.setStatus(dto.getStatus());
 

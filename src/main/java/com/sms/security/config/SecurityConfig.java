@@ -602,6 +602,48 @@ public class SecurityConfig {
 		                    "ADMIN",
 		                    "SUPER_ADMIN"
 		            )
+		            
+		            
+		            
+		         // ==========================================================
+		         // Fee Structure Management
+		         // ==========================================================
+
+		         .requestMatchers(
+		        		 HttpMethod.POST,
+		                 "/api/v1/fee-structures")
+		         .hasAnyRole("ADMIN")
+
+		         .requestMatchers(HttpMethod.PUT,
+		                 "/api/v1/fee-structures/**")
+		         .hasAnyRole("ADMIN")
+
+		         .requestMatchers(HttpMethod.DELETE,
+		                 "/api/v1/fee-structures/**")
+		         .hasAnyRole("ADMIN")
+
+		         .requestMatchers(HttpMethod.GET,
+		                 "/api/v1/fee-structures",
+		                 "/api/v1/fee-structures/**")
+		         .hasAnyRole("ADMIN", "FACULTY")
+
+		         .requestMatchers(HttpMethod.POST,
+		                 "/api/v1/fee-structures/search")
+		         .hasAnyRole("ADMIN", "FACULTY")
+		         
+		         
+		         // ==========================================================
+				 // Fee Structure Management
+				 // ==========================================================			
+		         
+		         .requestMatchers(
+		        	        "/api/v1/student-fee-payments/**"
+		        	)
+		        	.hasAnyRole(
+		        	        "ADMIN",
+		        	        "ACCOUNTANT"
+		           )
+		         
 
 		        	.anyRequest()
 		        	.authenticated()

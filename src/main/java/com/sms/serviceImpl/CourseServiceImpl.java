@@ -208,17 +208,6 @@ public class CourseServiceImpl implements CourseService {
                     CourseSpecification.hasDepartment(request.getDepartmentId()));
         }
 
-        // Minimum Fees
-        if (request.getMinFees() != null) {
-            spec = spec.and(
-                    CourseSpecification.hasFeesGreaterThan(request.getMinFees()));
-        }
-
-        // Maximum Fees
-        if (request.getMaxFees() != null) {
-            spec = spec.and(
-                    CourseSpecification.hasFeesLessThan(request.getMaxFees()));
-        }
 
         // Minimum Duration
         if (request.getMinDuration() != null) {
