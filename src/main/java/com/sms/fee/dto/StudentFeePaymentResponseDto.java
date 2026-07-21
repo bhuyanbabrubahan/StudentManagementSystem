@@ -36,8 +36,25 @@ public class StudentFeePaymentResponseDto {
     private Long id;
 
 
+    @Schema(
+            description = "Scholarship Id",
+            example = "1"
+    )
+    private Long scholarshipId;
 
+    @Schema(
+            description = "Scholarship Amount",
+            example = "20000.00"
+    )
+    private BigDecimal scholarshipAmount;
 
+    @Schema(
+            description = "Final payable fee after scholarship adjustment",
+            example = "50000.00"
+    )
+    private BigDecimal finalPayableAmount;
+    
+    
     // ==========================
     // Student
     // ==========================
@@ -168,6 +185,10 @@ public class StudentFeePaymentResponseDto {
     // ==========================
 
 
+    @Schema(
+            description = "Payment record status",
+            example = "ACTIVE"
+    )
     private RecordStatus status;
 
 }

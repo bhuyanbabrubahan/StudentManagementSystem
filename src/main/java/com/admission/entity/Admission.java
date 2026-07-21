@@ -14,13 +14,25 @@ import lombok.*;
 @Entity
 @Table(name = "admissions", indexes = {
 
-		@Index(name = "idx_student", columnList = "student_id"),
+        @Index(
+            name = "idx_student",
+            columnList = "student_id"
+        ),
 
-		@Index(name = "idx_department", columnList = "department_id"),
+        @Index(
+            name = "idx_department",
+            columnList = "department_id"
+        ),
 
-		@Index(name = "idx_course", columnList = "course_id"),
+        @Index(
+            name = "idx_course",
+            columnList = "course_id"
+        ),
 
-		@Index(name = "idx_status", columnList = "status")
+        @Index(
+            name = "idx_admission_status",
+            columnList = "admission_status"
+        )
 
 })
 @Getter

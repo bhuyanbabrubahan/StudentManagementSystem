@@ -603,6 +603,17 @@ public class SecurityConfig {
 		                    "SUPER_ADMIN"
 		            )
 		            
+		         // ==========================================================
+		         // Fee Dashboard
+		         // ==========================================================
+
+		         .requestMatchers(
+		                 "/api/v1/fee-dashboard/**"
+		         )
+		         .hasAnyRole(
+		                 "ADMIN",
+		                 "ACCOUNTANT"
+		         )
 		            
 		            
 		         // ==========================================================
@@ -633,7 +644,7 @@ public class SecurityConfig {
 		         
 		         
 		         // ==========================================================
-				 // Fee Structure Management
+				 // Fee Payment Management
 				 // ==========================================================			
 		         
 		         .requestMatchers(
@@ -643,8 +654,97 @@ public class SecurityConfig {
 		        	        "ADMIN",
 		        	        "ACCOUNTANT"
 		           )
-		         
+		        	
+		        
+		        	// ==========================================================
+		        	// Generate Receipt From Payment
+		        	// ==========================================================
 
+		        	.requestMatchers(
+		        	        HttpMethod.POST,
+		        	        "/api/v1/fee-receipts/payments/*/receipt"
+		        	)
+		        	.hasAnyRole(
+		        	        "ADMIN",
+		        	        "ACCOUNTANT"
+		        	)
+
+
+		        	// ==========================================================
+		        	// Receipt Management
+		        	// ==========================================================
+
+		        	.requestMatchers(
+		        	        HttpMethod.GET,
+		        	        "/api/v1/fee-receipts",
+		        	        "/api/v1/fee-receipts/*",
+		        	        "/api/v1/fee-receipts/*/print"
+		        	)
+		        	.hasAnyRole(
+		        	        "ADMIN",
+		        	        "ACCOUNTANT"
+		        	)
+
+		        	.requestMatchers(
+		        	        HttpMethod.POST,
+		        	        "/api/v1/fee-receipts/search"
+		        	)
+		        	.hasAnyRole(
+		        	        "ADMIN",
+		        	        "ACCOUNTANT"
+		        	)
+
+		        	.requestMatchers(
+		        	        HttpMethod.DELETE,
+		        	        "/api/v1/fee-receipts/*"
+		        	)
+		        	.hasAnyRole(
+		        	        "ADMIN",
+		        	        "ACCOUNTANT"
+		        	)
+		        
+		        	
+		        	// ==========================================================
+		        	// Student Scholarship Management APIs
+		        	// ==========================================================
+
+		        	.requestMatchers("/api/scholarships/**")
+		        	.hasAnyRole(
+		        	        "ADMIN",
+		        	        "ACCOUNTANT"
+		        	)
+		        	
+		        	.requestMatchers(
+		        	        "/api/v1/scholarships/*/approve",
+		        	        "/api/v1/scholarships/*/reject"
+		        	)
+		        	.hasRole("ADMIN")
+		        	
+		        	
+		        	// ==========================================================
+		        	// Fee Reports Management
+		        	// ==========================================================
+
+		        	.requestMatchers(
+		        	        "/api/v1/fee-reports/**"
+		        	)
+		        	.hasAnyRole(
+		        	        "ADMIN",
+		        	        "ACCOUNTANT"
+		        	)
+		        	
+		        	// ==========================================================
+		        	// Fee Refund Management
+		        	// ==========================================================
+		        	.requestMatchers(
+		        	        "/api/v1/fee-refunds/**"
+		        	)
+		        	.hasAnyRole(
+		        	        "ADMIN",
+		        	        "ACCOUNTANT"
+		        	)
+		        	
+		        	
 		        	.anyRequest()
 		        	.authenticated()
 	                    

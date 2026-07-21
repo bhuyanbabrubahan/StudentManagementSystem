@@ -30,6 +30,9 @@ import com.sms.fee.repository.StudentFeePaymentRepository;
 import com.sms.fee.service.StudentFeePaymentService;
 import com.sms.fee.specification.StudentFeePaymentSpecification;
 import com.sms.repository.StudentRepository;
+import com.sms.scholarship.entity.StudentScholarship;
+import com.sms.scholarship.enums.ScholarshipStatus;
+import com.sms.scholarship.repository.StudentScholarshipRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,6 +52,9 @@ public class StudentFeePaymentServiceImpl
     private final FeeStructureRepository feeStructureRepository;
 
     private final StudentFeePaymentMapper mapper;
+    
+    private final StudentScholarshipRepository scholarshipRepository;
+    
 
 	
     @Override
@@ -56,191 +62,345 @@ public class StudentFeePaymentServiceImpl
             StudentFeePaymentRequestDto dto) {
 
 
-        // =====================================================
-        // 1. Validate Student
-        // =====================================================
+    	// =====================================================
+    	// 1. Validate Student
+    	// =====================================================
+
+    	Student student =
+    	        studentRepository
+    	        .findByIdAndStatusNot(
+    	                dto.getStudentId(),
+    	                RecordStatus.DELETED
+    	        )
+    	        .orElseThrow(() ->
+    	                new ResourceNotFoundException(
+    	                        "Student not found"
+    	                )
+    	        );
 
 
-        Student student =
-                studentRepository
-                .findByIdAndStatusNot(
-                        dto.getStudentId(),
-                        RecordStatus.DELETED
-                )
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Student not found"
-                        )
-                );
-        
-        
 
-     
+    	// =====================================================
+    	// 2. Validate Admission
+    	// =====================================================
 
-     
+    	Admission admission =
+    	        admissionRepository
+    	        .findByIdAndAdmissionStatus(
+    	                dto.getAdmissionId(),
+    	                AdmissionStatus.ACTIVE
+    	        )
+    	        .orElseThrow(() ->
+    	                new ResourceNotFoundException(
+    	                        "Active admission not found"
+    	                )
+    	        );
 
-        // =====================================================
-        // 2. Validate Admission
-        // =====================================================
 
 
-        Admission admission =
-                admissionRepository
-                .findByIdAndAdmissionStatus(
-                        dto.getAdmissionId(),
-                        AdmissionStatus.ACTIVE
-                )
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                            "Active admission not found" 
-                        )
-                );
+    	// =====================================================
+    	// 3. Validate Student & Admission
+    	// =====================================================
 
+    	if (!admission.getStudent().getId().equals(student.getId())) {
 
-        // =====================================================
-        // 3. Duplicate Payment Check
-        // =====================================================
+    	    throw new BusinessException(
+    	            "Admission does not belong to the selected student"
+    	    );
+    	}
 
-        boolean exists =
-                studentFeePaymentRepository
-                .existsByStudentIdAndAdmissionIdAndAcademicYearAndStatusNot(
-                        dto.getStudentId(),
-                        dto.getAdmissionId(),
-                        dto.getAcademicYear(),
-                        RecordStatus.DELETED
-                );
 
 
-        if(exists){
+    	// =====================================================
+    	// 4. Validate Academic Year
+    	// =====================================================
 
-            throw new BusinessException(
-                    "Fee payment already exists for this academic year"
-            );
-        }
+    	if (!admission.getAcademicYear().equals(dto.getAcademicYear())) {
 
+    	    throw new BusinessException(
+    	            "Academic year does not match admission"
+    	    );
+    	}
 
-        // =====================================================
-        // 4. Calculate Total Fee
-        // =====================================================
 
 
-        BigDecimal totalFee =
-                feeStructureRepository
-                .findTotalFeeByCourseAndSemester(
-                        admission.getCourse().getId(),
-                        admission.getSemester().getId(),
-                        dto.getAcademicYear()
-                );
+    	// =====================================================
+    	// 5. Duplicate Payment Validation
+    	// =====================================================
 
+    	boolean exists =
+    	        studentFeePaymentRepository
+    	        .existsByStudentIdAndAdmissionIdAndAcademicYearAndStatusNot(
+    	                dto.getStudentId(),
+    	                dto.getAdmissionId(),
+    	                dto.getAcademicYear(),
+    	                RecordStatus.DELETED
+    	        );
 
+    	if (exists) {
 
-        if(totalFee == null){
+    	    throw new BusinessException(
+    	            "Fee payment already exists for this academic year"
+    	    );
+    	}
+    	
+    	
+    	
+    	// =====================================================
+    	// 6. Calculate Total Fee
+    	// =====================================================
 
-            throw new BusinessException(
-                "Fee structure not configured"
-            );
-        }
+    	BigDecimal totalFee =
+    	        feeStructureRepository
+    	        .findTotalFeeByCourseAndSemester(
+    	                admission.getCourse().getId(),
+    	                admission.getSemester().getId(),
+    	                dto.getAcademicYear()
+    	        );
 
+    	if (totalFee == null
+    	        || totalFee.compareTo(BigDecimal.ZERO) <= 0) {
 
+    	    throw new BusinessException(
+    	            "Fee structure not configured"
+    	    );
+    	}
 
 
-        // =====================================================
-        // 5. Validate Paid Amount
-        // =====================================================
 
+    	// =====================================================
+    	// 7. Scholarship Validation
+    	// =====================================================
 
-        if(dto.getPaidAmount() == null){
+    	StudentScholarship scholarship = null;
 
-            throw new BusinessException(
-                    "Paid amount is required"
-            );
-        }
+    	BigDecimal scholarshipAmount = BigDecimal.ZERO;
 
-        if(dto.getPaidAmount()
-                .compareTo(totalFee) > 0){
 
-            throw new BusinessException(
-                    "Paid amount cannot be greater than total fee"
-            );
-        }
+    	if (dto.getScholarshipId() != null) {
 
 
+    	    scholarship =
+    	            scholarshipRepository
+    	            .findByIdAndStatusNot(
+    	                    dto.getScholarshipId(),
+    	                    RecordStatus.DELETED
+    	            )
+    	            .orElseThrow(() ->
+    	                    new ResourceNotFoundException(
+    	                            "Scholarship not found"
+    	                    )
+    	            );
 
 
+    	    // =====================================================
+    	    // Validate Scholarship Owner Student
+    	    // =====================================================
 
-        // =====================================================
-        // 6. Calculate Due
-        // =====================================================
+    	    if (!scholarship.getStudent()
+    	            .getId()
+    	            .equals(student.getId())) {
 
+    	        throw new BusinessException(
+    	                "Scholarship does not belong to the selected student"
+    	        );
+    	    }
 
-        BigDecimal dueAmount =
-                totalFee.subtract(
-                        dto.getPaidAmount()
-                );
 
 
+    	    // =====================================================
+    	    // Validate Scholarship Admission
+    	    // =====================================================
 
+    	    if (!scholarship.getAdmission()
+    	            .getId()
+    	            .equals(admission.getId())) {
 
+    	        throw new BusinessException(
+    	                "Scholarship does not belong to the selected admission"
+    	        );
+    	    }
 
-        // =====================================================
-        // 7. Payment Status
-        // =====================================================
 
 
-        PaymentStatus paymentStatus =
-                calculatePaymentStatus(
-                        dto.getPaidAmount(),
-                        dueAmount
-                );
+    	    // =====================================================
+    	    // Validate Academic Year
+    	    // =====================================================
 
+    	    if (!scholarship.getAcademicYear()
+    	            .equals(dto.getAcademicYear())) {
 
+    	        throw new BusinessException(
+    	                "Scholarship academic year mismatch"
+    	        );
+    	    }
 
 
 
-        // =====================================================
-        // 8. DTO -> Entity
-        // =====================================================
+    	    // =====================================================
+    	    // Validate Scholarship Approval Status
+    	    // =====================================================
 
+    	    if (scholarship.getScholarshipStatus() 
+    	            == null
+    	            ||
+    	        scholarship.getScholarshipStatus()
+    	            != ScholarshipStatus.APPROVED) {
 
-        StudentFeePayment payment =
-                mapper.toEntity(dto);
 
+    	        throw new BusinessException(
+    	                "Only approved scholarship can be used for fee payment"
+    	        );
+    	    }
 
 
-        payment.setStudent(student);
 
-        payment.setAdmission(admission);
+    	    // =====================================================
+    	    // Validate Approved Amount
+    	    // =====================================================
 
-        payment.setTotalFee(totalFee);
+    	    if (scholarship.getApprovedAmount() == null) {
 
-        payment.setDueAmount(dueAmount);
+    	        throw new BusinessException(
+    	                "Scholarship approved amount is missing"
+    	        );
+    	    }
 
-        payment.setPaymentStatus(paymentStatus);
 
-        payment.setStatus(
-                RecordStatus.ACTIVE
-        );
 
+    	    scholarshipAmount =
+    	            scholarship.getApprovedAmount();
 
 
 
-        // =====================================================
-        // 9. Save
-        // =====================================================
+    	    // =====================================================
+    	    // Validate Scholarship Amount
+    	    // =====================================================
 
+    	    if (scholarshipAmount.compareTo(totalFee) > 0) {
 
-        StudentFeePayment saved =
-        		studentFeePaymentRepository.save(payment);
+    	        throw new BusinessException(
+    	                "Scholarship amount cannot exceed total fee"
+    	        );
+    	    }
 
+    	}
 
 
-        return mapper.toDto(saved);
+
+    	// =====================================================
+    	// 8. Calculate Final Payable Fee
+    	// =====================================================
+
+    	BigDecimal payableFee =
+    	        totalFee.subtract(
+    	                scholarshipAmount
+    	        );
+
+    	if (payableFee.compareTo(BigDecimal.ZERO) < 0) {
+
+    	    payableFee = BigDecimal.ZERO;
+    	}
+    	
+
+
+    	
+    	// =====================================================
+    	// 9. Validate Paid Amount
+    	// =====================================================
+
+    	if (dto.getPaidAmount() == null) {
+
+    	    throw new BusinessException(
+    	            "Paid amount is required"
+    	    );
+    	}
+
+    	if (dto.getPaidAmount().compareTo(BigDecimal.ZERO) < 0) {
+
+    	    throw new BusinessException(
+    	            "Paid amount cannot be negative"
+    	    );
+    	}
+
+    	if (dto.getPaidAmount().compareTo(payableFee) > 0) {
+
+    	    throw new BusinessException(
+    	            "Paid amount cannot exceed payable fee"
+    	    );
+    	}
+
+
+
+    	// =====================================================
+    	// 10. Calculate Due Amount
+    	// =====================================================
+
+    	BigDecimal dueAmount =
+    	        payableFee.subtract(
+    	                dto.getPaidAmount()
+    	        );
+
+
+
+    	// =====================================================
+    	// 11. Calculate Payment Status
+    	// =====================================================
+
+    	PaymentStatus paymentStatus =
+    	        calculatePaymentStatus(
+    	                dto.getPaidAmount(),
+    	                dueAmount
+    	        );
+    	
+    	
+    	// =====================================================
+    	// 12. DTO -> Entity
+    	// =====================================================
+
+    	StudentFeePayment payment =
+    	        mapper.toEntity(dto);
+
+    	payment.setStudent(student);
+
+    	payment.setAdmission(admission);
+
+    	payment.setScholarship(scholarship);
+
+    	payment.setTotalFee(totalFee);
+
+    	payment.setDueAmount(dueAmount);
+
+    	payment.setPaymentStatus(paymentStatus);
+
+    	payment.setStatus(
+    	        RecordStatus.ACTIVE
+    	);
+
+
+
+    	// =====================================================
+    	// 13. Save Payment
+    	// =====================================================
+
+    	StudentFeePayment saved =
+    	        studentFeePaymentRepository.save(
+    	                payment
+    	        );
+
+
+
+    	// =====================================================
+    	// 14. Return Response
+    	// =====================================================
+
+    	return mapper.toDto(saved);
 
     }
     
     
 
- // =====================================================
+    // =====================================================
     // GET BY ID
     // =====================================================
 
@@ -272,187 +432,305 @@ public class StudentFeePaymentServiceImpl
 
 
 
- // =====================================================
- // UPDATE PAYMENT
- // =====================================================
+    @Override
+    public StudentFeePaymentResponseDto updatePayment(
+            Long id,
+            StudentFeePaymentRequestDto dto) {
 
- @Override
- public StudentFeePaymentResponseDto updatePayment(
-         Long id,
-         StudentFeePaymentRequestDto dto) {
+        // =====================================================
+        // 1. Validate Existing Payment
+        // =====================================================
 
-
-     // =====================================================
-     // Validate Existing Payment
-     // =====================================================
-
-     StudentFeePayment payment =
-             studentFeePaymentRepository
-             .findByIdAndStatusNot(
-                     id,
-                     RecordStatus.DELETED
-             )
-             .orElseThrow(() ->
-                     new ResourceNotFoundException(
-                             "Fee payment not found"
-                     )
-             );
+        StudentFeePayment payment =
+                studentFeePaymentRepository
+                .findByIdAndStatusNot(
+                        id,
+                        RecordStatus.DELETED
+                )
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Fee payment not found"
+                        )
+                );
 
 
-     // =====================================================
-     // Duplicate Payment Validation
-     // =====================================================
+        // =====================================================
+        // 2. Validate Student
+        // =====================================================
 
-     boolean exists =
-             studentFeePaymentRepository
-             .existsByStudentIdAndAdmissionIdAndAcademicYearAndStatusNotAndIdNot(
-                     dto.getStudentId(),
-                     dto.getAdmissionId(),
-                     dto.getAcademicYear(),
-                     RecordStatus.DELETED,
-                     id
-             );
-
-     if (exists) {
-
-         throw new BusinessException(
-                 "Fee payment already exists for this academic year"
-         );
-     }
+        Student student =
+                studentRepository
+                .findByIdAndStatusNot(
+                        dto.getStudentId(),
+                        RecordStatus.DELETED
+                )
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Student not found"
+                        )
+                );
 
 
-     // =====================================================
-     // Validate Student
-     // =====================================================
+        // =====================================================
+        // 3. Validate Admission
+        // =====================================================
 
-     Student student =
-             studentRepository
-             .findByIdAndStatusNot(
-                     dto.getStudentId(),
-                     RecordStatus.DELETED
-             )
-             .orElseThrow(() ->
-                     new ResourceNotFoundException(
-                             "Student not found"
-                     )
-             );
-
-
-     // =====================================================
-     // Validate Admission
-     // =====================================================
-
-     Admission admission =
-             admissionRepository
-             .findByIdAndAdmissionStatus(
-                     dto.getAdmissionId(),
-                     AdmissionStatus.ACTIVE
-             )
-             .orElseThrow(() ->
-                     new ResourceNotFoundException(
-                             "Active admission not found"
-                     )
-             );
+        Admission admission =
+                admissionRepository
+                .findByIdAndAdmissionStatus(
+                        dto.getAdmissionId(),
+                        AdmissionStatus.ACTIVE
+                )
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Active admission not found"
+                        )
+                );
 
 
-     // =====================================================
-     // Calculate Total Fee
-     // =====================================================
+        // =====================================================
+        // 4. Validate Student & Admission
+        // =====================================================
 
-     BigDecimal totalFee =
-             feeStructureRepository
-             .findTotalFeeByCourseAndSemester(
-                     admission.getCourse().getId(),
-                     admission.getSemester().getId(),
-                     dto.getAcademicYear()
-             );
+        if (!admission.getStudent().getId().equals(student.getId())) {
 
-
-     if (totalFee == null
-             || totalFee.compareTo(BigDecimal.ZERO) <= 0) {
-
-         throw new BusinessException(
-                 "Fee structure not configured"
-         );
-     }
+            throw new BusinessException(
+                    "Admission does not belong to the selected student"
+            );
+        }
 
 
-     // =====================================================
-     // Validate Paid Amount
-     // =====================================================
+        // =====================================================
+        // 5. Validate Academic Year
+        // =====================================================
 
-     if (dto.getPaidAmount() == null) {
+        if (!admission.getAcademicYear().equals(dto.getAcademicYear())) {
 
-         throw new BusinessException(
-                 "Paid amount is required"
-         );
-     }
-
-     if (dto.getPaidAmount().compareTo(BigDecimal.ZERO) < 0) {
-
-         throw new BusinessException(
-                 "Paid amount cannot be negative"
-         );
-     }
-
-     if (dto.getPaidAmount().compareTo(totalFee) > 0) {
-
-         throw new BusinessException(
-                 "Paid amount cannot be greater than total fee"
-         );
-     }
+            throw new BusinessException(
+                    "Academic year does not match admission"
+            );
+        }
 
 
-     // =====================================================
-     // Calculate Due Amount
-     // =====================================================
+        // =====================================================
+        // 6. Duplicate Payment Validation
+        // =====================================================
 
-     BigDecimal dueAmount =
-             totalFee.subtract(
-                     dto.getPaidAmount()
-             );
+        boolean exists =
+                studentFeePaymentRepository
+                .existsByStudentIdAndAdmissionIdAndAcademicYearAndStatusNotAndIdNot(
+                        dto.getStudentId(),
+                        dto.getAdmissionId(),
+                        dto.getAcademicYear(),
+                        RecordStatus.DELETED,
+                        id
+                );
 
+        if (exists) {
 
-     // =====================================================
-     // Calculate Payment Status
-     // =====================================================
-
-     PaymentStatus paymentStatus =
-             calculatePaymentStatus(
-                     dto.getPaidAmount(),
-                     dueAmount
-             );
-
-
-     // =====================================================
-     // Update Entity
-     // =====================================================
-
-     mapper.updateEntity(
-             payment,
-             dto
-     );
-
-     payment.setStudent(student);
-     payment.setAdmission(admission);
-     payment.setTotalFee(totalFee);
-     payment.setDueAmount(dueAmount);
-     payment.setPaymentStatus(paymentStatus);
-     payment.setStatus(RecordStatus.ACTIVE);
+            throw new BusinessException(
+                    "Fee payment already exists for this academic year"
+            );
+        }
 
 
-     // =====================================================
-     // Save
-     // =====================================================
+        // =====================================================
+        // 7. Calculate Total Fee
+        // =====================================================
 
-     StudentFeePayment updated =
-             studentFeePaymentRepository.save(payment);
+        BigDecimal totalFee =
+                feeStructureRepository
+                .findTotalFeeByCourseAndSemester(
+                        admission.getCourse().getId(),
+                        admission.getSemester().getId(),
+                        dto.getAcademicYear()
+                );
 
 
-     return mapper.toDto(updated);
+        // =====================================================
+        // 8. Validate Fee Structure
+        // =====================================================
 
- }
+        if (totalFee == null
+                || totalFee.compareTo(BigDecimal.ZERO) <= 0) {
 
+            throw new BusinessException(
+                    "Fee structure not configured"
+            );
+        }
+
+
+        // =====================================================
+        // 9. Scholarship Validation
+        // =====================================================
+
+        BigDecimal scholarshipAmount = BigDecimal.ZERO;
+
+        StudentScholarship scholarship = null;
+
+        if (dto.getScholarshipId() != null) {
+
+            scholarship =
+                    scholarshipRepository
+                    .findByIdAndStatusNot(
+                            dto.getScholarshipId(),
+                            RecordStatus.DELETED
+                    )
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(
+                                    "Scholarship not found"
+                            )
+                    );
+
+            if (!scholarship.getStudent().getId().equals(student.getId())) {
+
+                throw new BusinessException(
+                        "Scholarship does not belong to the selected student"
+                );
+            }
+
+            if (!scholarship.getAdmission().getId().equals(admission.getId())) {
+
+                throw new BusinessException(
+                        "Scholarship does not belong to the selected admission"
+                );
+            }
+
+            if (!scholarship.getAcademicYear().equals(dto.getAcademicYear())) {
+
+                throw new BusinessException(
+                        "Scholarship academic year mismatch"
+                );
+            }
+
+            if (scholarship.getScholarshipStatus() 
+                    == null
+                    ||
+                scholarship.getScholarshipStatus()
+                    != ScholarshipStatus.APPROVED) {
+
+
+                throw new BusinessException(
+                        "Only approved scholarship can be used for fee payment"
+                );
+            }
+
+            
+            if (scholarship.getApprovedAmount() == null) {
+
+                throw new BusinessException(
+                        "Scholarship approved amount is missing"
+                );
+            }
+            
+            scholarshipAmount =
+                    scholarship.getApprovedAmount();
+
+            if (scholarshipAmount.compareTo(totalFee) > 0) {
+
+                throw new BusinessException(
+                        "Scholarship amount cannot exceed total fee"
+                );
+            }
+        }
+
+
+        // =====================================================
+        // 10. Calculate Final Payable Fee
+        // =====================================================
+
+        BigDecimal payableFee =
+                totalFee.subtract(scholarshipAmount);
+
+        if (payableFee.compareTo(BigDecimal.ZERO) < 0) {
+
+            payableFee = BigDecimal.ZERO;
+        }
+
+
+        // =====================================================
+        // 11. Validate Paid Amount
+        // =====================================================
+
+        if (dto.getPaidAmount() == null) {
+
+            throw new BusinessException(
+                    "Paid amount is required"
+            );
+        }
+
+        if (dto.getPaidAmount().compareTo(BigDecimal.ZERO) < 0) {
+
+            throw new BusinessException(
+                    "Paid amount cannot be negative"
+            );
+        }
+
+        if (dto.getPaidAmount().compareTo(payableFee) > 0) {
+
+            throw new BusinessException(
+                    "Paid amount cannot exceed payable fee"
+            );
+        }
+
+
+        // =====================================================
+        // 12. Calculate Due Amount
+        // =====================================================
+
+        BigDecimal dueAmount =
+                payableFee.subtract(dto.getPaidAmount());
+
+
+        // =====================================================
+        // 13. Calculate Payment Status
+        // =====================================================
+
+        PaymentStatus paymentStatus =
+                calculatePaymentStatus(
+                        dto.getPaidAmount(),
+                        dueAmount
+                );
+
+
+        // =====================================================
+        // 14. Update Entity
+        // =====================================================
+
+        mapper.updateEntity(
+                payment,
+                dto
+        );
+
+        payment.setStudent(student);
+
+        payment.setAdmission(admission);
+
+        payment.setScholarship(scholarship);
+
+        payment.setTotalFee(totalFee);
+
+        payment.setDueAmount(dueAmount);
+
+        payment.setPaymentStatus(paymentStatus);
+
+        payment.setStatus(RecordStatus.ACTIVE);
+
+
+        // =====================================================
+        // 15. Save
+        // =====================================================
+
+        StudentFeePayment updated =
+                studentFeePaymentRepository.save(payment);
+
+
+        // =====================================================
+        // 16. Return Response
+        // =====================================================
+
+        return mapper.toDto(updated);
+    }
 
 
 

@@ -1,7 +1,5 @@
 package com.location.state.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,13 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.location.country.dto.CountryResponseDto;
 import com.location.state.dto.StateRequestDto;
 import com.location.state.dto.StateResponseDto;
 import com.location.state.dto.StateSearchDto;
 import com.location.state.service.StateService;
 import com.sms.payload.ApiResponseDto;
-import com.sms.service.StudentService;
 import com.sms.util.ResponseBuilder;
 
 import jakarta.validation.Valid;

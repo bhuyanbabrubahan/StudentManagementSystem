@@ -1,17 +1,18 @@
 package com.sms.fee.mapper;
 
 
+import java.math.BigDecimal;
+
+import org.mapstruct.AfterMapping;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-
 import com.sms.fee.dto.StudentFeePaymentRequestDto;
 import com.sms.fee.dto.StudentFeePaymentResponseDto;
 import com.sms.fee.entity.StudentFeePayment;
-
 
 
 @Mapper(componentModel = "spring")
@@ -24,46 +25,59 @@ public interface StudentFeePaymentMapper {
 
 
     @Mapping(
-        target = "id",
-        ignore = true
+            target = "id",
+            ignore = true
     )
 
     @Mapping(
-        target = "student",
-        ignore = true
+            target = "student",
+            ignore = true
     )
 
     @Mapping(
-        target = "admission",
-        ignore = true
+            target = "admission",
+            ignore = true
     )
 
     @Mapping(
-        target = "totalFee",
-        ignore = true
+            target = "scholarship",
+            ignore = true
     )
 
     @Mapping(
-        target = "dueAmount",
-        ignore = true
+            target = "totalFee",
+            ignore = true
     )
 
     @Mapping(
-        target = "paymentStatus",
-        ignore = true
+            target = "dueAmount",
+            ignore = true
     )
 
     @Mapping(
-        target = "status",
-        ignore = true
+            target = "paymentStatus",
+            ignore = true
     )
-    
-    @Mapping(target = "createdAt", ignore = true)
-	@Mapping(target = "updatedAt", ignore = true)
+
+    @Mapping(
+            target = "status",
+            ignore = true
+    )
+
+    @Mapping(
+            target = "createdAt",
+            ignore = true
+    )
+
+    @Mapping(
+            target = "updatedAt",
+            ignore = true
+    )
 
     StudentFeePayment toEntity(
             StudentFeePaymentRequestDto dto
     );
+
 
 
 
@@ -74,20 +88,48 @@ public interface StudentFeePaymentMapper {
 
 
     @Mapping(
-        source = "student.id",
-        target = "studentId"
+            target = "studentId",
+            source = "student.id"
     )
 
 
     @Mapping(
-        source = "student.firstName",
-        target = "studentName"
+    	    target = "studentName",
+    	    expression = """
+    	    java(
+    	        entity.getStudent() != null
+    	            ? entity.getStudent().getFirstName() + " " + entity.getStudent().getLastName()
+    	            : null
+    	    )
+    	    """
+    	)
+
+
+    @Mapping(
+            target = "admissionId",
+            source = "admission.id"
+    )
+
+
+    // scholarshipId handled in AfterMapping
+
+    @Mapping(
+            target = "scholarshipId",
+            ignore = true
+    )
+
+
+    // calculated runtime fields
+
+    @Mapping(
+            target = "scholarshipAmount",
+            ignore = true
     )
 
 
     @Mapping(
-        source = "admission.id",
-        target = "admissionId"
+            target = "finalPayableAmount",
+            ignore = true
     )
 
 
@@ -100,64 +142,149 @@ public interface StudentFeePaymentMapper {
 
 
     // =====================================================
-    // UPDATE
+    // UPDATE ENTITY
     // =====================================================
 
 
     @BeanMapping(
-        nullValuePropertyMappingStrategy =
-        NullValuePropertyMappingStrategy.IGNORE
+            nullValuePropertyMappingStrategy =
+            NullValuePropertyMappingStrategy.IGNORE
     )
 
 
     @Mapping(
-        target = "id",
-        ignore = true
+            target = "id",
+            ignore = true
     )
-
 
     @Mapping(
-        target = "student",
-        ignore = true
+            target = "student",
+            ignore = true
     )
-
 
     @Mapping(
-        target = "admission",
-        ignore = true
+            target = "admission",
+            ignore = true
     )
-
 
     @Mapping(
-        target = "totalFee",
-        ignore = true
+            target = "scholarship",
+            ignore = true
     )
-
 
     @Mapping(
-        target = "dueAmount",
-        ignore = true
+            target = "totalFee",
+            ignore = true
     )
-
 
     @Mapping(
-        target = "paymentStatus",
-        ignore = true
+            target = "dueAmount",
+            ignore = true
     )
-
 
     @Mapping(
-        target = "status",
-        ignore = true
+            target = "paymentStatus",
+            ignore = true
     )
 
-    @Mapping(target = "createdAt", ignore = true)
-	@Mapping(target = "updatedAt", ignore = true)
+    @Mapping(
+            target = "status",
+            ignore = true
+    )
+
+    @Mapping(
+            target = "createdAt",
+            ignore = true
+    )
+
+    @Mapping(
+            target = "updatedAt",
+            ignore = true
+    )
 
     void updateEntity(
             @MappingTarget StudentFeePayment payment,
             StudentFeePaymentRequestDto dto
     );
+
+
+
+
+
+    // =====================================================
+    // RESPONSE CALCULATION
+    // =====================================================
+
+
+    @AfterMapping
+    default void calculateScholarshipFields(
+            StudentFeePayment entity,
+            @MappingTarget StudentFeePaymentResponseDto dto
+    ) {
+
+
+        BigDecimal scholarshipAmount =
+                BigDecimal.ZERO;
+
+
+
+        if(entity.getScholarship() != null){
+
+
+            dto.setScholarshipId(
+                    entity.getScholarship().getId()
+            );
+
+
+            if(entity.getScholarship().getApprovedAmount() != null){
+
+                scholarshipAmount =
+                        entity.getScholarship()
+                        .getApprovedAmount();
+
+            }
+
+        }
+        else{
+
+            dto.setScholarshipId(null);
+
+        }
+
+
+
+        dto.setScholarshipAmount(
+                scholarshipAmount
+        );
+
+
+
+
+        if(entity.getTotalFee() != null){
+
+
+        	BigDecimal payable =
+        	        entity.getTotalFee()
+        	              .subtract(scholarshipAmount);
+
+        	if (payable.compareTo(BigDecimal.ZERO) < 0) {
+        	    payable = BigDecimal.ZERO;
+        	}
+
+        	dto.setFinalPayableAmount(payable);
+
+        }
+        else{
+
+
+            dto.setFinalPayableAmount(
+                    BigDecimal.ZERO
+            );
+
+        }
+
+
+    }
 
 
 }

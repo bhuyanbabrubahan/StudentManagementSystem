@@ -17,7 +17,6 @@ import com.location.state.repository.StateRepository;
 import com.location.state.service.StateService;
 import com.location.state.specification.StateSpecification;
 import com.sms.exception.DuplicateResourceException;
-import com.sms.exception.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 

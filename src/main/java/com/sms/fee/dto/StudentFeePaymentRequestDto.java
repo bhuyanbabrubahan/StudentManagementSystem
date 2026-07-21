@@ -37,7 +37,13 @@ public class StudentFeePaymentRequestDto {
     private Long studentId;
 
 
-
+    @Schema(
+    		 description = "Scholarship id if applicable",
+    		 example = "1"
+    		)
+    private Long scholarshipId;
+    
+    
     // ==========================
     // Admission
     // ==========================

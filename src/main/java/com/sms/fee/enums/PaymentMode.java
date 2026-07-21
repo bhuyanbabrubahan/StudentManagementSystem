@@ -8,5 +8,7 @@ public enum PaymentMode {
 
     CARD,
 
-    UPI
+    UPI,
+    
+    CHEQUE
 }
